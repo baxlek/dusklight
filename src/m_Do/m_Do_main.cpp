@@ -46,6 +46,7 @@
 #include <thread>
 #include "SSystem/SComponent/c_API.h"
 #include "dusk/app_info.hpp"
+#include "dusk/crash_reporting.h"
 #include "dusk/dusk.h"
 #include "dusk/frame_interpolation.h"
 #include "dusk/gyro_aim.h"
@@ -245,6 +246,8 @@ void main01(void) {
         }
 
         if (dusk::getSettings().game.enableFrameInterpolation) {
+            dusk::frame_interp::notify_presentation_frame();
+
             while (accumulator >= kSimStepSeconds) {
                 mDoCPd_c::read();
                 if (dusk::getSettings().game.enableGyroAim) {
@@ -434,6 +437,7 @@ int game_main(int argc, char* argv[]) {
         arg_options.add_options()
             ("l,log-level", "Log level from " + std::to_string(AuroraLogLevel::LOG_DEBUG) + " to " + std::to_string(AuroraLogLevel::LOG_FATAL), cxxopts::value<uint8_t>()->default_value("0"))
             ("h,help", "Print usage")
+            ("console", "Show the Windows console window for logs", cxxopts::value<bool>()->default_value("false")->implicit_value("true"))
             ("dvd", "Path to DVD image file", cxxopts::value<std::string>())
             ("backend", "Graphics API backend to use (auto, d3d12, metal, vulkan, null)", cxxopts::value<std::string>())
             ("cvar", "Override configuration variables without modifying config", cxxopts::value<std::vector<std::string>>());
@@ -459,6 +463,7 @@ int game_main(int argc, char* argv[]) {
 
     dusk::config::LoadFromUserPreferences();
     ApplyCVarOverrides(parsed_arg_options["cvar"]);
+    dusk::InitializeCrashReporting();
 
     AuroraConfig config{};
     config.appName = dusk::AppName;
@@ -514,6 +519,7 @@ int game_main(int argc, char* argv[]) {
     if (!dvd_opened) {
         // pre game launch ui main loop
         if (!launchUILoop()) {
+            dusk::ShutdownCrashReporting();
             aurora_shutdown();
             return 0;
         }
@@ -551,6 +557,7 @@ int game_main(int argc, char* argv[]) {
 
     main01();
 
+    dusk::ShutdownCrashReporting();
     fflush(stdout);
     fflush(stderr);
 
