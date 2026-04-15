@@ -1074,7 +1074,7 @@ static int (*item_getcheck_func_ptr_randomizer[256])() = {
 
 inline int getCheckItemFunc(u8 i_itemNo) {
 #if TARGET_PC
-    (dComIfG_isRandomizer() ? item_getcheck_func_ptr_randomizer : item_getcheck_func_ptr)[i_itemNo]();
+    return (dComIfG_isRandomizer() ? item_getcheck_func_ptr_randomizer : item_getcheck_func_ptr)[i_itemNo]();
 #else
     return item_getcheck_func_ptr[i_itemNo]();
 #endif
