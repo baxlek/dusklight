@@ -442,6 +442,13 @@ void dSv_player_item_c::setLineUpItem() {
             slot_idx++;
         }
     }
+
+#if TARGET_PC
+    // Allow rando to use all item slots
+    if (dComIfG_isRandomizer()) {
+        mItemSlots[23] = 7;
+    }
+#endif
 }
 
 u8 dSv_player_item_c::getLineUpItem(int i_slotNo) const {
