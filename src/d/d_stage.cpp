@@ -2929,6 +2929,12 @@ int dStage_changeScene4Event(int i_exitId, s8 room_no, int i_wipe, bool param_3,
     }
 
     if (timeH < 31) {
+#if TARGET_PC
+        // If randomizer is active and we're loading the first spawn, set our starting time of day
+        if (dComIfG_isRandomizer() && strcmp(scls_info->mStage, "F_SP103") == 0 &&
+            scls_info->mRoom == 1 && scls_info->mStart == 1)
+            timeH = dComIfG_getRandomizer().mStartHour;
+#endif
         dKy_set_nexttime(15.0f * timeH);
     }
 

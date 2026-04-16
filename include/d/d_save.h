@@ -971,6 +971,8 @@ public:
     std::unordered_map<std::string, std::unordered_map<u8, u8>> mTreasureChestOverrides{};
     std::unordered_map<std::string, std::unordered_map<u8, u8>> mPoeOverrides{};
 
+    u8 mStartHour{0};
+
     void clear();
 };
 #endif

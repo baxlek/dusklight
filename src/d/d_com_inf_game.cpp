@@ -2980,6 +2980,17 @@ void dComIfGs_setupRandomizerSave() {
         execItemGet(static_cast<u8>(item->GetID()));
     }
 
+    // Set starting time of day
+    const auto startTimeSetting = world->Setting("Starting Time of Day");
+    if (startTimeSetting == "Morning")
+        randoData.mStartHour = 6;
+    else if (startTimeSetting == "Noon")
+        randoData.mStartHour = 12;
+    else if (startTimeSetting == "Evening")
+        randoData.mStartHour = 18;
+    else if (startTimeSetting == "Night")
+        randoData.mStartHour = 24;
+
     DuskLog.debug("Created Rando Save");
 }
 #endif
