@@ -573,6 +573,9 @@ int daNpc_ykW_c::isDelete() {
     case 0:
         return 0;
     case 1:
+#if TARGET_PC
+        if (randomizer_IsActive()) return false;// We don't want Yeta to leave the dungeon, even if the BK is obtained.
+#endif
         return dComIfGs_isDungeonItemBossKey();
     case 2:
         return !dComIfGs_isDungeonItemBossKey() ||
