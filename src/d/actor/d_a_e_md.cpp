@@ -396,7 +396,12 @@ inline int daE_MD_c::create() {
     int phase_state = dComIfG_resLoad(&mPhase, "E_MD");
     if (phase_state == cPhs_COMPLEATE_e) {
         OS_REPORT("E_MD PARAM %x\n", fopAcM_GetParam(this));
+#if TARGET_PC
+        // We want the statues to spawn in rando, regardles of boss flag value.
+        if ((cDmr_SkipInfo != 0 || randomizer_IsActive()) && current.pos.z > -1500.0f) {
+#else
         if (cDmr_SkipInfo != 0 && current.pos.z > -1500.0f) {
+#endif
             return cPhs_ERROR_e;
         }
 
