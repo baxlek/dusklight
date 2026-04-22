@@ -108,7 +108,7 @@ int daItemShield_c::__CreateHeap() {
 
 int daItemShield_c::create() {
     fopAcM_ct(this, daItemShield_c);
-    m_itemNo = dItemNo_WOOD_SHIELD_e;
+    m_itemNo = IF_DUSK(randomizer_IsActive() ? randomizer_getItemAtLocation("Ordon Shield") : ) dItemNo_WOOD_SHIELD_e;
     if (fopAcM_isSwitch(this, getSwBit2())) {
         OS_REPORT("木の盾：もう取ったので出ません\n");
         return cPhs_ERROR_e;
