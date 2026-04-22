@@ -22,9 +22,11 @@
 #include <cstdio>
 #include <cstring>
 
+
+#if TARGET_PC
 #include "dusk/logging.h"
 #include "dusk/string.hpp"
-#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include <format>
 #include <fmt/ranges.h>
 #endif
@@ -1594,6 +1596,22 @@ u8 dStage_roomControl_c::mNoArcBank;
 
 static void dStage_actorCreate(stage_actor_data_class* i_actorData, fopAcM_prm_class* i_actorPrm) {
     dStage_objectNameInf* actorInf = dStage_searchName(i_actorData->name);
+
+
+#if TARGET_PC
+    // If randomizer is active, override the data for this actor if it's in the actorPatches
+    if (randomizer_IsActive()) {
+        auto currentStageKey = getActorPatchesCurrentStageKey();
+        if (randomizer_GetContext().mActorPatches.contains(currentStageKey)) {
+            const auto& patches = randomizer_GetContext().mActorPatches.at(currentStageKey);
+            auto actorKey = getActorCRC32(i_actorData);
+            if (patches.contains(actorKey)) {
+                const auto& patchedActorData = patches.at(actorKey);
+                std::memcpy(i_actorPrm, patchedActorData.data() + 8, RandomizerContext::ACTOR_CRC_SIZE - 8);
+            }
+        }
+    }
+#endif
 
     if (actorInf == NULL) {
         OS_REPORT("\x1B""[43;30mStage Actor Name Nothing !! <%s>\n\x1B[m", i_actorData->name);

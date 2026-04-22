@@ -2492,6 +2492,12 @@ inline s8 dComIfGp_getStartStageRoomNo() {
     return g_dComIfG_gameInfo.play.getStartStageRoomNo();
 }
 
+#if TARGET_PC
+inline s8 dComIfGp_getLayerNo() {
+    return g_dComIfG_gameInfo.play.getLayerNo(0);
+}
+#endif
+
 inline s8 dComIfGp_getStartStageLayer() {
     return g_dComIfG_gameInfo.play.getStartStageLayer();
 }

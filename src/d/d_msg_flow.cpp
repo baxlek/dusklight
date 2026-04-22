@@ -15,6 +15,10 @@
 #include "SSystem/SComponent/c_math.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/stages.h"
+#endif
+
 dMsgFlow_c::dMsgFlow_c() {
     mNonStopJunpFlowFlag = 0;
     setInitValue(1);
@@ -1133,6 +1137,20 @@ u16 dMsgFlow_c::query021(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
 u16 dMsgFlow_c::query022(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u8 prm0 = i_flowNode_p->param;
     u16 ret = checkItemGet(prm0 & 0xFF, 1) ? 0 : 1;
+
+#if TARGET_PC
+    // Check to see if we're currently in one of the Ordon interiors
+    if (randomizer_IsActive() && daAlink_c::checkStageName(allStages[Ordon_Village_Interiors]))
+    {
+        // Check to see if checking for the Iron Boots
+        if (prm0 == dItemNo_Randomizer_HVY_BOOTS_e)
+        {
+            // Return false so that the door in Bo's house can be opened without having the
+            // Iron Boots
+            return 0;
+        }
+    }
+#endif
 
     if (param_2 != 0) {
         // "Get Check"

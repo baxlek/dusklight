@@ -882,7 +882,11 @@ u8 daNpc_zrC_c::getTypeFromParam() {
 
 int daNpc_zrC_c::isDelete() {
     if (mType == 4 || mType == 0 || mType == 1 || (mType == 2 && daNpcF_chkEvtBit(0x108)
+#if TARGET_PC
+        && (!daNpcF_chkEvtBit(0x10A) || randomizer_IsActive())) || mType == 3)
+#else
         && !daNpcF_chkEvtBit(0x10A)) || mType == 3)
+#endif
     {
         return false;
     }

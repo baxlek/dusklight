@@ -11469,6 +11469,14 @@ int daAlink_c::orderTalk(int i_checkZTalk) {
 static void* daAlink_searchBouDoor(fopAc_ac_c* i_actor, void* i_data) {
     UNUSED(i_data);
 
+#if TARGET_PC
+    // In randomizer, we don't want Bo preventing us from entering his house on Day 2
+    if (randomizer_IsActive() && daAlink_c::checkStageName("F_SP103"))
+    {
+        return NULL;
+    }
+#endif
+
     if (fopAcM_GetName(i_actor) == fpcNm_NPC_BOU_e && ((daNpc_Bou_c*)i_actor)->speakTo()) {
         return i_actor;
     }
