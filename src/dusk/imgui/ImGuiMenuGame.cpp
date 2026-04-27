@@ -12,14 +12,26 @@
 #include "dusk/main.h"
 #include "dusk/hotkeys.h"
 #include "dusk/settings.h"
+#include "dusk/livesplit.h"
 #include "m_Do/m_Do_controller_pad.h"
 #include "m_Do/m_Do_graphic.h"
 
 #include <aurora/gfx.h>
 #include <SDL3/SDL_gamepad.h>
 
+#include "m_Do/m_Do_main.h"
+
 namespace {
 constexpr int kInternalResolutionScaleMax = 12;
+
+bool is_controller_neutral(int port) {
+    if (port < 0) {
+        return true;
+    }
+
+    return PADGetNativeButtonPressed(port) == -1 &&
+           PADGetNativeAxisPulled(port).nativeAxis == -1;
+}
 }  // namespace
 
 namespace aurora::gx {
@@ -167,6 +179,8 @@ namespace dusk {
 
             config::ImGuiCheckbox("Enable Depth of Field", getSettings().game.enableDepthOfField);
 
+            config::ImGuiCheckbox("Enable Mini-Map Shadows", getSettings().game.enableMapBackground);
+
             ImGui::EndMenu();
         }
     }
@@ -191,7 +205,7 @@ namespace dusk {
                 ImGui::SetTooltip("Restores patched glitches from Wii USA 1.0,\n"
                                   "the first released version.");
             }
-            
+
             config::ImGuiCheckbox("Enable Rotating Link Doll", getSettings().game.enableLinkDollRotation);
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("Enables rotating Link in the collection menu with the C-Stick");
@@ -199,6 +213,7 @@ namespace dusk {
 
             ImGui::SeparatorText("Difficulty");
 
+            ImGui::BeginDisabled(getSettings().game.speedrunMode);
             config::ImGuiSliderInt("Damage Multiplier", getSettings().game.damageMultiplier, 1, 8, "x%d");
 
             config::ImGuiCheckbox("Instant Death", getSettings().game.instantDeath);
@@ -211,6 +226,7 @@ namespace dusk {
                 ImGui::SetTooltip("Hearts will never drop from enemies,\n"
                                   "pots and various other places.");
             }
+            ImGui::EndDisabled();
 
             ImGui::SeparatorText("Quality of Life");
 
@@ -280,12 +296,39 @@ namespace dusk {
                 ImGui::SetTooltip("Transform instantly by pressing R and Y simultaneously.");
             }
 
+            ImGui::SeparatorText("Speedrunning");
+            if (config::ImGuiCheckbox("Speedrun Mode", getSettings().game.speedrunMode)) {
+                resetForSpeedrunMode();
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Enables Speedrunning options, while restricting certain gameplay modifiers.");
+            }
+
+            ImGui::BeginDisabled(!getSettings().game.speedrunMode);
+            bool prevLiveSplit = getSettings().game.liveSplitEnabled;
+            config::ImGuiCheckbox("LiveSplit Connection", getSettings().game.liveSplitEnabled);
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Connect to LiveSplit server on localhost:16834.");
+            }
+            ImGui::EndDisabled();
+
+            if ((bool)getSettings().game.liveSplitEnabled != prevLiveSplit) {
+                if (getSettings().game.liveSplitEnabled) {
+                    dusk::speedrun::connectLiveSplit();
+                } else {
+                    dusk::speedrun::disconnectLiveSplit();
+                    DuskToast("LiveSplit disconnected", 3.f);
+                }
+            }
+
             ImGui::EndMenu();
         }
     }
 
     void ImGuiMenuGame::drawCheatsMenu() {
         if (ImGui::BeginMenu("Cheats")) {
+            ImGui::BeginDisabled(getSettings().game.speedrunMode);
+
             ImGui::SeparatorText("Resources");
             config::ImGuiCheckbox("Infinite Hearts", getSettings().game.infiniteHearts);
             config::ImGuiCheckbox("Infinite Arrows", getSettings().game.infiniteArrows);
@@ -293,8 +336,8 @@ namespace dusk {
             config::ImGuiCheckbox("Infinite Oil", getSettings().game.infiniteOil);
             config::ImGuiCheckbox("Infinite Oxygen", getSettings().game.infiniteOxygen);
             config::ImGuiCheckbox("Infinite Rupees", getSettings().game.infiniteRupees);
-            config::ImGuiCheckbox("Items Don't Despawn", getSettings().game.enableIndefiniteItemDrops);
-            ImGui::SetItemTooltip("Items Don't Despawn Unless You Load A Different Room In Which Case They Do But Even Under Some Circumstances They Don't, It Is Quite Rare Though");
+            config::ImGuiCheckbox("No Item Timer", getSettings().game.enableIndefiniteItemDrops);
+            ImGui::SetItemTooltip("Item drops such as Rupees, Hearts, etc. will never disappear after they drop.");
 
             ImGui::SeparatorText("Abilities");
             config::ImGuiCheckbox("Moon Jump (R+A)", getSettings().game.moonJump);
@@ -316,6 +359,8 @@ namespace dusk {
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("Makes the magic armor work without rupees.");
             }
+
+            ImGui::EndDisabled();
 
             ImGui::EndMenu();
         }
@@ -439,10 +484,12 @@ namespace dusk {
 
             ImGui::SeparatorText("Tools");
 
+            ImGui::BeginDisabled(getSettings().game.speedrunMode);
             config::ImGuiCheckbox("Turbo Key", getSettings().game.enableTurboKeybind);
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("Hold TAB to increase game speed by up to 4x.");
             }
+            ImGui::EndDisabled();
 
             ImGui::Checkbox("Show Input Viewer", &m_showInputViewer);
 
@@ -604,39 +651,90 @@ namespace dusk {
 
     void ImGuiMenuGame::windowControllerConfig() {
         if (!m_showControllerConfig) {
+            if (m_controllerConfig.m_isReading ||
+                m_controllerConfig.m_suppressRemapActivationUntilRelease)
+            {
+                m_controllerConfig.m_isReading = false;
+                m_controllerConfig.m_pendingButtonMapping = nullptr;
+                m_controllerConfig.m_pendingAxisMapping = nullptr;
+                m_controllerConfig.m_pendingPort = -1;
+                m_controllerConfig.m_waitForInputRelease = false;
+                m_controllerConfig.m_suppressRemapActivationUntilRelease = false;
+                m_controllerConfig.m_suppressRemapActivationPort = -1;
+                PADBlockInput(false);
+            }
             return;
         }
 
+        bool suppressRemapActivationThisFrame = m_controllerConfig.m_suppressRemapActivationUntilRelease;
+        if (m_controllerConfig.m_suppressRemapActivationUntilRelease &&
+            is_controller_neutral(m_controllerConfig.m_suppressRemapActivationPort))
+        {
+            m_controllerConfig.m_suppressRemapActivationUntilRelease = false;
+            m_controllerConfig.m_suppressRemapActivationPort = -1;
+            PADBlockInput(false);
+        }
+
+        if ((m_controllerConfig.m_pendingButtonMapping != nullptr ||
+             m_controllerConfig.m_pendingAxisMapping != nullptr) &&
+            m_controllerConfig.m_waitForInputRelease)
+        {
+            m_controllerConfig.m_waitForInputRelease =
+                !is_controller_neutral(m_controllerConfig.m_pendingPort);
+        }
+
         // if pending for a button mapping, check to set new input
-        if (m_controllerConfig.m_pendingButtonMapping != nullptr) {
+        if (m_controllerConfig.m_pendingButtonMapping != nullptr &&
+            !m_controllerConfig.m_waitForInputRelease)
+        {
             s32 nativeButton = PADGetNativeButtonPressed(m_controllerConfig.m_pendingPort);
             if (nativeButton != -1) {
+                const int suppressPort = m_controllerConfig.m_pendingPort;
                 m_controllerConfig.m_pendingButtonMapping->nativeButton = nativeButton;
                 m_controllerConfig.m_pendingButtonMapping = nullptr;
                 m_controllerConfig.m_pendingPort = -1;
-                PADBlockInput(false);
+                m_controllerConfig.m_isReading = false;
+                m_controllerConfig.m_waitForInputRelease = false;
+                m_controllerConfig.m_suppressRemapActivationUntilRelease = true;
+                m_controllerConfig.m_suppressRemapActivationPort = suppressPort;
+                suppressRemapActivationThisFrame = true;
+                PADBlockInput(true);
                 PADSerializeMappings();
             }
         }
 
         // if pending for an axis mapping, check to set new input
-        if (m_controllerConfig.m_pendingAxisMapping != nullptr) {
+        if (m_controllerConfig.m_pendingAxisMapping != nullptr &&
+            !m_controllerConfig.m_waitForInputRelease)
+        {
             auto nativeAxis = PADGetNativeAxisPulled(m_controllerConfig.m_pendingPort);
             if (nativeAxis.nativeAxis != -1) {
+                const int suppressPort = m_controllerConfig.m_pendingPort;
                 m_controllerConfig.m_pendingAxisMapping->nativeAxis = nativeAxis;
                 m_controllerConfig.m_pendingAxisMapping->nativeButton = -1;
                 m_controllerConfig.m_pendingAxisMapping = nullptr;
                 m_controllerConfig.m_pendingPort = -1;
-                PADBlockInput(false);
+                m_controllerConfig.m_isReading = false;
+                m_controllerConfig.m_waitForInputRelease = false;
+                m_controllerConfig.m_suppressRemapActivationUntilRelease = true;
+                m_controllerConfig.m_suppressRemapActivationPort = suppressPort;
+                suppressRemapActivationThisFrame = true;
+                PADBlockInput(true);
                 PADSerializeMappings();
             } else {
                 auto nativeButton = PADGetNativeButtonPressed(m_controllerConfig.m_pendingPort);
                 if (nativeButton != -1) {
+                    const int suppressPort = m_controllerConfig.m_pendingPort;
                     m_controllerConfig.m_pendingAxisMapping->nativeAxis = {-1, AXIS_SIGN_POSITIVE};
                     m_controllerConfig.m_pendingAxisMapping->nativeButton = nativeButton;
                     m_controllerConfig.m_pendingAxisMapping = nullptr;
                     m_controllerConfig.m_pendingPort = -1;
-                    PADBlockInput(false);
+                    m_controllerConfig.m_isReading = false;
+                    m_controllerConfig.m_waitForInputRelease = false;
+                    m_controllerConfig.m_suppressRemapActivationUntilRelease = true;
+                    m_controllerConfig.m_suppressRemapActivationPort = suppressPort;
+                    suppressRemapActivationThisFrame = true;
+                    PADBlockInput(true);
                     PADSerializeMappings();
                 }
             }
@@ -672,6 +770,10 @@ namespace dusk {
             m_controllerConfig.m_pendingButtonMapping = nullptr;
             m_controllerConfig.m_pendingAxisMapping = nullptr;
             m_controllerConfig.m_pendingPort = -1;
+            m_controllerConfig.m_waitForInputRelease = false;
+            m_controllerConfig.m_isReading = false;
+            m_controllerConfig.m_suppressRemapActivationUntilRelease = false;
+            m_controllerConfig.m_suppressRemapActivationPort = -1;
             PADBlockInput(false);
         }
 
@@ -748,7 +850,7 @@ namespace dusk {
 
                 std::string dispName;
                 if (m_controllerConfig.m_isReading && m_controllerConfig.m_pendingButtonMapping == &btnMappingList[i]) {
-                    dispName = fmt::format("Press a Key...##{}", btnName);
+                    dispName = fmt::format("{}##{}", m_controllerConfig.m_waitForInputRelease ? "Release..." : "Press a Key...", btnName);
                 } else {
                     const char* nativeName = GetNameForGamepadButton(gamepad, btnMappingList[i].nativeButton);
                     if (nativeName == nullptr) {
@@ -759,10 +861,11 @@ namespace dusk {
                 bool pressed = ImGui::Button(dispName.c_str(),
                     btnSize);
 
-                if (pressed) {
+                if (pressed && !m_controllerConfig.m_isReading && !suppressRemapActivationThisFrame) {
                     m_controllerConfig.m_isReading = true;
                     m_controllerConfig.m_pendingPort = m_controllerConfig.m_selectedPort;
                     m_controllerConfig.m_pendingButtonMapping = &btnMappingList[i];
+                    m_controllerConfig.m_waitForInputRelease = true;
                     PADBlockInput(true);
                 }
             }
@@ -792,17 +895,18 @@ namespace dusk {
 
                 std::string dispName;
                 if (m_controllerConfig.m_isReading && m_controllerConfig.m_pendingAxisMapping == &axisMappingList[trigger]) {
-                    dispName = fmt::format("Press a Key...##{}", axisName);
+                    dispName = fmt::format("{}##{}", m_controllerConfig.m_waitForInputRelease ? "Release..." : "Press a Key...", axisName);
                 } else {
                     dispName = fmt::format("{0}##-{1}", PADGetNativeAxisName(axisMappingList[trigger].nativeAxis), trigger);
                 }
                 bool pressed = ImGui::Button(dispName.c_str(),
                     btnSize);
 
-                if (pressed) {
+                if (pressed && !m_controllerConfig.m_isReading && !suppressRemapActivationThisFrame) {
                     m_controllerConfig.m_isReading = true;
                     m_controllerConfig.m_pendingPort = m_controllerConfig.m_selectedPort;
                     m_controllerConfig.m_pendingAxisMapping = &axisMappingList[trigger];
+                    m_controllerConfig.m_waitForInputRelease = true;
                     PADBlockInput(true);
                 }
             }
@@ -859,7 +963,7 @@ namespace dusk {
 
                 std::string dispName;
                 if (m_controllerConfig.m_isReading && m_controllerConfig.m_pendingAxisMapping == &axisMappingList[axis]) {
-                    dispName = fmt::format("Press a Key...##{}", label);
+                    dispName = fmt::format("{}##{}", m_controllerConfig.m_waitForInputRelease ? "Release..." : "Press a Key...", label);
                 } else {
                     if (axisMappingList[axis].nativeAxis.nativeAxis != -1) {
                         const char* signStr;
@@ -878,10 +982,11 @@ namespace dusk {
                 }
                 bool pressed = ImGui::Button(dispName.c_str(), btnSize);
 
-                if (pressed) {
+                if (pressed && !m_controllerConfig.m_isReading && !suppressRemapActivationThisFrame) {
                     m_controllerConfig.m_isReading = true;
                     m_controllerConfig.m_pendingPort = m_controllerConfig.m_selectedPort;
                     m_controllerConfig.m_pendingAxisMapping = &axisMappingList[axis];
+                    m_controllerConfig.m_waitForInputRelease = true;
                     PADBlockInput(true);
                 }
             }
@@ -922,7 +1027,7 @@ namespace dusk {
 
                 std::string dispName;
                 if (m_controllerConfig.m_isReading && m_controllerConfig.m_pendingAxisMapping == &axisMappingList[axis]) {
-                    dispName = fmt::format("Press a Key...##sub{}", label);
+                    dispName = fmt::format("{}##sub{}", m_controllerConfig.m_waitForInputRelease ? "Release..." : "Press a Key...", label);
                 } else {
                     if (axisMappingList[axis].nativeAxis.nativeAxis != -1) {
                         const char* signStr;
@@ -941,10 +1046,11 @@ namespace dusk {
                 }
                 bool pressed = ImGui::Button(fmt::format("{0}##sub{1}", dispName, label).c_str(), btnSize);
 
-                if (pressed) {
+                if (pressed && !m_controllerConfig.m_isReading && !suppressRemapActivationThisFrame) {
                     m_controllerConfig.m_isReading = true;
                     m_controllerConfig.m_pendingPort = m_controllerConfig.m_selectedPort;
                     m_controllerConfig.m_pendingAxisMapping = &axisMappingList[axis];
+                    m_controllerConfig.m_waitForInputRelease = true;
                     PADBlockInput(true);
                 }
             }
@@ -975,7 +1081,7 @@ namespace dusk {
                 PADSerializeMappings();
             }
         }
-        
+
         if (PADSupportsRumbleIntensity(m_controllerConfig.m_selectedPort)) {
             ImGuiBeginGroupPanel("Rumble Intensity", ImVec2(150 * scale, -1));
             u16 low;
@@ -994,11 +1100,95 @@ namespace dusk {
             if (ImGui::Button(fmt::format("{0}...##rumbleTest", m_controllerConfig.m_isRumbling ? "Stop": "Test").c_str(), {-1, 0})) {
                 PADControlMotor(m_controllerConfig.m_selectedPort, !m_controllerConfig.m_isRumbling ? PAD_MOTOR_RUMBLE : PAD_MOTOR_STOP_HARD);
                 m_controllerConfig.m_isRumbling ^= 1;
-            } 
+            }
             ImGuiEndGroupPanel();
         }
         ImGuiEndGroupPanel();
 
+        ImGui::End();
+    }
+
+    static std::string GetFormattedTime(OSTime ticks) {
+        OSCalendarTime time;
+        OSTicksToCalendarTime(ticks, &time);
+
+        return fmt::format("{0:02}:{1:02}:{2:02}.{3:03}", time.hour, time.min, time.sec, time.msec);
+    }
+
+    void ImGuiMenuGame::resetForSpeedrunMode() {
+        // reset settings that should be off for speedrun mode
+        mDoMain::developmentMode = -1;
+
+        getSettings().game.damageMultiplier.setValue(1);
+        getSettings().game.instantDeath.setValue(false);
+        getSettings().game.noHeartDrops.setValue(false);
+
+        getSettings().game.infiniteHearts.setValue(false);
+        getSettings().game.infiniteArrows.setValue(false);
+        getSettings().game.infiniteBombs.setValue(false);
+        getSettings().game.infiniteOil.setValue(false);
+        getSettings().game.infiniteOxygen.setValue(false);
+        getSettings().game.infiniteRupees.setValue(false);
+        getSettings().game.enableIndefiniteItemDrops.setValue(false);
+
+        getSettings().game.moonJump.setValue(false);
+        getSettings().game.superClawshot.setValue(false);
+        getSettings().game.alwaysGreatspin.setValue(false);
+        getSettings().game.enableFastIronBoots.setValue(false);
+        getSettings().game.canTransformAnywhere.setValue(false);
+        getSettings().game.fastSpinner.setValue(false);
+        getSettings().game.freeMagicArmor.setValue(false);
+
+        getSettings().game.enableTurboKeybind.setValue(false);
+    }
+
+    SpeedrunInfo m_speedrunInfo;
+
+    void ImGuiMenuGame::drawSpeedrunTimerOverlay() {
+        if (!getSettings().game.speedrunMode) {
+            return;
+        }
+
+        // L+R+A+Start to reset timer
+        if (mDoCPd_c::getHoldL(PAD_1) && mDoCPd_c::getHoldR(PAD_1) && mDoCPd_c::getHoldA(PAD_1) && mDoCPd_c::getTrigStart(PAD_1)) {
+            m_speedrunInfo.reset();
+        }
+
+        // L+R+A+Z to manually stop timer
+        if (mDoCPd_c::getHoldL(PAD_1) && mDoCPd_c::getHoldR(PAD_1) && mDoCPd_c::getHoldA(PAD_1) && mDoCPd_c::getTrigZ(PAD_1)) {
+            if (m_speedrunInfo.m_isRunStarted) {
+                m_speedrunInfo.m_endTimestamp = OSGetTime() - m_speedrunInfo.m_startTimestamp;
+                m_speedrunInfo.m_isRunStarted = false;
+            }
+        }
+
+        ImGui::SetNextWindowBgAlpha(0.65f);
+        ImGuiWindowFlags flags =
+            ImGuiWindowFlags_NoResize
+            | ImGuiWindowFlags_NoDocking
+            | ImGuiWindowFlags_NoTitleBar
+            | ImGuiWindowFlags_NoScrollbar;
+
+        if (ImGui::Begin("##SpeedrunTimerWindow", nullptr, flags)) {
+            OSTime elapsedTime = 0;
+            if (m_speedrunInfo.m_isRunStarted) {
+                elapsedTime = OSGetTime() - m_speedrunInfo.m_startTimestamp;
+            } else if (m_speedrunInfo.m_endTimestamp != 0) {
+                elapsedTime = m_speedrunInfo.m_endTimestamp;
+            }
+
+            ImGui::Text("RTA");
+            ImGui::SameLine(60.0f);
+            ImGuiStringViewText(GetFormattedTime(elapsedTime));
+
+            if (!m_speedrunInfo.m_isPauseIGT) {
+                m_speedrunInfo.m_igtTimer = elapsedTime - m_speedrunInfo.m_totalLoadTime;
+            }
+
+            ImGui::Text("IGT");
+            ImGui::SameLine(60.0f);
+            ImGuiStringViewText(GetFormattedTime(m_speedrunInfo.m_igtTimer));
+        }
         ImGui::End();
     }
 }

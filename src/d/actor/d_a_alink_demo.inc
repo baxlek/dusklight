@@ -24,6 +24,7 @@
 #include <cstring>
 
 #if TARGET_PC
+#include "dusk/imgui/ImGuiConsole.hpp"
 #include "dusk/settings.h"
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #endif
@@ -4300,6 +4301,15 @@ int daAlink_c::procGanonFinishInit() {
 
     field_0x37c8 = current.pos;
     onEndResetFlg1(ERFLG1_SHIELD_BACKBONE);
+
+#if TARGET_PC
+    if (dusk::getSettings().game.speedrunMode) {
+        if (dusk::m_speedrunInfo.m_isRunStarted) {
+            dusk::m_speedrunInfo.stopRun();
+        }
+    }
+#endif
+
     return 1;
 }
 
