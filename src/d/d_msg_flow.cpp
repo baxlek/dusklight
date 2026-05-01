@@ -657,6 +657,15 @@ int dMsgFlow_c::branchNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartn
 int dMsgFlow_c::eventNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
     mesg_flow_node_event* node = NULL;
     node = &mFlowNodeTBL[mNodeIdx].event;
+#if TARGET_PC
+    // Overwrite this node if we have a patch for it
+    if (randomizer_IsActive()) {
+        u32 key = (dMsgObject_getGroupID() << 16) | mNodeIdx;
+        if (randomizer_GetContext().mFlowPatches.contains(key)) {
+            node = reinterpret_cast<mesg_flow_node_event*>(&randomizer_GetContext().mFlowPatches[key]);
+        }
+    }
+#endif
     int proc_status = (this->*mEventList[node->event_idx])(node, i_speaker_p);
 
     switch (node->event_idx) {
