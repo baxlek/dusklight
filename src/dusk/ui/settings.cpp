@@ -1164,6 +1164,11 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,
             "Transform instantly by pressing R and Y simultaneously.");
 
+        leftPane.add_section("Equipments");
+        addOption("Enable Deselect Swords", getSettings().game.enableDeselectSwords, "Allows Link to deselect swords. Link will be unable to attack with a sword.");
+        addOption("Enable Deselect Shields", getSettings().game.enableDeselectShields, "Allows Link to deselect shields. Link will be unable to defend with a shield.");
+        addOption("Enable Deselect Clothes", getSettings().game.enableDeselectClothes, "Allows Link to deselect clothes. Link will wear Ordon Clothes.");
+
         leftPane.add_section("Speedrunning");
         config_bool_select(leftPane, rightPane, getSettings().game.speedrunMode,
             {

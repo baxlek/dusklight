@@ -36,6 +36,10 @@
 #include "d/d_menu_window.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 
+#if TARGET_PC
+#include "dusk/settings.h"
+#endif
+
 typedef void (dMenu_Collect2D_c::*initFunc)();
 static initFunc init[] = {
     &dMenu_Collect2D_c::wait_init,          &dMenu_Collect2D_c::save_open_init,
@@ -497,6 +501,18 @@ void dMenu_Collect2D_c::screenSet() {
     field_0x22d[0][2] = 0;
     field_0x22d[1][2] = 0;
     field_0x22d[2][2] = 0;
+#if TARGET_PC
+    if (dComIfGs_getSelectEquipClothes() == dItemNo_WEAR_CASUAL_e
+        && !dusk::getSettings().game.enableDeselectClothes) {
+        field_0x22d[3][2] = 0;
+        field_0x22d[4][2] = 0;
+        field_0x22d[5][2] = 0;
+    } else {
+        field_0x22d[3][2] = dComIfGs_isItemFirstBit(0x2F);
+        field_0x22d[4][2] = dComIfGs_isItemFirstBit(0x31);
+        field_0x22d[5][2] = dComIfGs_isItemFirstBit(0x30);
+    }
+#else
     if (dComIfGs_getSelectEquipClothes() == dItemNo_WEAR_CASUAL_e) {
         field_0x22d[3][2] = 0;
         field_0x22d[4][2] = 0;
@@ -506,6 +522,7 @@ void dMenu_Collect2D_c::screenSet() {
         field_0x22d[4][2] = dComIfGs_isItemFirstBit(0x31);
         field_0x22d[5][2] = dComIfGs_isItemFirstBit(0x30);
     }
+#endif
     field_0x22d[6][2] = 0;
     field_0x22d[0][3] = 1;
     if (checkItemGet(dItemNo_BOW_e, 1)) {
@@ -1129,15 +1146,32 @@ void dMenu_Collect2D_c::changeSword() {
                 mDoAud_seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0);
                 dMeter2Info_set2DVibration();
             }
+#if TARGET_PC
+            else if (dusk::getSettings().game.enableDeselectSwords) {
+                dMeter2Info_setSword(dItemNo_NONE_e, false);
+                setEquipItemFrameColorSword(-1);
+                mDoAud_seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0);
+                dMeter2Info_set2DVibration();
+            }
+#endif
         } else if (dComIfGs_getSelectEquipSword() != dItemNo_WOOD_STICK_e) {
             dMeter2Info_setSword(dItemNo_WOOD_STICK_e, false);
             setEquipItemFrameColorSword(0);
             Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
             dMeter2Info_set2DVibration();
         }
+#if TARGET_PC
+        else if (dusk::getSettings().game.enableDeselectSwords) {
+            dMeter2Info_setSword(dItemNo_NONE_e, false);
+            setEquipItemFrameColorSword(0);
+            Z2GetAudioMgr()->seStart(
+                Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            dMeter2Info_set2DVibration();
+        }
+#endif
         break;
     case 4:
-        if (dComIfGs_isItemFirstBit(dItemNo_LIGHT_SWORD_e)) {
+        if (dComIfGs_isItemFirstBit(dItemNo_LIGHT_SWORD_e)) {      
             if (dComIfGs_getSelectEquipSword() != dItemNo_LIGHT_SWORD_e) {
                 dMeter2Info_setSword(dItemNo_LIGHT_SWORD_e, false);
                 setEquipItemFrameColorSword(1);
@@ -1145,12 +1179,29 @@ void dMenu_Collect2D_c::changeSword() {
                                          0);
                 dMeter2Info_set2DVibration();
             }
-        } else if (dComIfGs_getSelectEquipSword() != dItemNo_MASTER_SWORD_e) {
+#if TARGET_PC
+            else if (dusk::getSettings().game.enableDeselectSwords) {
+                dMeter2Info_setSword(dItemNo_NONE_e, false);
+                setEquipItemFrameColorSword(-1);
+                mDoAud_seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0);
+                dMeter2Info_set2DVibration();
+            }
+#endif
+        }
+        else if (dComIfGs_getSelectEquipSword() != dItemNo_MASTER_SWORD_e) {
             dMeter2Info_setSword(dItemNo_MASTER_SWORD_e, false);
             setEquipItemFrameColorSword(1);
             Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
             dMeter2Info_set2DVibration();
         }
+#if TARGET_PC
+        else if (dusk::getSettings().game.enableDeselectSwords) {
+            dMeter2Info_setSword(dItemNo_NONE_e, false);
+            setEquipItemFrameColorSword(-1);
+            mDoAud_seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0);
+            dMeter2Info_set2DVibration();   
+        }
+#endif
         break;
     case 5:
         if (dComIfGs_getSelectEquipSword() != dItemNo_LIGHT_SWORD_e) {
@@ -1159,6 +1210,14 @@ void dMenu_Collect2D_c::changeSword() {
             Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
             dMeter2Info_set2DVibration();
         }
+#if TARGET_PC
+        else if (dusk::getSettings().game.enableDeselectSwords) {
+            dMeter2Info_setSword(dItemNo_NONE_e, false);
+            setEquipItemFrameColorSword(-1);
+            mDoAud_seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0);
+            dMeter2Info_set2DVibration();
+        }
+#endif
         break;
     }
 }
@@ -1175,6 +1234,16 @@ void dMenu_Collect2D_c::changeShield() {
                                          0);
                 dMeter2Info_set2DVibration();
             }
+#if TARGET_PC
+            else if (dusk::getSettings().game.enableDeselectShields) {
+                dMeter2Info_setShield(dItemNo_NONE_e, false);
+                setEquipItemFrameColorShield(-1);
+                daAlink_getAlinkActorClass()->setShieldChange();
+                Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
+                                         0);
+                dMeter2Info_set2DVibration();
+            }
+#endif
         } else if (dComIfGs_isItemFirstBit(dItemNo_WOOD_SHIELD_e)) {
             if (dComIfGs_getSelectEquipShield() != dItemNo_WOOD_SHIELD_e) {
                 dMeter2Info_setShield(dItemNo_WOOD_SHIELD_e, false);
@@ -1184,6 +1253,16 @@ void dMenu_Collect2D_c::changeShield() {
                                          0);
                 dMeter2Info_set2DVibration();
             }
+#if TARGET_PC
+            else if (dusk::getSettings().game.enableDeselectShields) {
+                dMeter2Info_setShield(dItemNo_NONE_e, false);
+                setEquipItemFrameColorShield(-1);
+                daAlink_getAlinkActorClass()->setShieldChange();
+                Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
+                                         0);
+                dMeter2Info_set2DVibration();           
+            }
+#endif
         }
         break;
     case 4:
@@ -1194,6 +1273,15 @@ void dMenu_Collect2D_c::changeShield() {
             Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
             dMeter2Info_set2DVibration();
         }
+#if TARGET_PC
+        else if (dusk::getSettings().game.enableDeselectShields) {
+            dMeter2Info_setShield(dItemNo_NONE_e, false);
+            setEquipItemFrameColorShield(-1);
+            daAlink_getAlinkActorClass()->setShieldChange();
+            Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            dMeter2Info_set2DVibration();      
+        }
+#endif
         break;
     }
 }
@@ -1208,6 +1296,15 @@ void dMenu_Collect2D_c::changeClothe() {
             Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
             dMeter2Info_set2DVibration();
         }
+#if TARGET_PC
+        else if (dusk::getSettings().game.enableDeselectClothes) {
+            dMeter2Info_setCloth(dItemNo_WEAR_CASUAL_e, false);
+            setEquipItemFrameColorClothes(-1);
+            daPy_getPlayerActorClass()->setClothesChange(0);
+            Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            dMeter2Info_set2DVibration();
+        }
+#endif
         break;
     case 4:
         if (dComIfGs_getSelectEquipClothes() != dItemNo_WEAR_ZORA_e) {
@@ -1217,6 +1314,15 @@ void dMenu_Collect2D_c::changeClothe() {
             Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
             dMeter2Info_set2DVibration();
         }
+#if TARGET_PC
+        else if (dusk::getSettings().game.enableDeselectClothes) {
+            dMeter2Info_setCloth(dItemNo_WEAR_CASUAL_e, false);
+            setEquipItemFrameColorClothes(-1);
+            daPy_getPlayerActorClass()->setClothesChange(0);
+            Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            dMeter2Info_set2DVibration();
+        }
+#endif
         break;
     case 5:
         if (dComIfGs_getSelectEquipClothes() != dItemNo_ARMOR_e) {
@@ -1226,6 +1332,15 @@ void dMenu_Collect2D_c::changeClothe() {
             Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
             dMeter2Info_set2DVibration();
         }
+#if TARGET_PC
+        else if (dusk::getSettings().game.enableDeselectClothes) {
+            dMeter2Info_setCloth(dItemNo_WEAR_CASUAL_e, false);
+            setEquipItemFrameColorClothes(-1);
+            daPy_getPlayerActorClass()->setClothesChange(0);
+            Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            dMeter2Info_set2DVibration();
+        }
+#endif
         break;
     }
 }
@@ -1426,6 +1541,11 @@ void dMenu_Collect2D_c::setEquipItemFrameColorSword(int i_frame) {
             }
         }
     } else {
+#if TARGET_PC
+        if (dusk::getSettings().game.enableDeselectSwords) {
+            mEquippedSword = dComIfGs_getSelectEquipSword();
+        }
+#endif
         for (int i = 0; i < 2; i++) {
             if (i == i_frame && field_0x22d[i + 3][0] != 0) {
                 static_cast<J2DPicture*>(mpScreen->search(tag[i]))
@@ -1474,6 +1594,11 @@ void dMenu_Collect2D_c::setEquipItemFrameColorShield(int i_frame) {
             }
         }
     } else {
+#if TARGET_PC
+        if (dusk::getSettings().game.enableDeselectShields) {
+            mEquippedShield = dComIfGs_getSelectEquipShield();
+        }
+#endif
         for (int i = 0; i < 2; i++) {
             if (i == i_frame && field_0x22d[i + 3][1] != 0) {
                 static_cast<J2DPicture*>(mpScreen->search(tag[i]))
@@ -1526,6 +1651,11 @@ void dMenu_Collect2D_c::setEquipItemFrameColorClothes(int i_frame) {
             }
         }
     } else {
+#if TARGET_PC
+        if (dusk::getSettings().game.enableDeselectClothes) {
+            mEquippedClothes = dComIfGs_getSelectEquipClothes();
+        }
+#endif
         for (int i = 0; i < 3; i++) {
             if (i == i_frame && field_0x22d[i + 3][2] != 0) {
                 static_cast<J2DPicture*>(mpScreen->search(tag[i]))
