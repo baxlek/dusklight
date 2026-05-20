@@ -1165,9 +1165,45 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Transform instantly by pressing R and Y simultaneously.");
 
         leftPane.add_section("Equipments");
-        addOption("Enable Deselect Swords", getSettings().game.enableDeselectSwords, "Allows Link to deselect swords. Link will be unable to attack with a sword.");
-        addOption("Enable Deselect Shields", getSettings().game.enableDeselectShields, "Allows Link to deselect shields. Link will be unable to defend with a shield.");
-        addOption("Enable Deselect Clothes", getSettings().game.enableDeselectClothes, "Allows Link to deselect clothes. Link will wear Ordon Clothes.");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Equipment Deselection",
+                .getValue = [] {
+                    int count = 0;
+                    if (getSettings().game.enableDeselectSwords.getValue()) count++;
+                    if (getSettings().game.enableDeselectShields.getValue()) count++;
+                    if (getSettings().game.enableDeselectClothes.getValue()) count++;
+                    return Rml::String{fmt::format("{} / 3", count)};
+                },
+                .isModified = [] {
+                    return getSettings().game.enableDeselectSwords.getValue() !=
+                               getSettings().game.enableDeselectSwords.getDefaultValue()
+                           || getSettings().game.enableDeselectShields.getValue() !=
+                                  getSettings().game.enableDeselectShields.getDefaultValue()
+                           || getSettings().game.enableDeselectClothes.getValue() !=
+                                  getSettings().game.enableDeselectClothes.getDefaultValue();
+                },
+            }),
+            rightPane, [](Pane& pane) {
+                pane.clear();
+                pane.add_rml(
+                    "Allows deselection of equipped items from the Collections menu.");
+
+                auto addSubToggle = [&pane](const Rml::String& text, ConfigVar<bool>& var) {
+                    pane.add_button({
+                        .text = text,
+                        .isSelected = [&var] { return var.getValue(); },
+                    }).on_pressed([&var] {
+                        mDoAud_seStartMenu(kSoundItemChange);
+                        var.setValue(!var.getValue());
+                        config::Save();
+                    });
+                };
+
+                addSubToggle("Deselect Swords", getSettings().game.enableDeselectSwords);
+                addSubToggle("Deselect Shields", getSettings().game.enableDeselectShields);
+                addSubToggle("Deselect Clothes", getSettings().game.enableDeselectClothes);
+            });
 
         leftPane.add_section("Speedrunning");
         config_bool_select(leftPane, rightPane, getSettings().game.speedrunMode,
