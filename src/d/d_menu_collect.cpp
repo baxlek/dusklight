@@ -503,6 +503,12 @@ void dMenu_Collect2D_c::screenSet() {
     field_0x22d[2][2] = 0;
 #if TARGET_PC
     if (dComIfGs_getSelectEquipClothes() == dItemNo_WEAR_CASUAL_e
+        && !dusk::getSettings().game.enableDeselectClothes
+        && dComIfGs_isItemFirstBit(dItemNo_WEAR_KOKIRI_e)) {
+        dMeter2Info_setCloth(dItemNo_WEAR_KOKIRI_e, false);
+        daPy_getPlayerActorClass()->setClothesChange(0);
+    }
+    if (dComIfGs_getSelectEquipClothes() == dItemNo_WEAR_CASUAL_e
         && !dusk::getSettings().game.enableDeselectClothes) {
         field_0x22d[3][2] = 0;
         field_0x22d[4][2] = 0;
