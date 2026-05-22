@@ -48,6 +48,7 @@ UserSettings g_userSettings = {
         .enableDeselectSwords {"game.enableDeselectSwords", false},
         .enableDeselectShields {"game.enableDeselectShields", false},
         .enableDeselectClothes {"game.enableDeselectClothes", false},
+        .enhancedMapMenus {"game.enhancedMapMenus", false},
 
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
@@ -57,6 +58,7 @@ UserSettings g_userSettings = {
         .enableAchievementToasts {"game.enableAchievementToasts", true},
         .enableControllerToasts {"game.enableControllerToasts", true},
         .enableDiscordPresence {"game.enableDiscordPresence", true},
+        .menuScalingMode {"game.menuScalingMode", MenuScaling::Wii},
 
         // Graphics
         .bloomMode {"game.bloomMode", BloomMode::Dusk},
@@ -217,6 +219,7 @@ void registerSettings() {
     Register(g_userSettings.game.enableDeselectSwords);
     Register(g_userSettings.game.enableDeselectShields);
     Register(g_userSettings.game.enableDeselectClothes);
+    Register(g_userSettings.game.enhancedMapMenus);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
     Register(g_userSettings.game.invertCameraYAxis);
@@ -253,6 +256,7 @@ void registerSettings() {
     Register(g_userSettings.game.liveSplitEnabled);
     Register(g_userSettings.game.showSpeedrunRTATimer);
     Register(g_userSettings.game.recordingMode);
+    Register(g_userSettings.game.menuScalingMode);
     Register(g_userSettings.game.removeQuestMapMarkers);
     Register(g_userSettings.game.showInputViewer);
     Register(g_userSettings.game.showInputViewerGyro);
