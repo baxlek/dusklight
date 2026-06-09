@@ -80,6 +80,8 @@ constexpr std::array kWalletSizes = {
     "HD", 
     "Large", 
     "Uncapped"
+};
+
 constexpr std::array kMagicArmorModes = {
     "Normal",
     "On Damage",
