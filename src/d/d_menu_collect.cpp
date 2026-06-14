@@ -1272,8 +1272,7 @@ void dMenu_Collect2D_c::changeSword() {
                 dMeter2Info_set2DVibration();
             }
 #endif
-        }
-        else if (dComIfGs_getSelectEquipSword() != dItemNo_MASTER_SWORD_e) {
+        } else if (dComIfGs_getSelectEquipSword() != dItemNo_MASTER_SWORD_e) {
             dMeter2Info_setSword(dItemNo_MASTER_SWORD_e, false);
             setEquipItemFrameColorSword(1);
             Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
