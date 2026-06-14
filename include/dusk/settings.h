@@ -57,6 +57,14 @@ enum class MenuScaling : u8 {
     Dusklight = 2,
 };
 
+enum class MagicArmorMode : u8 {
+    NORMAL = 0,
+    ON_DAMAGE = 1,
+    DOUBLE_DEFENSE = 2,
+    INVINCIBLE = 3,
+    COSMETIC = 4,
+};
+
 namespace config {
 template <>
 struct ConfigEnumRange<BloomMode> {
@@ -105,6 +113,12 @@ struct ConfigEnumRange<MenuScaling> {
     static constexpr auto min = MenuScaling::GameCube;
     static constexpr auto max = MenuScaling::Dusklight;
 };
+
+template <>
+struct ConfigEnumRange<MagicArmorMode> {
+    static constexpr auto min = MagicArmorMode::NORMAL;
+    static constexpr auto max = MagicArmorMode::COSMETIC;
+};
 }  // namespace config
 
 // Persistent user settings
@@ -120,6 +134,9 @@ struct UserSettings {
         ConfigVar<bool> enableFpsOverlay;
         ConfigVar<int> fpsOverlayCorner;
         ConfigVar<int> maxFrameRate;
+        ConfigVar<bool> rememberWindowSize;
+        ConfigVar<int> lastWindowWidth;
+        ConfigVar<int> lastWindowHeight;
     } video;
 
     struct {
@@ -153,6 +170,7 @@ struct UserSettings {
         ConfigVar<bool> noMissClimbing;
         ConfigVar<bool> fastTears;
         ConfigVar<bool> no2ndFishForCat;
+        ConfigVar<bool> buttonFishing;
         ConfigVar<bool> instantSaves;
         ConfigVar<bool> instantText;
         ConfigVar<bool> sunsSong;
@@ -166,6 +184,7 @@ struct UserSettings {
         // Preferences
         ConfigVar<bool> enableMirrorMode;
         ConfigVar<bool> minimalHUD;
+        ConfigVar<float> hudScale;
         ConfigVar<bool> pauseOnFocusLost;
         ConfigVar<bool> enableLinkDollRotation;
         ConfigVar<bool> enableAchievementToasts;
@@ -191,7 +210,6 @@ struct UserSettings {
         ConfigVar<bool> midnasLamentNonStop;
 
         // Input
-        ConfigVar<GyroMode> gyroMode;
         ConfigVar<bool> enableGyroAim;
         ConfigVar<bool> enableGyroRollgoal;
         ConfigVar<float> gyroSensitivityX;
@@ -201,6 +219,11 @@ struct UserSettings {
         ConfigVar<float> gyroDeadband;
         ConfigVar<bool> gyroInvertPitch;
         ConfigVar<bool> gyroInvertYaw;
+        ConfigVar<bool> enableMouseCamera;
+        ConfigVar<bool> enableMouseAim;
+        ConfigVar<float> mouseAimSensitivity;
+        ConfigVar<float> mouseCameraSensitivity;
+        ConfigVar<bool> invertMouseY;
         ConfigVar<bool> freeCamera;
         ConfigVar<bool> invertCameraXAxis;
         ConfigVar<bool> invertCameraYAxis;
@@ -232,7 +255,7 @@ struct UserSettings {
         ConfigVar<bool> canTransformAnywhere;
         ConfigVar<bool> fastRoll;
         ConfigVar<bool> fastSpinner;
-        ConfigVar<bool> freeMagicArmor;
+        ConfigVar<MagicArmorMode> armorRupeeDrain;
         ConfigVar<bool> invincibleEnemies;
 
         // Technical
