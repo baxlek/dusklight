@@ -1256,7 +1256,7 @@ void dMenu_Collect2D_c::changeSword() {
 #endif
         break;
     case 4:
-        if (dComIfGs_isItemFirstBit(dItemNo_LIGHT_SWORD_e)) {      
+        if (dComIfGs_isItemFirstBit(dItemNo_LIGHT_SWORD_e)) {
             if (dComIfGs_getSelectEquipSword() != dItemNo_LIGHT_SWORD_e) {
                 dMeter2Info_setSword(dItemNo_LIGHT_SWORD_e, false);
                 setEquipItemFrameColorSword(1);
