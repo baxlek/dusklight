@@ -1544,18 +1544,38 @@ void dScnKy_env_light_c::setDaytime() {
 
                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
                         #if TARGET_PC
-                        f32 prev = daytime;
-                        #endif
+                        if (dusk::getSettings().game.systemTimeSync) {
+                            OSCalendarTime calendarTime;
+                            OSTicksToCalendarTime(OSGetTime(), &calendarTime);
 
-                        daytime += time_change_rate;
+                            static int prevDay = -1;
 
-                        #if TARGET_PC
-                        if (time_change_rate == 1.0f &&
-                            (std::fmod(daytime - 90.0f + 360.0f, 360.0f) < std::fmod(prev - 90.0f + 360.0f, 360.0f) ||
-                             std::fmod(daytime - 285.0f + 360.0f, 360.0f) < std::fmod(prev - 285.0f + 360.0f, 360.0f)))
-                        {
-                            g_env_light.time_change_rate = 0.012f;
+                            if (prevDay == -1) {
+                                prevDay = calendarTime.mday;
+                            } else if (prevDay != calendarTime.mday) {
+                                mDate++;
+                                dKankyo_DayProc();
+                                prevDay = calendarTime.mday;
+                            }
+
+                            daytime = calendarTime.hour * 15.0f +
+                                calendarTime.min * (15.0f / 60.0f) +
+                                calendarTime.sec * (15.0f / 3600.0f);
                         }
+                        else {
+                            f32 prev = daytime;
+
+                            daytime += time_change_rate;
+
+                            if (time_change_rate == 1.0f &&
+                                (std::fmod(daytime - 90.0f + 360.0f, 360.0f) < std::fmod(prev - 90.0f + 360.0f, 360.0f) ||
+                                std::fmod(daytime - 285.0f + 360.0f, 360.0f) < std::fmod(prev - 285.0f + 360.0f, 360.0f)))
+                            {
+                                g_env_light.time_change_rate = 0.012f;
+                            }
+                        }
+                        #else
+                        daytime += time_change_rate;
                         #endif
 
                         // Stage is Fishing Pond or Hena's Hut
