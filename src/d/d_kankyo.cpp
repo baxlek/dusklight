@@ -1548,19 +1548,21 @@ void dScnKy_env_light_c::setDaytime() {
                             OSCalendarTime calendarTime;
                             OSTicksToCalendarTime(OSGetTime(), &calendarTime);
 
-                            static int prevDay = -1;
+                            const f32 calendarDaytime = calendarTime.hour * 15.0f +
+                                                      calendarTime.min * (15.0f / 60.0f) +
+                                                      calendarTime.sec * (15.0f / 3600.0f);
 
-                            if (prevDay == -1) {
-                                prevDay = calendarTime.mday;
-                            } else if (prevDay != calendarTime.mday) {
-                                mDate++;
-                                dKankyo_DayProc();
-                                prevDay = calendarTime.mday;
+                            f32 diffDaytime = calendarDaytime - daytime;
+
+                            if (diffDaytime < 0.0f) {
+                                diffDaytime += 360.0f;
                             }
 
-                            daytime = calendarTime.hour * 15.0f +
-                                calendarTime.min * (15.0f / 60.0f) +
-                                calendarTime.sec * (15.0f / 3600.0f);
+                            if (diffDaytime <= 1.0f) {
+                                daytime = calendarDaytime;
+                            } else {
+                                daytime += 1.0f;
+                            }
                         }
                         else {
                             f32 prev = daytime;
