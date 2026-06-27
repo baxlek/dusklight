@@ -234,6 +234,7 @@ void reset_for_speedrun_mode() {
     getSettings().game.fastSpinner.setSpeedrunValue(false);
     getSettings().game.armorRupeeDrain.setSpeedrunValue(MagicArmorMode::NORMAL);
     getSettings().game.invincibleEnemies.setSpeedrunValue(false);
+    getSettings().game.systemTimeSync.setSpeedrunValue(false);
 
     getSettings().game.pauseOnFocusLost.setSpeedrunValue(false);
     aurora_set_pause_on_focus_lost(false);
@@ -1376,6 +1377,10 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             });
         addCheat("Invincible Enemies", getSettings().game.invincibleEnemies,
             "Prevents enemies from taking damage.");
+
+        leftPane.add_section("World");
+        addCheat("System Time Sync", getSettings().game.systemTimeSync,
+            "Synchronizes in-game time with the system clock.");
     });
 
     add_tab("Interface", [this](Rml::Element* content) {
