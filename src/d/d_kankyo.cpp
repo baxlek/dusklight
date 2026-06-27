@@ -32,6 +32,7 @@
 #include "JSystem/JKernel/JKRSolidHeap.h"
 #include <cstdlib>
 #include <cstring>
+#include <chrono>
 #if TARGET_PC
 #include "dusk/imgui/ImGuiBloomWindow.hpp"
 #include "dusk/settings.h"
@@ -1546,7 +1547,7 @@ void dScnKy_env_light_c::setDaytime() {
                         #if TARGET_PC
                         if (dusk::getSettings().game.systemTimeSync) {
                             OSCalendarTime calendarTime;
-                            OSTicksToCalendarTime(OSGetTime(), &calendarTime);
+                            OSTicksToCalendarTime(chrono::system_clock::now(), &calendarTime);
 
                             const f32 calendarDaytime = calendarTime.hour * 15.0f +
                                                       calendarTime.min * (15.0f / 60.0f) +
