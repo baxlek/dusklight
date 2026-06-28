@@ -1546,8 +1546,7 @@ void dScnKy_env_light_c::setDaytime() {
                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
                         #if TARGET_PC
                         if (dusk::getSettings().game.systemTimeSync) {
-                            OSCalendarTime calendarTime;
-                             std::chrono::system_clock::now(&calendarTime);
+                            OSCalendarTime std::chrono::system_clock::now();
 
                             const f32 calendarDaytime = calendarTime.hour * 15.0f +
                                                       calendarTime.min * (15.0f / 60.0f) +
