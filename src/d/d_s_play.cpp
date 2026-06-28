@@ -59,8 +59,6 @@
 #include "d/d_cursor_mng.h"
 #endif
 
-#include "dusk/logging.h"
-
 static int dScnPly_Create(scene_class*);
 static int dScnPly_Delete(dScnPly_c*);
 static int dScnPly_IsDelete(dScnPly_c);
@@ -1092,7 +1090,6 @@ void dScnPly_c::offReset() {
 }
 
 static int phase_00(dScnPly_c* i_this) {
-    DuskLog.debug("dScnPly_c: phase_00");
     if (!i_this->resetGame()) {
         return cPhs_INIT_e;
     }
@@ -1127,7 +1124,6 @@ static int phase_00(dScnPly_c* i_this) {
 }
 
 static int phase_01(dScnPly_c* i_this) {
-    DuskLog.debug("dScnPly_c: phase_01");
     mDoAud_setHour(dKy_getdaytime_hour());
     mDoAud_setMinute(dKy_getdaytime_minute());
     mDoAud_setWeekday(dKy_get_dayofweek());
@@ -1152,12 +1148,10 @@ static int phase_01(dScnPly_c* i_this) {
 }
 
 static int phase_0(dScnPly_c* i_this) {
-    DuskLog.debug("dScnPly_c: phase_0");
     return cPhs_NEXT_e;
 }
 
 static int phase_1(dScnPly_c* i_this) {
-    DuskLog.debug("dScnPly_c: phase_1");
     dStage_roomControl_c::setProcID(fopScnM_GetID(i_this));
 
     dComIfGp_setStartStage(dComIfGp_getNextStartStage());
@@ -1343,7 +1337,6 @@ static int phase_1(dScnPly_c* i_this) {
 }
 
 static int phase_1_0(dScnPly_c* i_this) {
-    DuskLog.debug("dScnPly_c: phase_1_0");
     static char camparamarc[10] = "CamParam";
 
     int rt = dComIfG_syncStageRes("Stg_00");
@@ -1361,7 +1354,6 @@ static int phase_1_0(dScnPly_c* i_this) {
 }
 
 static int phase_2(dScnPly_c* i_this) {
-    DuskLog.debug("dScnPly_c: phase_2");
     int rt = dComIfG_syncAllObjectRes();
     if (rt >= 0 && rt != 0) {
         return cPhs_INIT_e;
@@ -1386,14 +1378,11 @@ static int phase_2(dScnPly_c* i_this) {
 }
 
 static int phase_3(dScnPly_c* i_this) {
-    DuskLog.debug("dScnPly_c: phase_3");
     if ((i_this->sceneCommand != NULL && !i_this->sceneCommand->sync()) || mDoAud_check1stDynamicWave()) {
-        DuskLog.debug("dScnPly_c: phase_3: wait 1");
         return cPhs_INIT_e;
     }
 
     if (i_this->field_0x1d0 != NULL && !i_this->field_0x1d0->sync()) {
-        DuskLog.debug("dScnPly_c: phase_3: wait 2");
         return cPhs_INIT_e;
     }
 
@@ -1413,7 +1402,6 @@ dScnPly_preset_HIO_c g_presetHIO;
 #endif
 
 static int phase_4(dScnPly_c* i_this) {
-    DuskLog.debug("dScnPly_c: phase_4");
     #if VERSION == VERSION_SHIELD_DEBUG
     if (!dBgp_c::executeShare()) {
         return cPhs_INIT_e;
@@ -1544,7 +1532,6 @@ static int phase_4(dScnPly_c* i_this) {
 }
 
 static int phase_5(dScnPly_c* i_this) {
-    DuskLog.debug("dScnPly_c: phase_5");
     if (preLoadNo >= 0) {
         int phase_state = cPhs_NEXT_e;
         int goodLoads = 0;
@@ -1580,7 +1567,6 @@ static int phase_5(dScnPly_c* i_this) {
 }
 
 static int phase_6(dScnPly_c* i_this) {
-    DuskLog.debug("dScnPly_c: phase_6");
     if (preLoadNo >= 0) {
         int phase_state = cPhs_NEXT_e;
         int goodLoads = 0;
