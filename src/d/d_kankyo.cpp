@@ -1547,7 +1547,7 @@ void dScnKy_env_light_c::setDaytime() {
                         #if TARGET_PC
                         if (dusk::getSettings().game.systemTimeSync) {
                             OSCalendarTime calendarTime;
-                            chrono::system_clock::now(&calendarTime);
+                             OSTicksToCalendarTime(std::chrono::system_clock::now(), &calendarTime);
 
                             const f32 calendarDaytime = calendarTime.hour * 15.0f +
                                                       calendarTime.min * (15.0f / 60.0f) +
