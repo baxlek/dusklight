@@ -1549,9 +1549,13 @@ void dScnKy_env_light_c::setDaytime() {
                             OSCalendarTime calendarTime;
                              OSTicksToCalendarTime(OSGetTime(), &calendarTime);
 
-                            const f32 calendarDaytime = std::chrono::system_clock::now().hour * 15.0f +
-                                                      std::chrono::system_clock::now().min * (15.0f / 60.0f) +
-                                                      std::chrono::system_clock::now().sec * (15.0f / 3600.0f);
+                            auto now = std::chrono::system_clock::now();
+                            auto time_t_now = std::chrono::system_clock::to_time_t(now);
+                            struct tm* timeinfo = std::localtime(&time_t_now);
+
+                            const f32 calendarDaytime = timeinfo->tm_hour * 15.0f +
+                                                        timeinfo->tm_min * (15.0f / 60.0f) +
+                                                        timeinfo->tm_sec * (15.0f / 3600.0f);
 
                             f32 diffDaytime = calendarDaytime - daytime;
 
