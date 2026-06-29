@@ -226,6 +226,7 @@ void reset_for_speedrun_mode() {
     getSettings().game.damageMultiplier.setSpeedrunValue(1);
     getSettings().game.instantDeath.setSpeedrunValue(false);
     getSettings().game.noHeartDrops.setSpeedrunValue(false);
+    getSettings().game.fastTransitions.setSpeedrunValue(false);
     getSettings().game.autoSave.setSpeedrunValue(false);
     getSettings().game.sunsSong.setSpeedrunValue(false);
 
@@ -1288,7 +1289,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Wallet sizes are like in the HD version. (500, 1000, 2000)");
         addOption("Disable Rupee Cutscenes", getSettings().game.disableRupeeCutscenes,
             "Rupees will not play cutscenes after you have collected them the first time.");
-        addOption("Faster Scene Transitions", getSettings().game.fastTransitions,
+        addSpeedrunDisabledOption("Faster Scene Transitions", getSettings().game.fastTransitions,
             "Reduces how long the transitions take when changing maps.");
         addOption("Faster Climbing", getSettings().game.fastClimbing,
             "Quicker climbing on ladders and vines like the HD version.");
