@@ -168,7 +168,7 @@ struct UserSettings {
         ConfigVar<bool> biggerWallets;
         ConfigVar<bool> noReturnRupees;
         ConfigVar<bool> disableRupeeCutscenes;
-        ConfigVar<bool> fasterSceneTransitions;
+        ConfigVar<bool> fastTransitions;
         ConfigVar<bool> noSwordRecoil;
         ConfigVar<int> damageMultiplier;
         ConfigVar<bool> noHeartDrops;
