@@ -1584,16 +1584,16 @@ void dScnKy_env_light_c::setDaytime() {
                         #endif
 
                         // Stage is Fishing Pond or Hena's Hut
-                        if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
-                            !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
-                        {
-                            if (daytime >= 300.0f || daytime <= 60.0f) {
-                                daytime += time_change_rate;
-                                daytime += time_change_rate;
-                            } else if (daytime >= 150.0f && daytime <= 195.0f) {
-                                daytime = daytime + time_change_rate;
-                            }
-                        }
+                   //     if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
+                   //         !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
+                   //     {
+                   //         if (daytime >= 300.0f || daytime <= 60.0f) {
+                   //             daytime += time_change_rate;
+                   //             daytime += time_change_rate;
+                   //         } else if (daytime >= 150.0f && daytime <= 195.0f) {
+                   //             daytime = daytime + time_change_rate;
+                   //         }
+                   //     }
 
                         if ((u32)daytime >= 360.0f) {
                             daytime = 0.0f;
