@@ -297,6 +297,29 @@ struct UserSettings {
     struct {
         std::array<ConfigVar<std::string>, 3> seedHashes;
     } randomizer;
+
+    // Cosmetics
+    struct {
+        ConfigVar<std::string> herosTunicCapColor;
+        ConfigVar<std::string> herosTunicTorsoColor;
+        ConfigVar<std::string> herosTunicSkirtColor;
+        ConfigVar<std::string> zoraArmorCapColor;
+        ConfigVar<std::string> zoraArmorHelmetColor;
+        ConfigVar<std::string> zoraArmorTorsoColor;
+        ConfigVar<std::string> zoraArmorScalesColor;
+        ConfigVar<std::string> zoraArmorFlippersColor;
+        ConfigVar<std::string> lanternGlowColor;
+        ConfigVar<std::string> woodenSwordColor;
+        ConfigVar<std::string> msBladeColor;
+        ConfigVar<std::string> msHandleColor;
+        ConfigVar<std::string> lightSwordGlowColor;
+        ConfigVar<std::string> boomerangColor;
+        ConfigVar<std::string> ironBootsColor;
+        ConfigVar<std::string> spinnerColor;
+        ConfigVar<std::string> linkHairColor;
+        ConfigVar<std::string> wolfLinkColor;
+        ConfigVar<std::string> eponaColor;
+    } cosmetics;
 };
 
 UserSettings& getSettings();
