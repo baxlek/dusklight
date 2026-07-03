@@ -37,6 +37,7 @@
 #include "dusk/settings.h"
 #include "dusk/frame_interpolation.h"
 #include "dusk/game_clock.h"
+#include <chrono>
 #endif
 
 static void GxXFog_set();
@@ -1545,12 +1546,14 @@ void dScnKy_env_light_c::setDaytime() {
                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
                         #if TARGET_PC
                         if (dusk::getSettings().game.systemTimeSync) {
-                            OSCalendarTime calendarTime;
-                            OSTicksToCalendarTime(OSGetTime(), &calendarTime);
+                    //  Replace OSGetTime() with actual device time
+                            auto now = std::chrono::system_clock::now();
+                            auto time_t_now = std::chrono::system_clock::to_time_t(now);
+                            struct tm* timeinfo = std::localtime(&time_t_now);
 
-                            const f32 calendarDaytime = calendarTime.hour * 15.0f +
-                                                      calendarTime.min * (15.0f / 60.0f) +
-                                                      calendarTime.sec * (15.0f / 3600.0f);
+                            const f32 calendarDaytime = timeinfo->tm_hour * 15.0f +
+                                                        timeinfo->tm_min * (15.0f / 60.0f) +
+                                                        timeinfo->tm_sec * (15.0f / 3600.0f);
 
                             f32 diffDaytime = calendarDaytime - daytime;
 
