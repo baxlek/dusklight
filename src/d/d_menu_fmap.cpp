@@ -2500,6 +2500,11 @@ void dMenu_Fmap_c::portalWarpMapMove(STControl* i_stick) {
             f32 pos_x, pos_y;
             mpDraw2DBack->calcAllMapPos2D(portals[i].mPosition.x, portals[i].mPosition.z,
                                           &pos_x, &pos_y);
+#if TARGET_PC
+            if (dusk::getSettings().game.enableMirrorMode) {
+                pos_x = mpDraw2DBack->getMirrorPosX(pos_x, 0.0f);
+            }
+#endif
             if ((pos_x - arrow_x) * (pos_x - arrow_x)
                                     + (pos_y - arrow_y) * (pos_y - arrow_y) <= 500.0f) {
                 uVar6 = i;
