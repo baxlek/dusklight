@@ -1322,10 +1322,14 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .key = "Equipment Deselection",
                 .getValue = [] {
                     int count = 0;
-                    if (getSettings().game.enableDeselectSwords.getValue()) count++;
-                    if (getSettings().game.enableDeselectShields.getValue()) count++;
-                    if (getSettings().game.enableDeselectClothes.getValue()) count++;
-                    return Rml::String{fmt::format("{} / 3", count)};
+                    int total = 0;
+                    auto check = [&](bool enabled) { total++; if (enabled) count++; };
+                    check(getSettings().game.enableDeselectSwords.getValue());
+                    check(getSettings().game.enableDeselectShields.getValue());
+                    check(getSettings().game.enableDeselectClothes.getValue());
+                    static thread_local char buf[12];
+                    std::snprintf(buf, sizeof(buf), "%d / %d", count, total);
+                    return Rml::String{buf};
                 },
                 .isModified = [] {
                     return getSettings().game.enableDeselectSwords.getValue() !=
