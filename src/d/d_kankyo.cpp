@@ -1544,6 +1544,24 @@ void dScnKy_env_light_c::setDaytime() {
                     }
 
                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
+
+                        // Stage is Fishing Pond or Hena's Hut
+                        if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
+                            !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
+                        {
+                            if (daytime >= 300.0f || daytime <= 60.0f) {
+                                daytime += time_change_rate;
+                                daytime += time_change_rate;
+                            } else if (daytime >= 150.0f && daytime <= 195.0f) {
+                                daytime = daytime + time_change_rate;
+                            }
+                        }
+
+                        if ((u32)daytime >= 360.0f) {
+                            daytime = 0.0f;
+                            mDate++;
+                            dKankyo_DayProc();
+                        }
                         #if TARGET_PC
                         if (dusk::getSettings().game.systemTimeSync) {
                     //  Replace OSGetTime() with actual device time
@@ -1583,23 +1601,6 @@ void dScnKy_env_light_c::setDaytime() {
                         daytime += time_change_rate;
                         #endif
 
-                        // Stage is Fishing Pond or Hena's Hut
-                        if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
-                            !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
-                        {
-                            if (daytime >= 300.0f || daytime <= 60.0f) {
-                                daytime += time_change_rate;
-                                daytime += time_change_rate;
-                            } else if (daytime >= 150.0f && daytime <= 195.0f) {
-                                daytime = daytime + time_change_rate;
-                            }
-                        }
-
-                        if ((u32)daytime >= 360.0f) {
-                            daytime = 0.0f;
-                            mDate++;
-                            dKankyo_DayProc();
-                        }
                     } else {
                         #if DEBUG
                         if (fapGmHIO_get2Ddraw()) {
