@@ -1063,7 +1063,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                             mDoAud_seStartMenu(kSoundItemChange);
                             getSettings().game.touchTargeting.setValue(
                                 static_cast<TouchTargeting>(i));
-                            config::Save();
+                            config::save();
                         });
                 }
                 pane.add_rml(fmt::format("<br/>Hybrid: {}<br/>Hold: {}<br/>Switch: {}",
@@ -1318,7 +1318,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                         .on_pressed([i] {
                             mDoAud_seStartMenu(kSoundItemChange);
                             getSettings().game.walletSizes.setValue(i);
-                            config::Save();
+                            config::save();
                         });
                 }
                 pane.add_rml(R"(
@@ -1398,7 +1398,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     }).on_pressed([&var] {
                         mDoAud_seStartMenu(kSoundItemChange);
                         var.setValue(!var.getValue());
-                        config::Save();
+                        config::save();
                     });
                 };
 
