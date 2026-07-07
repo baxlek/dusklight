@@ -94,7 +94,7 @@ void add_cosmetic_option(Pane& leftPane, Pane& rightPane, const std::string& key
             pane.add_child<StringButton>(StringButton::Props{
                 .key = "Edit Hex Color",
                 .getValue = [&option] {
-                    return option;
+                    return Rml::String(option.getValue());
                 },
                 .setValue = [&option](Rml::String str) {
                     // Make lowercase
