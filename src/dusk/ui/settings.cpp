@@ -219,6 +219,56 @@ AuroraBackend configured_backend() {
     return configuredBackend;
 }
 
+void reset_for_speedrun_mode() {
+    mDoMain::developmentMode = -1;
+
+    getSettings().game.enableTurboKeybind.setSpeedrunValue(false);
+
+    getSettings().game.damageMultiplier.setSpeedrunValue(1);
+    getSettings().game.instantDeath.setSpeedrunValue(false);
+    getSettings().game.noHeartDrops.setSpeedrunValue(false);
+    getSettings().game.autoSave.setSpeedrunValue(false);
+    getSettings().game.sunsSong.setSpeedrunValue(false);
+
+    getSettings().game.infiniteHearts.setSpeedrunValue(false);
+    getSettings().game.infiniteArrows.setSpeedrunValue(false);
+    getSettings().game.infiniteSeeds.setSpeedrunValue(false);
+    getSettings().game.infiniteBombs.setSpeedrunValue(false);
+    getSettings().game.infiniteOil.setSpeedrunValue(false);
+    getSettings().game.infiniteOxygen.setSpeedrunValue(false);
+    getSettings().game.infiniteRupees.setSpeedrunValue(false);
+    getSettings().game.infiniteBottle.setSpeedrunValue(false);
+    getSettings().game.infiniteBait.setSpeedrunValue(false);
+    getSettings().game.enableIndefiniteItemDrops.setSpeedrunValue(false);
+    getSettings().game.moonJump.setSpeedrunValue(false);
+    getSettings().game.superClawshot.setSpeedrunValue(false);
+    getSettings().game.alwaysGreatspin.setSpeedrunValue(false);
+    getSettings().game.enableFastIronBoots.setSpeedrunValue(false);
+    getSettings().game.canTransformAnywhere.setSpeedrunValue(false);
+    getSettings().game.fastRoll.setSpeedrunValue(false);
+    getSettings().game.fastSpinner.setSpeedrunValue(false);
+    getSettings().game.armorRupeeDrain.setSpeedrunValue(MagicArmorMode::NORMAL);
+    getSettings().game.invincibleEnemies.setSpeedrunValue(false);
+
+    getSettings().game.pauseOnFocusLost.setSpeedrunValue(false);
+    aurora_set_pause_on_focus_lost(false);
+
+    getSettings().backend.enableAdvancedSettings.setSpeedrunValue(false);
+    getSettings().game.recordingMode.setSpeedrunValue(false);
+    getSettings().game.debugFlyCam.setSpeedrunValue(false);
+}
+
+void clear_speedrun_overrides() {
+    config::EnumerateRegistered([](config::ConfigVarBase& cvar) {
+        cvar.clearSpeedrunOverride();
+    });
+}
+
+void restore_from_speedrun_mode() {
+    clear_speedrun_overrides();
+    aurora_set_pause_on_focus_lost(getSettings().game.pauseOnFocusLost.getValue());
+}
+
 std::filesystem::path normalized_display_path(const std::filesystem::path& path) {
     std::error_code ec;
     auto normalized = std::filesystem::weakly_canonical(path, ec);
@@ -1381,6 +1431,10 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Keeps your underwater oxygen meter full.");
         addCheat(
             "Infinite Rupees", getSettings().game.infiniteRupees, "Keeps your rupee count full.");
+        addCheat("Infinite Bottle Contents", getSettings().game.infiniteBottle,
+            "Using the contents of a bottle does not consume them.");
+        addCheat("Infinite Fishing Bait", getSettings().game.infiniteBait,
+            "Catching a fish while bobber fishing with bait does not consume the bait.");
         addCheat("No Item Timer", getSettings().game.enableIndefiniteItemDrops,
             "Item drops such as rupees and hearts will never disappear after they drop.");
 
