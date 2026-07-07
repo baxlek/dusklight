@@ -181,6 +181,10 @@ struct UserSettings {
         ConfigVar<bool> instantText;
         ConfigVar<bool> sunsSong;
         ConfigVar<bool> autoSave;
+        ConfigVar<bool> enableDeselectSwords;
+        ConfigVar<bool> enableDeselectShields;
+        ConfigVar<bool> enableDeselectClothes;
+
         ConfigVar<bool> enhancedMapMenus;
 
         // Preferences
