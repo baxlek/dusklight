@@ -1,5 +1,6 @@
 #include "dusk/speedrun.h"
 #include "dusk/settings.h"
+#include "dusk/config.hpp"
 #include "m_Do/m_Do_main.h"
 #include <aurora/aurora.h>
 
@@ -42,6 +43,17 @@ void resetForSpeedrunMode() {
     getSettings().backend.enableAdvancedSettings.setSpeedrunValue(false);
     getSettings().game.recordingMode.setSpeedrunValue(false);
     getSettings().game.debugFlyCam.setSpeedrunValue(false);
+}
+
+static void clear_speedrun_overrides() {
+    config::EnumerateRegistered([](config::ConfigVarBase& cvar) {
+        cvar.clearSpeedrunOverride();
+    });
+}
+
+void restoreFromSpeedrunMode() {
+    clear_speedrun_overrides();
+    aurora_set_pause_on_focus_lost(getSettings().game.pauseOnFocusLost.getValue());
 }
 
 }  // namespace dusk
