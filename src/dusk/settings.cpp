@@ -143,6 +143,7 @@ UserSettings g_userSettings = {
         .fastSpinner {"game.fastSpinner", false},
         .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
         .invincibleEnemies {"game.invincibleEnemies", false},
+        .systemTimeSync{"game.systemTimeSync", false},
 
         // Technical
         .restoreWiiGlitches {"game.restoreWiiGlitches", false},
@@ -355,6 +356,7 @@ void registerSettings() {
     Register(g_userSettings.game.alwaysGreatspin);
     Register(g_userSettings.game.invincibleEnemies);
     Register(g_userSettings.game.enableFrameInterpolation);
+    Register(g_userSettings.game.systemTimeSync);
     Register(g_userSettings.game.enableGyroAim);
     Register(g_userSettings.game.enableGyroRollgoal);
     Register(g_userSettings.game.gyroSensitivityX);
