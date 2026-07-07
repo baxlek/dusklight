@@ -219,17 +219,6 @@ AuroraBackend configured_backend() {
     return configuredBackend;
 }
 
-void clear_speedrun_overrides() {
-    config::EnumerateRegistered([](config::ConfigVarBase& cvar) {
-        cvar.clearSpeedrunOverride();
-    });
-}
-
-void restore_from_speedrun_mode() {
-    clear_speedrun_overrides();
-    aurora_set_pause_on_focus_lost(getSettings().game.pauseOnFocusLost.getValue());
-}
-
 std::filesystem::path normalized_display_path(const std::filesystem::path& path) {
     std::error_code ec;
     auto normalized = std::filesystem::weakly_canonical(path, ec);
@@ -1291,7 +1280,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                         if (enabled) {
                             resetForSpeedrunMode();
                         } else {
-                            restore_from_speedrun_mode();
+                            restoreFromSpeedrunMode();
                             if (getSettings().game.liveSplitEnabled) {
                                 speedrun::disconnectLiveSplit();
                             }
