@@ -55,7 +55,7 @@ bool writeAutoSave() {
 
     // Save randomizer hash
     dusk::getSettings().randomizer.seedHashes[dComIfGs_getDataNum()].setValue(randomizer_GetContext().mHash);
-    dusk::config::Save();
+    dusk::config::save();
     if (randomizer_IsActive()) {
         g_randomizerState.mFileNum = dComIfGs_getDataNum();
     }
