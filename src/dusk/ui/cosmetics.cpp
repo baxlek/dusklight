@@ -103,7 +103,7 @@ void add_cosmetic_option(Pane& leftPane, Pane& rightPane, const std::string& key
                     }
 
                     option.setValue(str);
-                    config::Save();
+                    config::save();
                 },
                 .maxLength = 6,
             });
@@ -118,7 +118,7 @@ void add_cosmetic_option(Pane& leftPane, Pane& rightPane, const std::string& key
                 if (key.starts_with("Midna's Hair")) {
                     cosmetics::set_all_midna_hair_colors();
                 }
-                config::Save();
+                config::save();
             });
 
             pane.add_button(ControlledButton::Props{
@@ -128,7 +128,7 @@ void add_cosmetic_option(Pane& leftPane, Pane& rightPane, const std::string& key
                 std::uniform_int_distribution dist(0, 0xFFFFFF);
                 std::string hexStr = randomizer::utility::str::intToHex(dist(rd), 6, false);
                 option.setValue(hexStr);
-                config::Save();
+                config::save();
             });
         }
 
@@ -143,7 +143,7 @@ void add_cosmetic_option(Pane& leftPane, Pane& rightPane, const std::string& key
                 if (key.starts_with("Midna's Hair")) {
                     cosmetics::set_all_midna_hair_colors();
                 }
-                config::Save();
+                config::save();
             });
         }
     });
