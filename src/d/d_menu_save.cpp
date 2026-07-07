@@ -1360,7 +1360,7 @@ void dMenu_save_c::dataWrite() {
 #if TARGET_PC
     // Save randomizer hash
     dusk::getSettings().randomizer.seedHashes[mSelectedFile].setValue(randomizer_GetContext().mHash);
-    dusk::config::Save();
+    dusk::config::save();
     if (randomizer_IsActive()) {
         g_randomizerState.mFileNum = mSelectedFile;
     }
