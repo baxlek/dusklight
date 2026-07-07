@@ -259,7 +259,6 @@ void reset_for_speedrun_mode() {
     getSettings().game.systemTimeSync.setSpeedrunValue(false);
 
     getSettings().game.pauseOnFocusLost.setSpeedrunValue(false);
-    aurora_set_pause_on_focus_lost(false);
 
     getSettings().backend.enableAdvancedSettings.setSpeedrunValue(false);
     getSettings().game.recordingMode.setSpeedrunValue(false);
@@ -274,7 +273,6 @@ void clear_speedrun_overrides() {
 
 void restore_from_speedrun_mode() {
     clear_speedrun_overrides();
-    aurora_set_pause_on_focus_lost(getSettings().game.pauseOnFocusLost.getValue());
 }
 
 std::filesystem::path normalized_display_path(const std::filesystem::path& path) {
@@ -458,7 +456,7 @@ SelectButton& config_bool_select(
                     return;
                 }
                 var.setValue(value);
-                config::Save();
+                config::save();
                 if (callback) {
                     callback(value);
                 }
@@ -479,7 +477,7 @@ void add_speedrun_disabled_option(Pane& leftPane, Pane& rightPane, ConfigVar<boo
     config_bool_select(leftPane, rightPane, var, {
         .key = key,
         .helpText = helpText,
-        .isDisabled = [] { return getSettings().game.speedrunMode; },
+        .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
     });
 }
 
@@ -492,7 +490,7 @@ SelectButton& config_percent_select(Pane& leftPane, Pane& rightPane, ConfigVar<f
         .setValue =
             [&var, min, max](int value) {
                 var.setValue(std::clamp(value, min, max) / 100.0f);
-                config::Save();
+                config::save();
             },
         .isDisabled = std::move(isDisabled),
         .isModified = [&var] { return var.getValue() != var.getDefaultValue(); },
@@ -514,12 +512,12 @@ SelectButton& config_int_select(Pane& leftPane, Pane& rightPane, ConfigVar<int>&
     std::string suffix = "") {
     auto& button = leftPane.add_child<NumberButton>(NumberButton::Props{
         .key = std::move(key),
-        .getValue = [&var] { return var; },
+        .getValue = [&var] { return var.getValue(); },
         .setValue =
             [&var, min, max, callback = std::move(onChange)](int value) {
                 const int clampedValue = std::clamp(value, min, max);
                 var.setValue(clampedValue);
-                config::Save();
+                config::save();
                 if (callback) {
                     callback(clampedValue);
                 }
@@ -691,7 +689,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                             .on_pressed([i] {
                                 mDoAud_seStartMenu(kSoundItemChange);
                                 getSettings().game.language.setValue(static_cast<GameLanguage>(i));
-                                config::Save();
+                                config::save();
                             });
                     }
                     pane.add_rml("<br/>Changes require a restart.");
@@ -718,7 +716,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                                 mDoAud_seStartMenu(kSoundItemChange);
                                 getSettings().backend.graphicsBackend.setValue(
                                     std::string{backend_id(backend)});
-                                config::Save();
+                                config::save();
                             });
                     }
                     pane.add_rml("<br/>Changes require a restart.");
@@ -749,7 +747,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                             .on_pressed([i] {
                                 mDoAud_seStartMenu(kSoundItemChange);
                                 getSettings().backend.cardFileType.setValue(i);
-                                config::Save();
+                                config::save();
                             });
                     }
                 });
@@ -766,7 +764,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             mDoAud_seStartMenu(kSoundItemChange);
             getSettings().video.enableFullscreen.setValue(!getSettings().video.enableFullscreen);
             VISetWindowFullscreen(getSettings().video.enableFullscreen);
-            config::Save();
+            config::save();
         }),
             rightPane, [](Pane& pane) { pane.clear(); });
         leftPane.register_control(leftPane.add_button("Restore Default Window Size").on_pressed([] {
@@ -797,7 +795,6 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             {
                 .key = "Pause on Focus Lost",
                 .helpText = "Pause the game when window focus is lost.",
-                .onChange = [](bool value) { aurora_set_pause_on_focus_lost(value); },
                 .isDisabled = [] { return IsMobile || getSettings().game.speedrunMode; },
             });
         leftPane.register_control(
@@ -829,7 +826,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     .on_pressed([] {
                         mDoAud_seStartMenu(kSoundItemChange);
                         getSettings().video.enableFpsOverlay.setValue(false);
-                        config::Save();
+                        config::save();
                     });
                 for (int i = 0; i < static_cast<int>(kFpsOverlayCornerNames.size()); ++i) {
                     pane.add_button(
@@ -845,7 +842,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                             mDoAud_seStartMenu(kSoundItemChange);
                             getSettings().video.enableFpsOverlay.setValue(true);
                             getSettings().video.fpsOverlayCorner.setValue(i);
-                            config::Save();
+                            config::save();
                         });
                 }
                 pane.add_rml(
@@ -861,7 +858,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                             const auto windowSize = aurora::window::get_window_size();
                             dusk::getSettings().video.lastWindowWidth.setValue(windowSize.width);
                             dusk::getSettings().video.lastWindowHeight.setValue(windowSize.height);
-                            dusk::config::Save();
+                            dusk::config::save();
                         }
                     },
                 .isDisabled = [] { return IsMobile; },
@@ -967,7 +964,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                             mDoAud_seStartMenu(kSoundItemChange);
                             getSettings().game.enableFrameInterpolation.setValue(static_cast<FrameInterpMode>(i));
                             android::update_surface_frame_rate();
-                            config::Save();
+                            config::save();
                         });
                 }
                 pane.add_rml(kUnlockFramerateHelpText);
@@ -1162,7 +1159,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         leftPane.add_section("Tools");
         addOption("Turbo Key", getSettings().game.enableTurboKeybind,
             "Hold Tab to increase game speed by up to 4x.",
-            [] { return getSettings().game.speedrunMode; });
+            [] { return getSettings().game.speedrunMode.getValue(); });
         addOption("Reset Key (" + Rml::String{hotkeys::DO_RESET} + ")",
             getSettings().game.enableResetKeybind,
             "Press " + Rml::String{hotkeys::DO_RESET} + " to reset the game.");
@@ -1181,7 +1178,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .setValue =
                     [](int value) {
                         getSettings().audio.masterVolume.setValue(value);
-                        config::Save();
+                        config::save();
                         audio::SetMasterVolume(audio::MasterVolumeToLinear(value / 100.0f));
                     },
                 .isModified =
@@ -1273,9 +1270,9 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .setValue =
                     [](int value) {
                         getSettings().game.damageMultiplier.setValue(value);
-                        config::Save();
+                        config::save();
                     },
-                .isDisabled = [] { return getSettings().game.speedrunMode; },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
                 .isModified =
                     [] {
                         return getSettings().game.damageMultiplier.getValue() !=
@@ -1506,7 +1503,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     [] {
                         return kMagicArmorModes[static_cast<u8>(getSettings().game.armorRupeeDrain.getValue())];
                     },
-                .isDisabled = [] { return getSettings().game.speedrunMode; },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
                 .isModified =
                     [] {
                         return getSettings().game.armorRupeeDrain.getValue() !=
@@ -1525,7 +1522,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                         .on_pressed([i] {
                             mDoAud_seStartMenu(kSoundItemChange);
                             getSettings().game.armorRupeeDrain.setValue(static_cast<MagicArmorMode>(i));
-                            config::Save();
+                            config::save();
                         });
                 }
                 pane.add_rml(
@@ -1582,13 +1579,13 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     mDoAud_seStartMenu(kSoundItemChange);
                     getSettings().game.enableAchievementToasts.setValue(true);
                     getSettings().game.enableControllerToasts.setValue(true);
-                    config::Save();
+                    config::save();
                 });
                 pane.add_button("Select None").on_pressed([] {
                     mDoAud_seStartMenu(kSoundItemChange);
                     getSettings().game.enableAchievementToasts.setValue(false);
                     getSettings().game.enableControllerToasts.setValue(false);
-                    config::Save();
+                    config::save();
                 });
 
                 pane.add_section("Types");
@@ -1604,7 +1601,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                         mDoAud_seStartMenu(kSoundItemChange);
                         auto& v = getSettings().game.enableAchievementToasts;
                         v.setValue(!v.getValue());
-                        config::Save();
+                        config::save();
                     });
                 pane.add_button(
                     {
@@ -1616,7 +1613,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                         mDoAud_seStartMenu(kSoundItemChange);
                         auto& v = getSettings().game.enableControllerToasts;
                         v.setValue(!v.getValue());
-                        config::Save();
+                        config::save();
                     });
                 pane.add_rml("<br/>Choose which notifications can be displayed.");
             });
@@ -1682,7 +1679,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                             }
                         }
                     },
-                .isDisabled = [] { return getSettings().game.speedrunMode; },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
             });
         config_bool_select(leftPane, rightPane, getSettings().game.showInputViewer,
             {
@@ -1719,15 +1716,13 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                                 [i] {
                                     return getSettings().game.menuScalingMode.getValue() ==
                                            static_cast<MenuScaling>(i);
-                                    ;
                                 },
                         })
                         .on_pressed([i] {
                             mDoAud_seStartMenu(kSoundItemChange);
                             getSettings().game.menuScalingMode.setValue(
                                 static_cast<MenuScaling>(i));
-                            ;
-                            config::Save();
+                            config::save();
                         });
                 }
                 pane.add_rml("<br/>Changes how the Collection and File Select menus scale to your "
@@ -1753,7 +1748,7 @@ void SettingsWindow::update() {
 }
 
 void SettingsWindow::hide(bool close) {
-    config::Save();
+    config::save();
     Window::hide(close);
 }
 
