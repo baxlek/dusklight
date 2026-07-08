@@ -1544,8 +1544,8 @@ void dScnKy_env_light_c::setDaytime() {
                     }
 
                      if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29 || 
-                         (!strcmp(dComIfGp_getStartStageName(), "R_SP01")) || 
-                         (!strcmp(dComIfGp_getStartStageName(), "R_SP109"))) {
+                         (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) || 
+                         (!strcmp(dComIfGp_getStartStageName(), "F_SP109"))) {
                         #if TARGET_PC
                         if (dusk::getSettings().game.systemTimeSync) {
                      //     For when OSGetSystemTime() is implemented  
