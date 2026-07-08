@@ -1590,14 +1590,14 @@ void dScnKy_env_light_c::setDaytime() {
                             {
                                 g_env_light.time_change_rate = 0.012f;
                             }
-                        }
+						}
 						}
                         #else
                         daytime += time_change_rate;
                         #endif
 
-					if (dusk::getSettings().game.systemTimeSync == false) &&
-						(dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
+					if (dusk::getSettings().game.systemTimeSync == false &&
+						(dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29)) {
 						if (time_change_rate == 1.0f &&
 							(std::fmod(daytime - 90.0f + 360.0f, 360.0f) < std::fmod(prev - 90.0f + 360.0f, 360.0f) ||
 							std::fmod(daytime - 285.0f + 360.0f, 360.0f) < std::fmod(prev - 285.0f + 360.0f, 360.0f)))
