@@ -1543,8 +1543,8 @@ void dScnKy_env_light_c::setDaytime() {
                         temp_r29 = false;
                     }
 
-                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29 && 
-                         (!strcmp(dComIfGp_getStartStageName(), "R_SP01")) && 
+                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29 || 
+                         (!strcmp(dComIfGp_getStartStageName(), "R_SP01")) || 
                          (!strcmp(dComIfGp_getStartStageName(), "R_SP109"))) {
                         #if TARGET_PC
                         if (dusk::getSettings().game.systemTimeSync) {
