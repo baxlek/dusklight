@@ -1542,16 +1542,15 @@ void dScnKy_env_light_c::setDaytime() {
                     if (msg != NULL && msg->mode >= 2) {
                         temp_r29 = false;
                     }
-
-                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29 ||
-                           (!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||    // Ordon Ranch
-                           (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) ||   // Ordon Village
-                           (!strcmp(dComIfGp_getStartStageName(), "F_SP104")) ||   // Ordon Spring
-                           (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) ||   // Kakariko Village
-                           (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) ||   // Kakariko Graveyard
-                           (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) {   // Hidden Village
-                         #if TARGET_PC
+                     #if TARGET_PC
                          if (dusk::getSettings().game.systemTimeSync) {
+                         if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29 ||
+                            (!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||    // Ordon Ranch
+                            (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) ||   // Ordon Village
+                            (!strcmp(dComIfGp_getStartStageName(), "F_SP104")) ||   // Ordon Spring
+                            (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) ||   // Kakariko Village
+                            (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) ||   // Kakariko Graveyard
+                            (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) {   // Hidden Village
 
                      //     For when OSGetSystemTime() is implemented  
                      //     OSCalendarTime calendarTime;
@@ -1581,7 +1580,7 @@ void dScnKy_env_light_c::setDaytime() {
                                 daytime += 1.0f;
                             }
                         }
-                        else {
+                        else if (dusk::getSettings().game.systemTimeSync == false) {
                             f32 prev = daytime;
                        daytime += time_change_rate;
 
@@ -1596,7 +1595,6 @@ void dScnKy_env_light_c::setDaytime() {
                         daytime += time_change_rate;
                         #endif
 
-                        if (dusk::getSettings().game.systemTimeSync == false) {
                         // Stage is Fishing Pond or Hena's Hut
                         if (dusk::getSettings().game.systemTimeSync == false) {
                             if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
@@ -1614,7 +1612,6 @@ void dScnKy_env_light_c::setDaytime() {
                                 mDate++;
                                 dKankyo_DayProc();
                             }
-                        }
                         }
                     } else {
                         #if DEBUG
