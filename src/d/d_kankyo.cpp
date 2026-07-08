@@ -1591,12 +1591,14 @@ void dScnKy_env_light_c::setDaytime() {
                                 g_env_light.time_change_rate = 0.012f;
                             }
                         }
-                        #else
-                        daytime += time_change_rate;
+                        #else if (dusk::getSettings().game.systemTimeSync == false &&
+                                 dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29)
+                        {
+                                 daytime += time_change_rate;
+                        }
                         #endif
 
-                        if (dusk::getSettings().game.systemTimeSync == false &&
-                            dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
+                        if (dusk::getSettings().game.systemTimeSync == false) {
                             // Stage is Fishing Pond or Hena's Hut
                             if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
                                 !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
