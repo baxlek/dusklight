@@ -139,6 +139,7 @@ UserSettings g_userSettings = {
         .fastSpinner {"game.fastSpinner", false},
         .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
         .invincibleEnemies {"game.invincibleEnemies", false},
+        .systemTimeSync{"game.systemTimeSync", false},
 
         // Technical
         .restoreWiiGlitches {"game.restoreWiiGlitches", false},
