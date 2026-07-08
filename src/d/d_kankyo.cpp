@@ -1543,15 +1543,15 @@ void dScnKy_env_light_c::setDaytime() {
                         temp_r29 = false;
                     }
 
-                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
-                        #if TARGET_PC
-                        if ((dusk::getSettings().game.systemTimeSync) &&
+                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29 &&
                            (!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||    // Ordon Ranch
                            (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) ||   // Ordon Village
                            (!strcmp(dComIfGp_getStartStageName(), "F_SP104")) ||   // Ordon Spring
                            (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) ||   // Kakariko Village
                            (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) ||   // Kakariko Graveyard
                            (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) {   // Hidden Village
+                         #if TARGET_PC
+                         if (dusk::getSettings().game.systemTimeSync) {
 
                      //     For when OSGetSystemTime() is implemented  
                      //     OSCalendarTime calendarTime;
