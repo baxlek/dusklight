@@ -15,6 +15,7 @@
 #include "dusk/io.hpp"
 #include "dusk/livesplit.h"
 #include "dusk/discord_presence.hpp"
+#include "dusk/speedrun.h"
 #include "graphics_tuner.hpp"
 #include "m_Do/m_Do_main.h"
 #include "menu_bar.hpp"
@@ -236,6 +237,8 @@ void reset_for_speedrun_mode() {
     getSettings().game.infiniteOil.setSpeedrunValue(false);
     getSettings().game.infiniteOxygen.setSpeedrunValue(false);
     getSettings().game.infiniteRupees.setSpeedrunValue(false);
+    getSettings().game.infiniteBottle.setSpeedrunValue(false);
+    getSettings().game.infiniteBait.setSpeedrunValue(false);
     getSettings().game.enableIndefiniteItemDrops.setSpeedrunValue(false);
     getSettings().game.moonJump.setSpeedrunValue(false);
     getSettings().game.superClawshot.setSpeedrunValue(false);
@@ -1313,6 +1316,51 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,
             "Transform instantly by pressing R and Y simultaneously.");
 
+        leftPane.add_section("Equipments");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Equipment Deselection",
+                .getValue = [] {
+                    int count = 0;
+                    int total = 0;
+                    auto check = [&](bool enabled) { total++; if (enabled) count++; };
+                    check(getSettings().game.enableDeselectSwords.getValue());
+                    check(getSettings().game.enableDeselectShields.getValue());
+                    check(getSettings().game.enableDeselectClothes.getValue());
+                    static thread_local char buf[12];
+                    std::snprintf(buf, sizeof(buf), "%d / %d", count, total);
+                    return Rml::String{buf};
+                },
+                .isModified = [] {
+                    return getSettings().game.enableDeselectSwords.getValue() !=
+                               getSettings().game.enableDeselectSwords.getDefaultValue()
+                           || getSettings().game.enableDeselectShields.getValue() !=
+                                  getSettings().game.enableDeselectShields.getDefaultValue()
+                           || getSettings().game.enableDeselectClothes.getValue() !=
+                                  getSettings().game.enableDeselectClothes.getDefaultValue();
+                },
+            }),
+            rightPane, [](Pane& pane) {
+                pane.clear();
+                pane.add_rml(
+                    "Allows deselection of equipped items from the Collections menu.");
+
+                auto addSubToggle = [&pane](const Rml::String& text, ConfigVar<bool>& var) {
+                    pane.add_button({
+                        .text = text,
+                        .isSelected = [&var] { return var.getValue(); },
+                    }).on_pressed([&var] {
+                        mDoAud_seStartMenu(kSoundItemChange);
+                        var.setValue(!var.getValue());
+                        config::Save();
+                    });
+                };
+
+                addSubToggle("Deselect Swords", getSettings().game.enableDeselectSwords);
+                addSubToggle("Deselect Shields", getSettings().game.enableDeselectShields);
+                addSubToggle("Deselect Clothes", getSettings().game.enableDeselectClothes);
+            });
+
         leftPane.add_section("Speedrunning");
         config_bool_select(leftPane, rightPane, getSettings().game.speedrunMode,
             {
@@ -1322,9 +1370,9 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .onChange =
                     [](bool enabled) {
                         if (enabled) {
-                            reset_for_speedrun_mode();
+                            resetForSpeedrunMode();
                         } else {
-                            restore_from_speedrun_mode();
+                            restoreFromSpeedrunMode();
                             if (getSettings().game.liveSplitEnabled) {
                                 speedrun::disconnectLiveSplit();
                             }
@@ -1380,6 +1428,10 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Keeps your underwater oxygen meter full.");
         addCheat(
             "Infinite Rupees", getSettings().game.infiniteRupees, "Keeps your rupee count full.");
+        addCheat("Infinite Bottle Contents", getSettings().game.infiniteBottle,
+            "Using the contents of a bottle does not consume them.");
+        addCheat("Infinite Fishing Bait", getSettings().game.infiniteBait,
+            "Catching a fish while bobber fishing with bait does not consume the bait.");
         addCheat("No Item Timer", getSettings().game.enableIndefiniteItemDrops,
             "Item drops such as rupees and hearts will never disappear after they drop.");
 

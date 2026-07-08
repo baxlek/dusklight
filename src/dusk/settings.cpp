@@ -50,6 +50,9 @@ UserSettings g_userSettings = {
         .instantText {"game.instantText", false},
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
+        .enableDeselectSwords {"game.enableDeselectSwords", false},
+        .enableDeselectShields {"game.enableDeselectShields", false},
+        .enableDeselectClothes {"game.enableDeselectClothes", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
 
         // Preferences
@@ -129,6 +132,8 @@ UserSettings g_userSettings = {
         .infiniteOil {"game.infiniteOil", false},
         .infiniteOxygen {"game.infiniteOxygen", false},
         .infiniteRupees {"game.infiniteRupees", false},
+        .infiniteBottle {"game.infiniteBottle", false},
+        .infiniteBait {"game.infiniteBait", false},
         .enableIndefiniteItemDrops {"game.enableIndefiniteItemDrops", false},
         .moonJump {"game.moonJump", false},
         .superClawshot {"game.superClawshot", false},
@@ -285,6 +290,9 @@ void registerSettings() {
     Register(g_userSettings.game.instantText);
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
+    Register(g_userSettings.game.enableDeselectSwords);
+    Register(g_userSettings.game.enableDeselectShields);
+    Register(g_userSettings.game.enableDeselectClothes);
     Register(g_userSettings.game.enhancedMapMenus);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
@@ -341,6 +349,8 @@ void registerSettings() {
     Register(g_userSettings.game.infiniteOil);
     Register(g_userSettings.game.infiniteOxygen);
     Register(g_userSettings.game.infiniteRupees);
+    Register(g_userSettings.game.infiniteBottle);
+    Register(g_userSettings.game.infiniteBait);
     Register(g_userSettings.game.enableIndefiniteItemDrops);
     Register(g_userSettings.game.moonJump);
     Register(g_userSettings.game.superClawshot);

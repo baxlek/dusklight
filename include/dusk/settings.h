@@ -182,6 +182,10 @@ struct UserSettings {
         ConfigVar<bool> instantText;
         ConfigVar<bool> sunsSong;
         ConfigVar<bool> autoSave;
+        ConfigVar<bool> enableDeselectSwords;
+        ConfigVar<bool> enableDeselectShields;
+        ConfigVar<bool> enableDeselectClothes;
+
         ConfigVar<bool> enhancedMapMenus;
 
         // Preferences
@@ -256,6 +260,8 @@ struct UserSettings {
         ConfigVar<bool> infiniteOil;
         ConfigVar<bool> infiniteOxygen;
         ConfigVar<bool> infiniteRupees;
+        ConfigVar<bool> infiniteBottle;
+        ConfigVar<bool> infiniteBait;
         ConfigVar<bool> enableIndefiniteItemDrops;
         ConfigVar<bool> moonJump;
         ConfigVar<bool> superClawshot;
