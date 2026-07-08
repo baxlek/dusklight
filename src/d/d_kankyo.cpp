@@ -1545,7 +1545,7 @@ void dScnKy_env_light_c::setDaytime() {
 
                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
                         #if TARGET_PC
-                        if (dusk::getSettings().game.systemTimeSync) {
+                        if (dusk::getSettings().game.systemTimeSync) && (dComIfGp_roomControl_getTimePass()) || (dComIfGp_roomControl_getTimePass() == false) {
                      //     For when OSGetSystemTime() is implemented  
                      //     OSCalendarTime calendarTime;
                      //     OSTicksToCalendarTime(OSGetSystemTime(), &calendarTime);
