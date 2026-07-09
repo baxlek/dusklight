@@ -1580,7 +1580,7 @@ void dScnKy_env_light_c::setDaytime() {
                                 daytime += 1.0f;
                             }
 						}
-                        if (dusk::getSettings().game.systemTimeSync == false &&
+                        else (dusk::getSettings().game.systemTimeSync == false &&
 							(dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29)) ||
 							(!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||    // Ordon Ranch
 							(!strcmp(dComIfGp_getStartStageName(), "F_SP103")) ||   // Ordon Village
