@@ -37,6 +37,7 @@
 #include "dusk/settings.h"
 #include "dusk/frame_interpolation.h"
 #include "dusk/game_clock.h"
+#include <chrono>
 #endif
 
 static void GxXFog_set();
@@ -1542,38 +1543,78 @@ void dScnKy_env_light_c::setDaytime() {
                         temp_r29 = false;
                     }
 
-                    if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
-                        #if TARGET_PC
-                        f32 prev = daytime;
-                        #endif
+                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29 ||
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||    // Ordon Ranch
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) ||   // Ordon Village
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP104")) ||   // Ordon Spring
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) ||   // Kakariko Village
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) ||   // Kakariko Graveyard
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) {   // Hidden Village
+                         #if TARGET_PC
+                         if (dusk::getSettings().game.systemTimeSync) {
 
-                        daytime += time_change_rate;
+                     //     For when OSGetSystemTime() is implemented  
+                     //     OSCalendarTime calendarTime;
+                     //     OSTicksToCalendarTime(OSGetSystemTime(), &calendarTime);
 
-                        #if TARGET_PC
-                        if (time_change_rate == 1.0f &&
-                            (std::fmod(daytime - 90.0f + 360.0f, 360.0f) < std::fmod(prev - 90.0f + 360.0f, 360.0f) ||
-                             std::fmod(daytime - 285.0f + 360.0f, 360.0f) < std::fmod(prev - 285.0f + 360.0f, 360.0f)))
-                        {
-                            g_env_light.time_change_rate = 0.012f;
-                        }
-                        #endif
+                            auto now = std::chrono::system_clock::now();
+                            auto time_t_now = std::chrono::system_clock::to_time_t(now);
+                            struct tm* timeinfo = std::localtime(&time_t_now);
+                            
+                     //     const f32 calendarDaytime = calendarTime.hour * 15.0f +
+                     //                               calendarTime.min * (15.0f / 60.0f) +
+                     //                               calendarTime.sec * (15.0f / 3600.0f);
 
-                        // Stage is Fishing Pond or Hena's Hut
-                        if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
-                            !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
-                        {
-                            if (daytime >= 300.0f || daytime <= 60.0f) {
-                                daytime += time_change_rate;
-                                daytime += time_change_rate;
-                            } else if (daytime >= 150.0f && daytime <= 195.0f) {
-                                daytime = daytime + time_change_rate;
+                            const f32 calendarDaytime = timeinfo->tm_hour * 15.0f +
+                                                        timeinfo->tm_min * (15.0f / 60.0f) +
+                                                        timeinfo->tm_sec * (15.0f / 3600.0f);
+                            
+                        f32 diffDaytime = calendarDaytime - daytime;
+
+                            if (diffDaytime < 0.0f) {
+                                diffDaytime += 360.0f;
+                            }
+
+                            if (diffDaytime <= 1.0f) {
+                                daytime = calendarDaytime;
+                            } else {
+                                daytime += 1.0f;
                             }
                         }
+                        else {
+                            f32 prev = daytime;
+                       daytime += time_change_rate;
 
-                        if ((u32)daytime >= 360.0f) {
-                            daytime = 0.0f;
-                            mDate++;
-                            dKankyo_DayProc();
+                            if (time_change_rate == 1.0f &&
+                                (std::fmod(daytime - 90.0f + 360.0f, 360.0f) < std::fmod(prev - 90.0f + 360.0f, 360.0f) ||
+                                std::fmod(daytime - 285.0f + 360.0f, 360.0f) < std::fmod(prev - 285.0f + 360.0f, 360.0f)))
+                            {
+                                g_env_light.time_change_rate = 0.012f;
+                            }
+                        }
+                        #else
+                        daytime += time_change_rate;
+                        #endif
+
+                        if (dusk::getSettings().game.systemTimeSync == false) {
+                        // Stage is Fishing Pond or Hena's Hut
+                        if (dusk::getSettings().game.systemTimeSync == false) {
+                            if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
+                                !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
+                            {
+                                if (daytime >= 300.0f || daytime <= 60.0f) {
+                                    daytime += time_change_rate;
+                                    daytime += time_change_rate;
+                                } else if (daytime >= 150.0f && daytime <= 195.0f) {
+                                    daytime = daytime + time_change_rate;
+                                }
+                            }
+                            if ((u32)daytime >= 360.0f) {
+                                daytime = 0.0f;
+                                mDate++;
+                                dKankyo_DayProc();
+                            }
+                        }
                         }
                     } else {
                         #if DEBUG
