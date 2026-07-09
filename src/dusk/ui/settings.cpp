@@ -528,7 +528,7 @@ SelectButton& config_int_select(Pane& leftPane, Pane& rightPane, ConfigVar<int>&
 
 template <typename T>
 void graphics_tuner_control(Window& window, Pane& leftPane, Pane& rightPane, ConfigVar<T>& var,
-    const GraphicsTunerProps& props, bool prelaunch) {
+    const GraphicsTunerProps& props) {
     leftPane.register_control(
         leftPane
             .add_select_button({
@@ -546,10 +546,10 @@ void graphics_tuner_control(Window& window, Pane& leftPane, Pane& rightPane, Con
                 .isModified = [&var] { return var.getValue() != var.getDefaultValue(); },
                 .submit = false,
             })
-            .on_nav_command([&window, props, prelaunch](Rml::Event&, NavCommand cmd) {
+            .on_nav_command([&window, props](Rml::Event&, NavCommand cmd) {
                 if (cmd == NavCommand::Confirm || cmd == NavCommand::Left ||
                     cmd == NavCommand::Right) {
-                    window.push(std::make_unique<GraphicsTuner>(props, prelaunch));
+                    window.push(std::make_unique<GraphicsTuner>(props));
                     return true;
                 }
                 return false;
@@ -564,7 +564,6 @@ void graphics_tuner_control(Window& window, Pane& leftPane, Pane& rightPane, Con
 
 SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
     if (prelaunch) {
-        mSuppressNavFallback = true;
         add_tab("Prelaunch", [this](Rml::Element* content) {
             auto& leftPane = add_child<Pane>(content, Pane::Type::Controlled);
             auto& rightPane = add_child<Pane>(content, Pane::Type::Uncontrolled);
@@ -863,7 +862,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = 0,
                 .valueMax = 12,
                 .defaultValue = 0,
-            }, mPrelaunch);
+            });
         graphics_tuner_control(*this, leftPane, rightPane,
             getSettings().game.shadowResolutionMultiplier,
             GraphicsTunerProps{
@@ -873,7 +872,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = 1,
                 .valueMax = 8,
                 .defaultValue = 1,
-            }, mPrelaunch);
+            });
         graphics_tuner_control(*this, leftPane, rightPane, getSettings().game.resampler,
             GraphicsTunerProps{
                 .option = GraphicsOption::Resampler,
@@ -882,7 +881,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = static_cast<int>(Resampler::Bilinear),
                 .valueMax = static_cast<int>(Resampler::Area),
                 .defaultValue = static_cast<int>(Resampler::Bilinear),
-            }, mPrelaunch);
+            });
 
         leftPane.add_section("Post-Processing");
         graphics_tuner_control(*this, leftPane, rightPane, getSettings().game.bloomMode,
@@ -893,7 +892,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = static_cast<int>(BloomMode::Off),
                 .valueMax = static_cast<int>(BloomMode::Dusk),
                 .defaultValue = static_cast<int>(BloomMode::Classic),
-            }, mPrelaunch);
+            });
         graphics_tuner_control(*this, leftPane, rightPane, getSettings().game.bloomMultiplier,
             GraphicsTunerProps{
                 .option = GraphicsOption::BloomMultiplier,
@@ -903,8 +902,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMax = 100,
                 .defaultValue = 100,
                 .step = 10,
-            },
-            mPrelaunch);
+            });
         graphics_tuner_control(*this, leftPane, rightPane, getSettings().game.depthOfFieldMode,
             GraphicsTunerProps{
                 .option = GraphicsOption::DepthOfFieldMode,
@@ -913,8 +911,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = static_cast<int>(DepthOfFieldMode::Off),
                 .valueMax = static_cast<int>(DepthOfFieldMode::Dusk),
                 .defaultValue = static_cast<int>(DepthOfFieldMode::Classic),
-            },
-            mPrelaunch);
+            });
 
         leftPane.add_section("Rendering");
         graphics_tuner_control(*this, leftPane, rightPane,
@@ -926,8 +923,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = static_cast<int>(false),
                 .valueMax = static_cast<int>(true),
                 .defaultValue = static_cast<int>(false),
-            },
-            mPrelaunch);
+            });
         leftPane.register_control(
             leftPane.add_select_button({
                 .key = "Unlock Framerate",
@@ -993,7 +989,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
 
         leftPane.add_section("Inputs");
         leftPane.register_control(leftPane.add_button("Configure Inputs").on_pressed([this] {
-            push(std::make_unique<ControllerConfigWindow>(mPrelaunch));
+            push(std::make_unique<ControllerConfigWindow>());
         }),
             rightPane, [](Pane& pane) {
                 pane.clear();
