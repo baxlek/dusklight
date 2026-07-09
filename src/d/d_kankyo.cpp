@@ -1543,8 +1543,8 @@ void dScnKy_env_light_c::setDaytime() {
                         temp_r29 = false;
                     }
 						#if TARGET_PC
-						if (dusk::getSettings().game.systemTimeSync &&
-							dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) ||
+						if (dusk::getSettings().game.systemTimeSync) {
+							if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) ||
 							(!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||    // Ordon Ranch
 							(!strcmp(dComIfGp_getStartStageName(), "F_SP103")) ||   // Ordon Village
 							(!strcmp(dComIfGp_getStartStageName(), "F_SP104")) ||   // Ordon Spring
@@ -1579,11 +1579,12 @@ void dScnKy_env_light_c::setDaytime() {
                             } else {
                                 daytime += 1.0f;
                             }
-                        }
-                        if (dusk::getSettings().game.systemTimeSync == false) &&
-							(dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
-                            f32 prev = daytime;
-							daytime += time_change_rate;
+							}
+						}
+                        if (dusk::getSettings().game.systemTimeSync == false) {
+							if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
+								f32 prev = daytime;
+								daytime += time_change_rate;
 
                             if (time_change_rate == 1.0f &&
                                 (std::fmod(daytime - 90.0f + 360.0f, 360.0f) < std::fmod(prev - 90.0f + 360.0f, 360.0f) ||
@@ -1591,6 +1592,7 @@ void dScnKy_env_light_c::setDaytime() {
                             {
                                 g_env_light.time_change_rate = 0.012f;
                             }
+							}
                         #else
                         daytime += time_change_rate;
                         #endif
