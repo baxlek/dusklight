@@ -50,6 +50,9 @@ UserSettings g_userSettings = {
         .instantText {"game.instantText", false},
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
+        .enableDeselectSwords {"game.enableDeselectSwords", false},
+        .enableDeselectShields {"game.enableDeselectShields", false},
+        .enableDeselectClothes {"game.enableDeselectClothes", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
 
         // Preferences
@@ -256,6 +259,9 @@ void registerSettings() {
     Register(g_userSettings.game.instantText);
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
+    Register(g_userSettings.game.enableDeselectSwords);
+    Register(g_userSettings.game.enableDeselectShields);
+    Register(g_userSettings.game.enableDeselectClothes);
     Register(g_userSettings.game.enhancedMapMenus);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
