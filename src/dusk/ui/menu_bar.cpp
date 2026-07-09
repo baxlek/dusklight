@@ -18,6 +18,7 @@
 #include "imgui.h"
 #include "modal.hpp"
 #include "rando_config.hpp"
+#include "mods_window.hpp"
 #include "settings.hpp"
 #include "ui.hpp"
 #include "warp.hpp"
@@ -65,6 +66,7 @@ MenuBar::MenuBar() : Document(kDocumentSource), mRoot(mDocument->GetElementById(
     mTabBar->add_tab("Randomizer", [this] { push(std::make_unique<RandomizerWindow>()); });
 
     mTabBar->add_tab("Cosmetics", [this] {push(std::make_unique<CosmeticsWindow>());});
+    mTabBar->add_tab("Mods", [this] { push(std::make_unique<ModsWindow>()); });
 
     mTabBar->add_tab("Reset", [this] {
         mTabBar->set_active_tab(-1);
@@ -233,6 +235,19 @@ bool MenuBar::handle_nav_command(Rml::Event& event, NavCommand cmd) {
 
 bool MenuBar::focus() {
     return mTabBar->focus();
+}
+
+void MenuBar::rebuild() {
+    for (auto& doc : get_document_stack()) {
+        if (auto* menuBar = dynamic_cast<MenuBar*>(doc.get())) {
+            const bool wasVisible = menuBar->visible();
+            doc = std::make_unique<MenuBar>();
+            if (wasVisible) {
+                doc->show();
+            }
+            break;
+        }
+    }
 }
 
 }  // namespace dusk::ui
