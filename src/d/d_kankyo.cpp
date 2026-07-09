@@ -1597,8 +1597,8 @@ void dScnKy_env_light_c::setDaytime() {
 
                         // Stage is Fishing Pond or Hena's Hut
                         if (dusk::getSettings().game.systemTimeSync == false) {
-							(!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
-                            !strcmp(dComIfGp_getStartStageName(), "R_SP127"));
+							if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
+								!strcmp(dComIfGp_getStartStageName(), "R_SP127"))
                             {
                                 if (daytime >= 300.0f || daytime <= 60.0f) {
                                     daytime += time_change_rate;
@@ -1619,6 +1619,7 @@ void dScnKy_env_light_c::setDaytime() {
                             dDbVw_Report(190, 65, "TS");
                         }
                         #endif
+					}
                 } else {
                     #if DEBUG
                     if (fapGmHIO_get2Ddraw()) {
