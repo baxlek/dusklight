@@ -1581,7 +1581,7 @@ void dScnKy_env_light_c::setDaytime() {
                             }
                         }
                         if (dusk::getSettings().game.systemTimeSync == false) {
-                            if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29)) {
+                            if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
 
                             f32 prev = daytime;
                             daytime += time_change_rate;
