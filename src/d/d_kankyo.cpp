@@ -1590,6 +1590,7 @@ void dScnKy_env_light_c::setDaytime() {
                             {
                                 g_env_light.time_change_rate = 0.012f;
                             }
+						}
                         #else
                         daytime += time_change_rate;
                         #endif
@@ -1612,8 +1613,7 @@ void dScnKy_env_light_c::setDaytime() {
                                 dKankyo_DayProc();
                             }
                         }
-					}
-                    else {
+                    } else {
                         #if DEBUG
                         if (fapGmHIO_get2Ddraw()) {
                             dDbVw_Report(190, 65, "TS");
