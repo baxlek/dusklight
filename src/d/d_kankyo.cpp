@@ -1598,7 +1598,7 @@ void dScnKy_env_light_c::setDaytime() {
                                (!strcmp(dComIfGp_getStartStageName(), "F_SP104")) ||   // Ordon Spring
                                (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) ||   // Kakariko Village
                                (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) ||   // Kakariko Graveyard
-                               (!strcmp(dComIfGp_getStartStageName(), "F_SP128")) {    // Hidden Village
+                               (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) {   // Hidden Village
                                time_change_rate = 0.0f;
                             }
                         #else
