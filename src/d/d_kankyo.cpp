@@ -1592,7 +1592,6 @@ void dScnKy_env_light_c::setDaytime() {
                                 g_env_light.time_change_rate = 0.012f;
                             }
 						}
-						}
                         #else
                         daytime += time_change_rate;
                         #endif
