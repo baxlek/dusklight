@@ -1542,16 +1542,15 @@ void dScnKy_env_light_c::setDaytime() {
                     if (msg != NULL && msg->mode >= 2) {
                         temp_r29 = false;
                     }
-					
+					if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
 						#if TARGET_PC
-						if (dusk::getSettings().game.systemTimeSync) &&
-							(dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) ||
+						if (dusk::getSettings().game.systemTimeSync &&
 							(!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||    // Ordon Ranch
 							(!strcmp(dComIfGp_getStartStageName(), "F_SP103")) ||   // Ordon Village
 							(!strcmp(dComIfGp_getStartStageName(), "F_SP104")) ||   // Ordon Spring
 							(!strcmp(dComIfGp_getStartStageName(), "F_SP109")) ||   // Kakariko Village
 							(!strcmp(dComIfGp_getStartStageName(), "F_SP111")) ||   // Kakariko Graveyard
-							(!strcmp(dComIfGp_getStartStageName(), "F_SP128")) {    // Hidden Village
+							(!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) {   // Hidden Village
 
                      //     For when OSGetSystemTime() is implemented  
                      //     OSCalendarTime calendarTime;
@@ -1580,10 +1579,8 @@ void dScnKy_env_light_c::setDaytime() {
                             } else {
                                 daytime += 1.0f;
                             }
-							}
 						}
                         if (dusk::getSettings().game.systemTimeSync == false) {
-							if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
 								f32 prev = daytime;
 								daytime += time_change_rate;
 
@@ -1593,7 +1590,6 @@ void dScnKy_env_light_c::setDaytime() {
                             {
                                 g_env_light.time_change_rate = 0.012f;
                             }
-							}
                         #else
                         daytime += time_change_rate;
                         #endif
@@ -1616,6 +1612,7 @@ void dScnKy_env_light_c::setDaytime() {
                                 dKankyo_DayProc();
                             }
                         }
+					}
                     else {
                         #if DEBUG
                         if (fapGmHIO_get2Ddraw()) {
