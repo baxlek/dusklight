@@ -1599,7 +1599,7 @@ void dScnKy_env_light_c::setDaytime() {
                                (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) ||   // Kakariko Village
                                (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) ||   // Kakariko Graveyard
                                (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) {   // Hidden Village
-                                dComIfGp_roomControl_getTimePass() = false;
+                                using_time_control_tag = 1;
                             }
                         #else
                         daytime += time_change_rate;
