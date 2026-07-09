@@ -1593,12 +1593,12 @@ void dScnKy_env_light_c::setDaytime() {
                                 g_env_light.time_change_rate = 0.012f;
                             }
                         }
-                            if (!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||    // Ordon Ranch
+                            if ((!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||   // Ordon Ranch
                                (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) ||   // Ordon Village
                                (!strcmp(dComIfGp_getStartStageName(), "F_SP104")) ||   // Ordon Spring
                                (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) ||   // Kakariko Village
                                (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) ||   // Kakariko Graveyard
-                               (!strcmp(dComIfGp_getStartStageName(), "F_SP128")) {    // Hidden Village
+                               (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) {   // Hidden Village
                                 dComIfGp_roomControl_getTimePass() = false;
                             }
                         #else
