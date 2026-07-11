@@ -7,6 +7,7 @@
 
 #include "achievements.hpp"
 #include "aurora/rmlui.hpp"
+#include "cosmetics.hpp"
 #include "dusk/livesplit.h"
 #include "dusk/main.h"
 #include "dusk/mods/svc/ui.hpp"
@@ -18,6 +19,7 @@
 #include "imgui.h"
 #include "modal.hpp"
 #include "mods_window.hpp"
+#include "rando_config.hpp"
 #include "settings.hpp"
 #include "ui.hpp"
 #include "warp.hpp"
@@ -25,6 +27,7 @@
 
 #include <chrono>
 #include <cmath>
+
 
 namespace dusk::ui {
 namespace {
@@ -66,6 +69,10 @@ MenuBar::MenuBar()
     for (auto& tab : mods::svc::ui_mod_menu_tabs()) {
         mTabBar->add_tab(tab.label, std::move(tab.onSelected));
     }
+
+    mTabBar->add_tab("Randomizer", [this] { push(std::make_unique<RandomizerWindow>()); });
+
+    mTabBar->add_tab("Cosmetics", [this] {push(std::make_unique<CosmeticsWindow>());});
 
     mTabBar->add_tab("Reset", [this] {
         mTabBar->set_active_tab(-1);
