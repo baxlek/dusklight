@@ -18,6 +18,7 @@
 #include "f_pc/f_pc_name.h"
 #include "imgui.h"
 #include "modal.hpp"
+#include "mods_window.hpp"
 #include "rando_config.hpp"
 #include "mods_window.hpp"
 #include "settings.hpp"
@@ -65,6 +66,10 @@ MenuBar::MenuBar()
     }
 
     mTabBar->add_tab("Achievements", [this] { push(std::make_unique<AchievementsWindow>()); });
+    mTabBar->add_tab("Mods", [this] { push(std::make_unique<ModsWindow>()); });
+    for (auto& tab : mods::svc::ui_mod_menu_tabs()) {
+        mTabBar->add_tab(tab.label, std::move(tab.onSelected));
+    }
 
     mTabBar->add_tab("Randomizer", [this] { push(std::make_unique<RandomizerWindow>()); });
 
