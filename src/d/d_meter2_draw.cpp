@@ -58,6 +58,7 @@ void dAnchorHudScale(CPaneMgr* i_pane, HudCorner i_corner, f32* io_x, f32* io_y,
 
 }  // namespace
 #endif
+
 dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
     OS_REPORT("enter dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap *mp_heap)\n");
 
@@ -2150,6 +2151,16 @@ void dMeter2Draw_c::setAlphaLightDropAnimeMax() {
 }
 
 void dMeter2Draw_c::drawRupee(s16 i_rupeeNum) {
+    /* 
+        The game crashes if i_rupeeNum > 9 999 since the UI wasn't made to display five digits. 
+        Possible workaround is to clamp the rupee count shown by the UI but keep the true rupee count intact.
+        Doing so would allow the rupee count to go to 65 535, the u16 limit.
+        Working example: 
+
+        if (i_rupeeNum > 9999) {
+            i_rupeeNum = 9999;
+        }
+    */ 
     mpRupeeTexture[3][0]->hide();
     mpRupeeTexture[3][1]->hide();
 
@@ -2813,7 +2824,7 @@ void dMeter2Draw_c::drawButtonCross(f32 i_posX, f32 i_posY) {
 #if TARGET_PC
     f32 buttonCrossPosX = i_posX;
     f32 buttonCrossPosY = i_posY;
-    dAnchorHudScale(mpButtonCrossParent, HudCorner::TopLeft, &buttonCrossPosX, &buttonCrossPosY);
+    dAnchorHudScale(mpButtonCrossParent, HudCorner::BottomLeft, &buttonCrossPosX, &buttonCrossPosY);
     mpButtonCrossParent->paneTrans(buttonCrossPosX, buttonCrossPosY);
 #else
     mpButtonCrossParent->paneTrans(i_posX, i_posY);

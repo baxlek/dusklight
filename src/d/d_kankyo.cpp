@@ -37,6 +37,8 @@
 #include "dusk/settings.h"
 #include "dusk/frame_interpolation.h"
 #include "dusk/game_clock.h"
+static f32 timeScale = 1.0f;
+#include <chrono>
 #endif
 
 static void GxXFog_set();
@@ -1542,38 +1544,87 @@ void dScnKy_env_light_c::setDaytime() {
                         temp_r29 = false;
                     }
 
-                    if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29) {
-                        #if TARGET_PC
-                        f32 prev = daytime;
-                        #endif
+                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29 ||
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||    // Ordon Ranch
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) ||   // Ordon Village
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP104")) ||   // Ordon Spring
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) ||   // Kakariko Village
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) ||   // Kakariko Graveyard
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP118")) ||   // Bulblin Camp
+                           (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) {   // Hidden Village
+                         #if TARGET_PC
+                         if (dusk::getSettings().game.systemTimeSync) {
 
-                        daytime += time_change_rate;
+                     //     For when OSGetSystemTime() is implemented  
+                     //     OSCalendarTime calendarTime;
+                     //     OSTicksToCalendarTime(OSGetSystemTime(), &calendarTime);
 
-                        #if TARGET_PC
-                        if (time_change_rate == 1.0f &&
-                            (std::fmod(daytime - 90.0f + 360.0f, 360.0f) < std::fmod(prev - 90.0f + 360.0f, 360.0f) ||
-                             std::fmod(daytime - 285.0f + 360.0f, 360.0f) < std::fmod(prev - 285.0f + 360.0f, 360.0f)))
-                        {
-                            g_env_light.time_change_rate = 0.012f;
+                            auto now = std::chrono::system_clock::now();
+                            auto time_t_now = std::chrono::system_clock::to_time_t(now);
+                            struct tm* timeinfo = std::localtime(&time_t_now);
+                            
+                     //     const f32 calendarDaytime = calendarTime.hour * 15.0f +
+                     //                               calendarTime.min * (15.0f / 60.0f) +
+                     //                               calendarTime.sec * (15.0f / 3600.0f);
+
+                            const f32 calendarDaytime = timeinfo->tm_hour * 15.0f +
+                                                        timeinfo->tm_min * (15.0f / 60.0f) +
+                                                        timeinfo->tm_sec * (15.0f / 3600.0f);
+                            
+                        f32 diffDaytime = calendarDaytime - daytime;
+
+                            if (diffDaytime < 0.0f) {
+                                diffDaytime += 360.0f;
+                            }
+
+                            if (diffDaytime <= 1.0f) {
+                                daytime = calendarDaytime;
+                            } else {
+                                daytime += 1.0f;
+                            }
                         }
+                        else {
+                            f32 prev = daytime;
+                       daytime += time_change_rate;
+
+                            if (time_change_rate == 1.0f &&
+                                (std::fmod(daytime - 90.0f + 360.0f, 360.0f) < std::fmod(prev - 90.0f + 360.0f, 360.0f) ||
+                                std::fmod(daytime - 285.0f + 360.0f, 360.0f) < std::fmod(prev - 285.0f + 360.0f, 360.0f)))
+                            {
+                                g_env_light.time_change_rate = 0.012f;
+                            }
+                        }
+                        #else
+                        daytime += time_change_rate;
                         #endif
 
                         // Stage is Fishing Pond or Hena's Hut
-                        if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
-                            !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
-                        {
-                            if (daytime >= 300.0f || daytime <= 60.0f) {
-                                daytime += time_change_rate;
-                                daytime += time_change_rate;
-                            } else if (daytime >= 150.0f && daytime <= 195.0f) {
-                                daytime = daytime + time_change_rate;
+                        if (dusk::getSettings().game.systemTimeSync == false) {
+                            if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
+                                !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
+                            {
+                                if (daytime >= 300.0f || daytime <= 60.0f) {
+                                    daytime += time_change_rate;
+                                    daytime += time_change_rate;
+                                } else if (daytime >= 150.0f && daytime <= 195.0f) {
+                                    daytime = daytime + time_change_rate;
+                                }
                             }
-                        }
-
-                        if ((u32)daytime >= 360.0f) {
-                            daytime = 0.0f;
-                            mDate++;
-                            dKankyo_DayProc();
+                            if ((u32)daytime >= 360.0f) {
+                                daytime = 0.0f;
+                                mDate++;
+                                dKankyo_DayProc();
+                            }
+                        // Reset certain stages to default
+                            if (!strcmp(dComIfGp_getStartStageName(), "F_SP00") ||    // Ordon Ranch
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP103") ||   // Ordon Village
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP104") ||   // Ordon Spring
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP109") ||   // Kakariko Village
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP111") ||   // Kakariko Graveyard
+								!strcmp(dComIfGp_getStartStageName(), "F_SP118") ||   // Bulblin Camp
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP128")) {   // Hidden Village
+                                time_change_rate = 0.0f;
+                            }
                         }
                     } else {
                         #if DEBUG
@@ -1799,6 +1850,9 @@ void dScnKy_env_light_c::setLight_palno_get(u8* prev_envr_id_p, u8* next_envr_id
     u8 psel_idx = 0;
     int i;
     int sp14 = 0;
+#if TARGET_PC
+    const f32 timeScale = (pattern_ratio_p == &g_env_light.pat_ratio) ? ::timeScale : 1.0f;
+#endif
 
     if (*init_timer_p != 0) {
         (*init_timer_p)++;
@@ -2132,14 +2186,22 @@ void dScnKy_env_light_c::setLight_palno_get(u8* prev_envr_id_p, u8* next_envr_id
 
             if (g_env_light.mColPatMode == 0) {
                 if (pselect_p->change_rate > 0.0f) {
+#if TARGET_PC
+                    *pattern_ratio_p += timeScale * ((1.0f / 30) / pselect_p->change_rate);
+#else
                     *pattern_ratio_p += (1.0f / 30) / pselect_p->change_rate;
+#endif
                 }
 
                 // pattern change rate is faster in hyrule field
                 if (strcmp(dComIfGp_getStartStageName(), "F_SP121") == 0 &&
                     *prev_pat_p == *next_pat_p)
                 {
+#if TARGET_PC
+                    *pattern_ratio_p += timeScale * (1.0f / 15);
+#else
                     *pattern_ratio_p += (1.0f / 15);
+#endif
                 }
 
                 if (*pattern_ratio_p >= 1.0f) {
@@ -2332,6 +2394,10 @@ void dScnKy_env_light_c::setLight() {
         u8 next_pal_start_id;
         u8 prev_pal_end_id;
         u8 next_pal_end_id;
+#if TARGET_PC
+        const f32 deltaTime = dusk::game_clock::consume_interval(this);
+        timeScale = deltaTime / dusk::game_clock::period_for_original_frames(1.0f);
+#endif
         setLight_palno_get(&g_env_light.PrevCol, &g_env_light.UseCol, &g_env_light.wether_pat0,
                            &g_env_light.wether_pat1, &prev_pal_start_id, &prev_pal_end_id,
                            &next_pal_start_id, &next_pal_end_id, &color_ratio, &start_pat_pal_id,
@@ -2517,8 +2583,6 @@ void dScnKy_env_light_c::setLight() {
                 f32 sin = cM_ssin(S_fuwan_sin);
 
                 #if TARGET_PC
-                    const f32 deltaTime = dusk::game_clock::consume_interval(this);
-                    const f32 timeScale = deltaTime / dusk::game_clock::period_for_original_frames(1.0f);
                     S_fuwan_sin += (s16)((cM_rndF(2000.0f) + 500) * timeScale);
                 #else
                     S_fuwan_sin += (s16)cM_rndF(2000.0f) + 500;

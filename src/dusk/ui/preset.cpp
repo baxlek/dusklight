@@ -34,7 +34,7 @@ void applyPresetDusk() {
     s.game.fastClimbing.setValue(true);
     s.game.noMissClimbing.setValue(true);
     s.game.fastTears.setValue(true);
-    s.game.biggerWallets.setValue(true);
+    s.game.walletSizes.setValue(1); // HD
     s.game.invertCameraXAxis.setValue(true);
     s.game.invertFirstPersonYAxis.setValue(true);
     s.game.no2ndFishForCat.setValue(true);
@@ -106,7 +106,7 @@ PresetWindow::PresetWindow() : WindowSmall("modal", "modal-dialog") {
             if (cmd == NavCommand::Confirm) {
                 apply();
                 getSettings().backend.wasPresetChosen.setValue(true);
-                config::Save();
+                config::save();
                 hide(true);
                 return true;
             }

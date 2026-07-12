@@ -1,5 +1,6 @@
 #include "dusk/settings.h"
 #include "dusk/config.hpp"
+#include <aurora/aurora.h>
 
 namespace dusk {
 
@@ -33,7 +34,7 @@ UserSettings g_userSettings = {
         // Quality of Life
         .enableQuickTransform {"game.enableQuickTransform", false},
         .hideTvSettingsScreen {"game.hideTvSettingsScreen", true},
-        .biggerWallets {"game.biggerWallets", false},
+        .walletSizes{"game.walletSizes", 0},
         .noReturnRupees {"game.noReturnRupees", false},
         .disableRupeeCutscenes {"game.disableRupeeCutscenes", false},
         .noSwordRecoil {"game.noSwordRecoil", false},
@@ -49,6 +50,9 @@ UserSettings g_userSettings = {
         .instantText {"game.instantText", false},
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
+        .enableDeselectSwords {"game.enableDeselectSwords", false},
+        .enableDeselectShields {"game.enableDeselectShields", false},
+        .enableDeselectClothes {"game.enableDeselectClothes", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
 
         // Preferences
@@ -128,6 +132,8 @@ UserSettings g_userSettings = {
         .infiniteOil {"game.infiniteOil", false},
         .infiniteOxygen {"game.infiniteOxygen", false},
         .infiniteRupees {"game.infiniteRupees", false},
+        .infiniteBottle {"game.infiniteBottle", false},
+        .infiniteBait {"game.infiniteBait", false},
         .enableIndefiniteItemDrops {"game.enableIndefiniteItemDrops", false},
         .moonJump {"game.moonJump", false},
         .superClawshot {"game.superClawshot", false},
@@ -138,6 +144,7 @@ UserSettings g_userSettings = {
         .fastSpinner {"game.fastSpinner", false},
         .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
         .invincibleEnemies {"game.invincibleEnemies", false},
+        .systemTimeSync{"game.systemTimeSync", false},
 
         // Technical
         .restoreWiiGlitches {"game.restoreWiiGlitches", false},
@@ -269,7 +276,7 @@ void registerSettings() {
     Register(g_userSettings.game.language);
     Register(g_userSettings.game.enableQuickTransform);
     Register(g_userSettings.game.hideTvSettingsScreen);
-    Register(g_userSettings.game.biggerWallets);
+    Register(g_userSettings.game.walletSizes);
     Register(g_userSettings.game.noReturnRupees);
     Register(g_userSettings.game.disableRupeeCutscenes);
     Register(g_userSettings.game.noSwordRecoil);
@@ -284,6 +291,9 @@ void registerSettings() {
     Register(g_userSettings.game.instantText);
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
+    Register(g_userSettings.game.enableDeselectSwords);
+    Register(g_userSettings.game.enableDeselectShields);
+    Register(g_userSettings.game.enableDeselectClothes);
     Register(g_userSettings.game.enhancedMapMenus);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
@@ -298,7 +308,8 @@ void registerSettings() {
     Register(g_userSettings.game.touchCameraYSensitivity);
     Register(g_userSettings.game.minimalHUD);
     Register(g_userSettings.game.hudScale);
-    Register(g_userSettings.game.pauseOnFocusLost);
+    Register(g_userSettings.game.pauseOnFocusLost,
+        [](const bool& value, const bool&) { aurora_set_pause_on_focus_lost(value); });
     Register(g_userSettings.game.enableDiscordPresence);
     Register(g_userSettings.game.bloomMode);
     Register(g_userSettings.game.bloomMultiplier);
@@ -339,12 +350,15 @@ void registerSettings() {
     Register(g_userSettings.game.infiniteOil);
     Register(g_userSettings.game.infiniteOxygen);
     Register(g_userSettings.game.infiniteRupees);
+    Register(g_userSettings.game.infiniteBottle);
+    Register(g_userSettings.game.infiniteBait);
     Register(g_userSettings.game.enableIndefiniteItemDrops);
     Register(g_userSettings.game.moonJump);
     Register(g_userSettings.game.superClawshot);
     Register(g_userSettings.game.alwaysGreatspin);
     Register(g_userSettings.game.invincibleEnemies);
     Register(g_userSettings.game.enableFrameInterpolation);
+    Register(g_userSettings.game.systemTimeSync);
     Register(g_userSettings.game.enableGyroAim);
     Register(g_userSettings.game.enableGyroRollgoal);
     Register(g_userSettings.game.gyroSensitivityX);
