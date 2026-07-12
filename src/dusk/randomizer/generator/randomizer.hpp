@@ -7,6 +7,8 @@
 
 #ifndef RANDO_SAVE_PATH
 #define RANDO_SAVE_PATH "."
+#ifndef DUSK_RANDOMIZER_GENERATOR_RANDOMIZER_HPP
+#define DUSK_RANDOMIZER_GENERATOR_RANDOMIZER_HPP
 #endif
 
 namespace randomizer
