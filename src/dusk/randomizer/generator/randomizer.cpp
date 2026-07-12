@@ -20,8 +20,6 @@
 
 namespace randomizer
 {
-    Randomizer::Randomizer() = default;
-
     logic::world::World* Randomizer::GetWorld(int worldId /*= 1*/) {
         auto worldIndex = worldId - 1;
         if (worldIndex < this->_worlds.size()) {
