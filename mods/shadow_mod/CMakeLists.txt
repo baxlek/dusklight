@@ -23,3 +23,8 @@ target_link_libraries(shadow_mod
   PRIVATE
     yaml-cpp
 )
+
+target_link_libraries(shadow_mod
+  PRIVATE
+    battery
+)
