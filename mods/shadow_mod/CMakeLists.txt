@@ -24,7 +24,9 @@ target_link_libraries(shadow_mod
     yaml-cpp
 )
 
-target_link_libraries(shadow_mod
-  PRIVATE
-    battery
-)
+if(TARGET battery)
+    target_link_libraries(shadow_mod
+      PRIVATE
+        battery
+    )
+endif()
