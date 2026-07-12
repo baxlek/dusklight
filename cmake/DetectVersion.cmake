@@ -85,7 +85,7 @@ macro(detect_version)
             math(EXPR DUSK_VERSION_CODE
                     "${_ver_major} * 10000000 + ${_ver_minor} * 100000 + ${_ver_patch} * 1000 + ${_tweak}")
         else ()
-            set(DUSK_WC_DESCRIBE "UNKNOWN-VERSION")
+            set(DUSK_WC_DESCRIBE "Custom")
             set(DUSK_VERSION_STRING "0.0.0.0")
             set(DUSK_SHORT_VERSION_STRING "0.0.0")
             set(DUSK_VERSION_CODE "1")
