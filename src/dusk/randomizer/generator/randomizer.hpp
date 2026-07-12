@@ -3,6 +3,11 @@
 #include "logic/world.hpp"
 
 #include <optional>
+#include <filesystem>
+
+#ifndef RANDO_SAVE_PATH
+#define RANDO_SAVE_PATH "."
+#endif
 
 namespace randomizer
 {
