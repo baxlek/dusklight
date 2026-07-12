@@ -1,7 +1,6 @@
 #include "spoiler_log.hpp"
 
 #include "entrance_shuffle.hpp"
-#include "../randomizer.hpp"
 #include "../utility/file.hpp"
 #include "../utility/platform.hpp"
 #include "../utility/yaml.hpp"
