@@ -4,7 +4,6 @@
 
 #include "../utility/file.hpp"
 #include "../utility/path.hpp"
-#include "battery/embed.hpp"
 
 // Prefer Battery embed when available, but allow builds without it.
 #if __has_include("battery/embed.hpp")
