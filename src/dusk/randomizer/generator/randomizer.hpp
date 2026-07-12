@@ -9,10 +9,6 @@
 #define RANDO_SAVE_PATH "."
 #endif
 
-#ifndef DUSK_RANDOMIZER_GENERATOR_RANDOMIZER_HPP
-#define DUSK_RANDOMIZER_GENERATOR_RANDOMIZER_HPP
-#endif
-
 namespace randomizer
 {
     class Randomizer
