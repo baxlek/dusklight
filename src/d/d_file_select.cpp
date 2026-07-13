@@ -2760,7 +2760,7 @@ void dFile_select_c::CommandExec() {
         // Copy over the seed hash as well
         auto& seedHashes = dusk::getSettings().randomizer.seedHashes;
         seedHashes[mCpDataToNum].setValue(seedHashes[mCpDataNum]);
-        dusk::config::Save();
+        dusk::config::save();
 #endif
         break;
     }
@@ -2823,7 +2823,7 @@ void dFile_select_c::ErasePaneMoveOk() {
 #if TARGET_PC
         // Clear the seed hash for this file when it gets erased
         dusk::getSettings().randomizer.seedHashes.at(mSelectNum).setValue("");
-        dusk::config::Save();
+        dusk::config::save();
 #endif
         makeRecInfo(mSelectNum);
         headerTxtSet(0x4b, 0, 0);
