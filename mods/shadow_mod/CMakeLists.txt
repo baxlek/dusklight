@@ -18,3 +18,15 @@ add_mod(shadow_mod
     RES_DIR  res
     BUNDLE
 )
+
+target_link_libraries(shadow_mod
+  PRIVATE
+    yaml-cpp
+)
+
+if(TARGET battery)
+    target_link_libraries(shadow_mod
+      PRIVATE
+        battery
+    )
+endif()
