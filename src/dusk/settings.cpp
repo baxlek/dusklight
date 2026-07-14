@@ -50,10 +50,10 @@ UserSettings g_userSettings = {
         .instantText {"game.instantText", false},
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
+        .enhancedMapMenus {"game.enhancedMapMenus", false},
         .enableDeselectSwords {"game.enableDeselectSwords", false},
         .enableDeselectShields {"game.enableDeselectShields", false},
         .enableDeselectClothes {"game.enableDeselectClothes", false},
-        .enhancedMapMenus {"game.enhancedMapMenus", false},
         .timeSync{"game.timeSync", false},
 
         // Preferences
