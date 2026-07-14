@@ -4163,14 +4163,7 @@ int daAlink_c::procWolfHowlDemo() {
                     } else {
                         #if TARGET_PC
                         if (daAlink_getAlinkActorClass()->getCorrectCurveID() == 9) {
-                            if (!dusk::getSettings().game.timeSync && dComIfGp_roomControl_getTimePass() ||
-                               (!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||  // Ordon Ranch
-                               (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) || // Ordon Village
-                               (!strcmp(dComIfGp_getStartStageName(), "F_SP104")) || // Ordon Spring
-                               (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) || // Kakariko Village
-                               (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) || // Kakariko Graveyard
-                               (!strcmp(dComIfGp_getStartStageName(), "F_SP118")) || // Bulblin Camp
-                               (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) { // Hidden Village)
+                            if (!dusk::getSettings().game.timeSync && dComIfGp_roomControl_getTimePass() {
                                 g_env_light.time_change_rate = 1.0f;
                                 dComIfGp_event_reset();
                                 dCam_getBody()->EndEventCamera(fopAcM_GetID(this));
