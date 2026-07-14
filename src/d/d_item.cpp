@@ -1116,14 +1116,6 @@ int checkItemGet(u8 i_itemNo, int i_default) {
                     return 0;
                 }
             break;
-        case dItemNo_Randomizer_TOMATO_PUREE_e:
-        case dItemNo_Randomizer_TASTE_e:
-            // Check to see if currently in Snowpeak Ruins
-            if (getStageID() == Snowpeak_Ruins) {
-                // Return false so that yeta will give the map item no matter what.
-                return 0;
-            }
-            break;
         case dItemNo_Randomizer_IRONBALL_e:
             // Check to see if currently in Snowpeak Ruins Darkhammer room
             if (getStageID() == Darkhammer) {
