@@ -1265,7 +1265,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Transform instantly by pressing R and Y simultaneously.");
 
         leftPane.add_section("World");
-        addSpeedrunDisabledOption("Time Sync", getSettings().game.TimeSync,
+        addSpeedrunDisabledOption("Time Sync", getSettings().game.timeSync,
             "Synchronizes in-game time with the device clock.");
 
         leftPane.add_section("Speedrunning");
