@@ -50,10 +50,10 @@ UserSettings g_userSettings = {
         .instantText {"game.instantText", false},
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
-        .enhancedMapMenus {"game.enhancedMapMenus", false},
         .enableDeselectSwords {"game.enableDeselectSwords", false},
         .enableDeselectShields {"game.enableDeselectShields", false},
         .enableDeselectClothes {"game.enableDeselectClothes", false},
+        .enhancedMapMenus {"game.enhancedMapMenus", false},
         .timeSync{"game.timeSync", false},
 
         // Preferences
@@ -72,7 +72,7 @@ UserSettings g_userSettings = {
         .bloomMultiplier {"game.bloomMultiplier", 1.0f},
         .depthOfFieldMode{"game.depthOfFieldMode", DepthOfFieldMode::Dusk},
         .disableWaterRefraction {"game.disableWaterRefraction", false},
-        .enableTextureReplacements {"game.enableTextureReplacements", true},
+        .nableTextureReplacements {"game.enableTextureReplacements", true},
         .enableFrameInterpolation {"game.enableFrameInterpolation", FrameInterpMode::Off},
         .internalResolutionScale {"game.internalResolutionScale", 0},
         .shadowResolutionMultiplier {"game.shadowResolutionMultiplier", 1},
@@ -358,7 +358,6 @@ void registerSettings() {
     Register(g_userSettings.game.alwaysGreatspin);
     Register(g_userSettings.game.invincibleEnemies);
     Register(g_userSettings.game.enableFrameInterpolation);
-    Register(g_userSettings.game.timeSync);
     Register(g_userSettings.game.enableGyroAim);
     Register(g_userSettings.game.enableGyroRollgoal);
     Register(g_userSettings.game.gyroSensitivityX);
