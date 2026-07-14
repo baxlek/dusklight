@@ -53,8 +53,8 @@ UserSettings g_userSettings = {
         .enableDeselectSwords {"game.enableDeselectSwords", false},
         .enableDeselectShields {"game.enableDeselectShields", false},
         .enableDeselectClothes {"game.enableDeselectClothes", false},
-        .enhancedMapMenus {"game.enhancedMapMenus", false},
         .timeSync{"game.timeSync", false},
+        .enhancedMapMenus {"game.enhancedMapMenus", false},
 
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
