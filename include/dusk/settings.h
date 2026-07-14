@@ -266,7 +266,7 @@ struct UserSettings {
         ConfigVar<bool> fastSpinner;
         ConfigVar<MagicArmorMode> armorRupeeDrain;
         ConfigVar<bool> invincibleEnemies;
-        ConfigVar<bool> TimeSync;
+        ConfigVar<bool> timeSync;
 
         // Technical
         ConfigVar<bool> restoreWiiGlitches;
