@@ -9,8 +9,12 @@
 #include "d/actor/d_a_tag_statue_evt.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_debug_viewer.h"
+
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/tools.h"
 #include "dusk/randomizer/game/verify_item_functions.h"
+#endif
 
 class daTagStatue_HIO_c : public mDoHIO_entry_c {
 public:

@@ -20,6 +20,9 @@
 #include "d/d_tresure.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
 
 enum ykM_RES_File_ID {
     /* BCK */

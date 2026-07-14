@@ -14,6 +14,10 @@
 #include "d/actor/d_a_obj_ystone.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 static DUSK_CONST char* l_arcName = "ef_Portal";
 
 static char const* l_clearEvName[9] = {

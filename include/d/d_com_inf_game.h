@@ -1,10 +1,6 @@
 #ifndef D_COM_D_COM_INF_GAME_H
 #define D_COM_D_COM_INF_GAME_H
 
-#if TARGET_PC
-#include "dusk/randomizer/game/randomizer_context.hpp"
-#endif
-
 #include "d/d_attention.h"
 #include "d/d_cc_s.h"
 #include "d/d_event.h"
@@ -21,7 +17,9 @@
 #include "m_Do/m_Do_graphic.h"
 #include <cstring>
 
+#if TARGET_PC
 #include "dusk/profiling.hpp"
+#endif
 
 enum dComIfG_ButtonStatus {
     /* 0x00 */ BUTTON_STATUS_NONE,

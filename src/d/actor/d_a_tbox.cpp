@@ -13,6 +13,7 @@
 #include <cstring>
 
 #if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/tools.h"
 #include "dusk/randomizer/game/verify_item_functions.h"
 #endif

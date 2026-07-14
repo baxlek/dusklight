@@ -10,6 +10,10 @@
 #include "d/d_s_play.h"
 #include "c/c_damagereaction.h"
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 enum daE_MD_TYPE {
     TYPE_DUMMY,
     TYPE_REAL,

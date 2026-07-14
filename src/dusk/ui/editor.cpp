@@ -9,6 +9,7 @@
 #include "d/d_kankyo.h"
 #include "d/d_meter2_info.h"
 #include "dusk/map_loader_definitions.h"
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/verify_item_functions.h"
 #include "number_button.hpp"
 #include "pane.hpp"

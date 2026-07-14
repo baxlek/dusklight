@@ -14,6 +14,10 @@
 #include <cstring>
 #include "Z2AudioLib/SpotName.h"
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 Z2SceneMgr::Z2SceneMgr() : JASGlobalInstance<Z2SceneMgr>(true) {
     sceneNum = -1;
     BGM_ID = -1;

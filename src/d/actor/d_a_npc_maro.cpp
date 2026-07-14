@@ -18,6 +18,7 @@
 #include "d/d_item.h"
 #include "d/d_timer.h"
 #if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/verify_item_functions.h"
 #endif
 #if DEBUG

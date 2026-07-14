@@ -26,6 +26,7 @@
 #if TARGET_PC
 #include "dusk/config.hpp"
 #include "dusk/menu_pointer.h"
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/string.hpp"
 #include "dusk/ui/modal.hpp"
 #include "dusk/ui/rando_config.hpp"

@@ -10,6 +10,10 @@
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_spinner.h"
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 static int daKytag08_Draw(kytag08_class* i_this) {
     return 1;
 }

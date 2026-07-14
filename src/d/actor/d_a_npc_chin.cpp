@@ -11,6 +11,10 @@
 #include "d/d_meter2_info.h"
 #include "d/d_timer.h"
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 enum Event {
     EVT_NONE,
     EVT_GAME_START,

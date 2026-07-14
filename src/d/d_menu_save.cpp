@@ -25,6 +25,7 @@
 #include "dusk/config.hpp"
 #include "dusk/frame_interpolation.h"
 #include "dusk/menu_pointer.h"
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/settings.h"
 #endif
 

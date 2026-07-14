@@ -3,6 +3,7 @@
 #include "dusk/config.hpp"
 #include "dusk/ui/ui.hpp"
 #include "imgui/ImGuiConsole.hpp"
+#include "dusk/randomizer/game/randomizer_context.hpp"
 
 bool shouldAutoSave = false;
 u8 mSaveBuffer[QUEST_LOG_SIZE * 3];

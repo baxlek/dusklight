@@ -16,6 +16,7 @@
 #include <cstring>
 
 #if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/string.hpp"
 #include "battery/embed.hpp"
 #endif

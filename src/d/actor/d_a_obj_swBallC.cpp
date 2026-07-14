@@ -16,6 +16,7 @@
 #include "f_op/f_op_msg.h"
 
 #if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/tools.h"
 #endif
 

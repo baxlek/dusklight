@@ -14,6 +14,10 @@
 #include "d/d_camera.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 enum Bou_RES_File_ID {
     /* BCK */
     /* 0x06 */ BCK_BOU_F_TALK_A = 0x6,

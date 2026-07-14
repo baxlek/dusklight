@@ -14,7 +14,10 @@
 #include "JSystem/J2DGraph/J2DGrafContext.h"
 #include <cstring>
 
+#if TARGET_PC
 #include "dusk/gx_helper.h"
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
 
 class dGov_HIO_c : public mDoHIO_entry_c {
 public:

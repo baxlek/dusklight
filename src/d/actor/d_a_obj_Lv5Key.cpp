@@ -9,6 +9,7 @@
 #include "d/d_com_inf_game.h"
 #if TARGET_PC
 #include "d/d_map.h"
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #endif
 
 static int useHeapInit(fopAc_ac_c*);

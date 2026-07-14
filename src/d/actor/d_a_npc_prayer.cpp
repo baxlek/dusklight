@@ -8,6 +8,7 @@
 #include "d/actor/d_a_npc_prayer.h"
 #include "d/d_com_inf_game.h"
 #if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/verify_item_functions.h"
 #endif
 

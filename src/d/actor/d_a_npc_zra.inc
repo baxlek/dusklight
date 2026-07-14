@@ -1,3 +1,7 @@
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 BOOL daNpc_zrA_c::wait(void* param_0) {
     switch (mMode) {
     case 0:

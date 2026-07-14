@@ -13,8 +13,10 @@
 #include "f_op/f_op_camera_mng.h"
 #include <cstring>
 
-#include "d/actor/d_a_tboxSw.h"
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/tools.h"
+#endif
 
 const static dCcD_SrcCyl l_cyl_src = {
     {

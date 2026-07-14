@@ -12,6 +12,10 @@
 #include "d/d_msg_object.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 const daNpcShad_HIOParam daNpcShad_Param_c::m = {
     35.0f,      // attention_offset
     -3.0f,      // gravity

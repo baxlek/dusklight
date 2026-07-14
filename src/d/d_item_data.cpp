@@ -1,8 +1,9 @@
 #include "d/dolzel.h" // IWYU pragma: keep
 
 #include "d/d_item_data.h"
+
 #if TARGET_PC
-#include "d/d_com_inf_game.h"
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #endif
 
 dItem_itemResource dItem_data::item_resource[] = {

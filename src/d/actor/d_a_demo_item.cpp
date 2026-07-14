@@ -15,6 +15,10 @@
 #include "Z2AudioLib/Z2Instances.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 static cXyz l_player_offset = cXyz(0.0f, 115.0f, 54.0f);
 
 static cXyz l_wolf_offset = cXyz(13.0f, 135.0f, 57.0f);

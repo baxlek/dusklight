@@ -13,6 +13,10 @@
 #include "d/actor/d_a_npc_len.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 enum Bans_RES_File_ID {
     /* BCK */
     /* 0x06 */ BCK_BANS_F_TALK_A = 0x6,

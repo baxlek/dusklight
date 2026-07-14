@@ -10,6 +10,10 @@
 #include "d/d_com_inf_game.h"
 #include "d/d_meter2_info.h"
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 daObjMasterSword_Attr_c const daObjMasterSword_c::mAttr = {1.0f};
 
 void daObjMasterSword_c::initBaseMtx() {

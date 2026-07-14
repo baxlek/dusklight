@@ -11,6 +11,7 @@
 #include "d/actor/d_a_player.h"
 #if TARGET_PC
 #include "d/actor/d_a_alink.h"
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #endif
 #include "d/d_com_inf_game.h"
 #include "d/d_path.h"

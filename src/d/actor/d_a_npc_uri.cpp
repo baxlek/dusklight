@@ -10,6 +10,10 @@
 #include "m_Do/m_Do_graphic.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 const daNpc_Uri_HIOParam daNpc_Uri_Param_c::m = {
     200.0f,   // attention_offset
     -3.0f,    // gravity

@@ -16,9 +16,10 @@
 #include <cstring>
 #if TARGET_PC
 #include "dusk/randomizer/game/verify_item_functions.h"
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#include "dusk/string.hpp"
 #endif
 
-#include "dusk/string.hpp"
 
 #if DEBUG
 static dEvM_HIO_c l_HIO;

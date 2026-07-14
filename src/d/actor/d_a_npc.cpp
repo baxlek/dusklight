@@ -15,6 +15,7 @@
 #include <cstring>
 
 #if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/stages.h"
 #include "dusk/randomizer/game/tools.h"
 #endif

@@ -10,6 +10,10 @@
 #include "d/actor/d_a_itembase.h"
 #include "d/d_item_data.h"
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 u8 daItemBase_c::getItemNo() {
     return M_ITEMNO_MODEL_ITEM_ID;
 }

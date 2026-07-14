@@ -19,6 +19,10 @@
 #include "f_op/f_op_actor_enemy.h"
 #include "Z2AudioLib/Z2Instances.h"
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 enum daB_DS_Joint {
     DS_JNT_BACKBONE1,
     DS_JNT_BACKBONE2,

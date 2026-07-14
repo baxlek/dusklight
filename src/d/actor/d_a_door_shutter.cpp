@@ -23,6 +23,7 @@
 #if TARGET_PC
 #include <f_ap/f_ap_game.h>
 #include <dusk/autosave.h>
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #endif
 
 char DUSK_CONST* daDoor20_c::getStopBmdName() {
@@ -320,8 +321,7 @@ int daDoor20_c::checkOpenMsgDoor(int* param_1) {
     int rv = 1;
 
     // If we are in SPR, we don't want Yeta's msg flow to prevent us from opening the door if we haven't talked to her.
-    if (randomizer_IsActive() && !daAlink_c::checkStageName("D_MN11"))
-    {
+    if (randomizer_IsActive() && !daAlink_c::checkStageName("D_MN11")) {
         rv = field_0x624.checkOpenDoor(this, param_1);
     }
 #else

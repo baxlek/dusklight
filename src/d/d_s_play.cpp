@@ -42,6 +42,7 @@
 #if TARGET_PC
 #include "dusk/autosave.h"
 #include "dusk/memory.h"
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/tools.h"
 #include <dusk/autosave.h>
 #include "dusk/ui/ui.hpp"

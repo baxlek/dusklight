@@ -13,7 +13,10 @@
 #include "SSystem/SComponent/c_counter.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/string.hpp"
+#endif
 
 namespace {
 static u8 event_debug_evnt() {

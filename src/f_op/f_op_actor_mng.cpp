@@ -31,6 +31,7 @@
 #include "f_op/f_op_scene_mng.h"
 #include "m_Do/m_Do_lib.h"
 #if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/verify_item_functions.h"
 #include "dusk/randomizer/game/tools.h"
 #endif

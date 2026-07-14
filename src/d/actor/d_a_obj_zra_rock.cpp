@@ -11,6 +11,7 @@
 #include "f_pc/f_pc_name.h"
 
 #if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/flags.h"
 #endif
 
