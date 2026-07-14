@@ -16,7 +16,7 @@
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #endif
 
-const daNpcShad_HIOParam daNpcShad_Param_c::m = {
+DUSK_GAME_DATA const daNpcShad_HIOParam daNpcShad_Param_c::m = {
     35.0f,      // attention_offset
     -3.0f,      // gravity
     1.0f,       // scale
@@ -314,7 +314,7 @@ static DUSK_CONSTEXPR char DUSK_CONST* l_myName = "Shad";
 
 static NPC_SHAD_HIO_CLASS l_HIO;
 
-daNpcShad_c::EventFn DUSK_CONST daNpcShad_c::mEvtSeqList[14] = {
+DUSK_GAME_DATA daNpcShad_c::EventFn DUSK_CONST daNpcShad_c::mEvtSeqList[14] = {
     NULL,
     &daNpcShad_c::EvCut_Introduction,
     &daNpcShad_c::EvCut_Meeting,

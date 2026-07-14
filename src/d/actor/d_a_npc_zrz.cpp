@@ -22,7 +22,7 @@
 
 static NPC_ZRZ_HIO_CLASS l_HIO;
 
-daNpc_zrZ_HIOParam const daNpc_zrZ_Param_c::m = {
+DUSK_GAME_DATA daNpc_zrZ_HIOParam const daNpc_zrZ_Param_c::m = {
     700.0f,   // mAttnOffsetY
     0.0f,     // mGravity
     1.0f,     // mScale
@@ -145,7 +145,7 @@ static DUSK_CONSTEXPR char DUSK_CONST* l_evtNames[8] = {
 
 static DUSK_CONSTEXPR char DUSK_CONST* l_myName = "zrZ";
 
-char DUSK_CONST* DUSK_CONST daNpc_zrZ_c::mEvtCutNameList[8] = {
+DUSK_GAME_DATA char DUSK_CONST* DUSK_CONST daNpc_zrZ_c::mEvtCutNameList[8] = {
     "",
     "HELP_PRINCE",
     "COME_HERE",
@@ -156,7 +156,7 @@ char DUSK_CONST* DUSK_CONST daNpc_zrZ_c::mEvtCutNameList[8] = {
     "SR_SKIP",
 };
 
-daNpc_zrZ_c::EventFn DUSK_CONST daNpc_zrZ_c::mEvtCutList[8] = {
+DUSK_GAME_DATA daNpc_zrZ_c::EventFn DUSK_CONST daNpc_zrZ_c::mEvtCutList[8] = {
     NULL,
     &daNpc_zrZ_c::ECut_helpPrince,
     &daNpc_zrZ_c::ECut_comeHere,

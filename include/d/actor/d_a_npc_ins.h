@@ -12,7 +12,7 @@ class daNpcIns_Param_c {
 public:
     virtual ~daNpcIns_Param_c() {}
 
-    static daNpcIns_HIOParam const m;
+    static DUSK_GAME_DATA daNpcIns_HIOParam const m;
 };
 
 #if DEBUG
@@ -119,10 +119,10 @@ public:
     inline void playExpression();
     BOOL chkAction(actionFunc action) { return action == mAction; }
 
-    static eventFunc mEvtSeqList[1];
+    static DUSK_GAME_DATA eventFunc mEvtSeqList[1];
 #if TARGET_PC
     // Keep track of last given bug for rando
-    static u8 mGivenInsectId;
+    static DUSK_GAME_DATA u8 mGivenInsectId;
 #endif
 private:
     /* 0xB48 */ Z2Creature mSound;
