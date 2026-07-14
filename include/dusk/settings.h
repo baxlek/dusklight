@@ -182,11 +182,11 @@ struct UserSettings {
         ConfigVar<bool> instantText;
         ConfigVar<bool> sunsSong;
         ConfigVar<bool> autoSave;
+        ConfigVar<bool> enhancedMapMenus;
         ConfigVar<bool> enableDeselectSwords;
         ConfigVar<bool> enableDeselectShields;
         ConfigVar<bool> enableDeselectClothes;
-
-        ConfigVar<bool> enhancedMapMenus;
+        ConfigVar<bool> timeSync;
 
         // Preferences
         ConfigVar<bool> enableMirrorMode;
@@ -272,7 +272,6 @@ struct UserSettings {
         ConfigVar<bool> fastSpinner;
         ConfigVar<MagicArmorMode> armorRupeeDrain;
         ConfigVar<bool> invincibleEnemies;
-        ConfigVar<bool> timeSync;
 
         // Technical
         ConfigVar<bool> restoreWiiGlitches;
