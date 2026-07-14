@@ -17,7 +17,7 @@
 #include "m_Do/m_Do_graphic.h"
 #include <cstring>
 
-#include "tracy/Tracy.hpp"
+#include "dusk/profiling.hpp"
 
 enum dComIfG_ButtonStatus {
     /* 0x00 */ BUTTON_STATUS_NONE,
@@ -1049,7 +1049,7 @@ public:
 
 STATIC_ASSERT(122384 == sizeof(dComIfG_inf_c));
 
-extern dComIfG_inf_c g_dComIfG_gameInfo;
+DUSK_GAME_EXTERN dComIfG_inf_c g_dComIfG_gameInfo;
 extern GXColor g_blackColor;
 extern GXColor g_clearColor;
 extern GXColor g_whiteColor;
