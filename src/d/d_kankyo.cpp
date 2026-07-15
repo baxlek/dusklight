@@ -1555,8 +1555,9 @@ void dScnKy_env_light_c::setDaytime() {
                            (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) { // Hidden Village
 
                             if (dusk::getSettings().game.timeSync) {
-                              // For when OSGetSystemTime() is implemented  
-                              // OSCalendarTime calendarTime;
+                                
+                             // For when OSGetSystemTime() is implemented  
+                             // OSCalendarTime calendarTime;
                              // OSTicksToCalendarTime(OSGetSystemTime(), &calendarTime);
 
                                 auto now = std::chrono::system_clock::now();
