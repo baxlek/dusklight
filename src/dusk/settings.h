@@ -166,7 +166,7 @@ struct UserSettings {
         // QoL
         ConfigVar<bool> enableQuickTransform;
         ConfigVar<bool> hideTvSettingsScreen;
-        ConfigVar<bool> biggerWallets;
+        ConfigVar<int> walletSizes;
         ConfigVar<bool> noReturnRupees;
         ConfigVar<bool> disableRupeeCutscenes;
         ConfigVar<bool> noSwordRecoil;
@@ -183,6 +183,9 @@ struct UserSettings {
         ConfigVar<bool> sunsSong;
         ConfigVar<bool> autoSave;
         ConfigVar<bool> enhancedMapMenus;
+        ConfigVar<bool> enableDeselectSwords;
+        ConfigVar<bool> enableDeselectShields;
+        ConfigVar<bool> enableDeselectClothes;
 
         // Preferences
         ConfigVar<bool> enableMirrorMode;
@@ -256,6 +259,8 @@ struct UserSettings {
         ConfigVar<bool> infiniteOil;
         ConfigVar<bool> infiniteOxygen;
         ConfigVar<bool> infiniteRupees;
+        ConfigVar<bool> infiniteBottle;
+        ConfigVar<bool> infiniteBait;
         ConfigVar<bool> enableIndefiniteItemDrops;
         ConfigVar<bool> moonJump;
         ConfigVar<bool> superClawshot;

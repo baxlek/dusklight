@@ -4936,9 +4936,16 @@ int daAlink_c::create() {
         } else
         #endif
         // Event Flag: Finished Sewers
+#if TARGET_PC
+        if (checkCasualWearFlg() && dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[47])
+            && !dusk::getSettings().game.enableDeselectClothes) {
+            dComIfGs_setSelectEquipClothes(dItemNo_WEAR_KOKIRI_e);
+        }
+#else
         if (checkCasualWearFlg() && dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[47])) {
             dComIfGs_setSelectEquipClothes(dItemNo_WEAR_KOKIRI_e);
         }
+#endif
 
         if (isEnteringLV7 && checkMagicArmorHeavy()) {
             dComIfGs_setSelectEquipClothes(dItemNo_WEAR_KOKIRI_e);
