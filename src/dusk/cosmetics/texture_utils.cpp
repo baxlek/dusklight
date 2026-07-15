@@ -12,6 +12,8 @@
 #include "gx/GXEnum.h"
 #include "m_Do/m_Do_dvd_thread.h"
 
+#include <list>
+
 namespace dusk::cosmetics {
     ResTIMG* find_tex_header_in_tex_1_section(J3DTextureBlock* tex1Ptr, const char* textureName) {
         if (tex1Ptr == nullptr) {
