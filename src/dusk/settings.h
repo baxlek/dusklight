@@ -183,6 +183,7 @@ struct UserSettings {
         ConfigVar<bool> sunsSong;
         ConfigVar<bool> autoSave;
         ConfigVar<bool> enhancedMapMenus;
+        ConfigVar<bool> timeSync;
         ConfigVar<bool> enableDeselectSwords;
         ConfigVar<bool> enableDeselectShields;
         ConfigVar<bool> enableDeselectClothes;

@@ -1262,7 +1262,6 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Allows Wolf Link to howl and change the time of day.");
         addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,
             "Transform instantly by pressing R and Y simultaneously.");
-
         leftPane.add_section("Equipment");
         leftPane.register_control(
             leftPane.add_select_button({
@@ -1307,6 +1306,10 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 addSubToggle("Deselect Shields", getSettings().game.enableDeselectShields);
                 addSubToggle("Deselect Clothes", getSettings().game.enableDeselectClothes);
             });
+
+        leftPane.add_section("World");
+        addSpeedrunDisabledOption("Time Sync", getSettings().game.timeSync,
+            "Synchronizes in-game time with the device clock.");
 
         leftPane.add_section("Speedrunning");
         config_bool_select(leftPane, rightPane, getSettings().game.speedrunMode,
