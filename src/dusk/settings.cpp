@@ -51,6 +51,7 @@ UserSettings g_userSettings = {
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
+        .timeSync{"game.timeSync", false},
 
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
@@ -139,7 +140,6 @@ UserSettings g_userSettings = {
         .fastSpinner {"game.fastSpinner", false},
         .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
         .invincibleEnemies {"game.invincibleEnemies", false},
-        .timeSync{"game.timeSync", false},
 
         // Technical
         .restoreWiiGlitches {"game.restoreWiiGlitches", false},
