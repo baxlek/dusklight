@@ -15,9 +15,9 @@
 #include <cstring>
 
 #if TARGET_PC
-#include "dusk/gx_helper.h"
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #endif
+#include "helpers/gx_helper.h"
 
 class dGov_HIO_c : public mDoHIO_entry_c {
 public:

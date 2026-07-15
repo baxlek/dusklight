@@ -24,7 +24,6 @@
 #include "mods/service.hpp"
 #include "mods/svc/camera.h"
 #include "mods/svc/config.h"
-#include "mods/svc/game.h"
 #include "mods/svc/gfx.h"
 #include "mods/svc/hook.h"
 #include "mods/svc/log.h"
@@ -45,7 +44,6 @@ IMPORT_SERVICE(UiService, svc_ui);
 IMPORT_SERVICE(GfxService, svc_gfx);
 IMPORT_SERVICE(CameraService, svc_camera);
 IMPORT_SERVICE(HookService, svc_hook);
-IMPORT_SERVICE(GameService, svc_game);
 IMPORT_SERVICE(LogService, svc_log);
 
 namespace {
@@ -93,10 +91,15 @@ constexpr float kMaxLightLookahead = 10000.0f;
 constexpr float kSunMoonDistance = 80000.0f;
 constexpr float kSunMoonZDistance = -48000.0f;
 
-using ClipperSphereClip = int (J3DUClipper::*)(f32 const (*)[4], Vec, f32) const;
-using ClipperBoxClip = int (J3DUClipper::*)(f32 const (*)[4], Vec*, Vec*) const;
-constexpr ClipperSphereClip kClipperSphereClip = static_cast<ClipperSphereClip>(&J3DUClipper::clip);
-constexpr ClipperBoxClip kClipperBoxClip = static_cast<ClipperBoxClip>(&J3DUClipper::clip);
+DEFINE_HOOK(&dDlst_shadowControl_c::imageDraw, GameShadowImageDraw);
+DEFINE_HOOK(&dDlst_shadowControl_c::draw, GameShadowDraw);
+DEFINE_HOOK(&drawCloudShadow, CloudShadowDraw);
+DEFINE_HOOK(static_cast<int (J3DUClipper::*)(f32 const (*)[4], Vec, f32) const>(&J3DUClipper::clip),
+    ClipperSphereClip);
+DEFINE_HOOK(
+    static_cast<int (J3DUClipper::*)(f32 const (*)[4], Vec*, Vec*) const>(&J3DUClipper::clip),
+    ClipperBoxClip);
+DEFINE_HOOK(GXCopyTex, CopyTex);
 
 // Mirror of the WGSL Uniforms struct (keep in sync with res/shadow.wgsl).
 struct ShadowUniforms {
@@ -1048,20 +1051,18 @@ MOD_EXPORT ModResult mod_initialize(ModError* error) {
     // Skip the game's own shadow rendering while the dynamic pass is active: the
     // shadowControl pair covers the actor real/blob shadows, drawCloudShadow the weather
     // cloud shadows.
-    if (dusk::mods::hook_add_pre<&dDlst_shadowControl_c::imageDraw>(svc_hook, on_game_shadow_pre) !=
-            MOD_OK ||
-        dusk::mods::hook_add_pre<&dDlst_shadowControl_c::draw>(svc_hook, on_game_shadow_pre) !=
-            MOD_OK ||
-        dusk::mods::hook_add_pre<&drawCloudShadow>(svc_hook, on_game_shadow_pre) != MOD_OK)
+    if (dusk::mods::hook_add_pre<GameShadowImageDraw>(svc_hook, on_game_shadow_pre) != MOD_OK ||
+        dusk::mods::hook_add_pre<GameShadowDraw>(svc_hook, on_game_shadow_pre) != MOD_OK ||
+        dusk::mods::hook_add_pre<CloudShadowDraw>(svc_hook, on_game_shadow_pre) != MOD_OK)
     {
         return dusk::mods::set_error(error, MOD_ERROR, "failed to hook game shadow rendering");
     }
-    if (dusk::mods::hook_add_pre<kClipperSphereClip>(svc_hook, on_frustum_clip_pre) != MOD_OK ||
-        dusk::mods::hook_add_pre<kClipperBoxClip>(svc_hook, on_frustum_clip_pre) != MOD_OK)
+    if (dusk::mods::hook_add_pre<ClipperSphereClip>(svc_hook, on_frustum_clip_pre) != MOD_OK ||
+        dusk::mods::hook_add_pre<ClipperBoxClip>(svc_hook, on_frustum_clip_pre) != MOD_OK)
     {
         return dusk::mods::set_error(error, MOD_ERROR, "failed to hook frustum clipping");
     }
-    if (dusk::mods::hook_add_pre<GXCopyTex>(svc_hook, on_copy_tex_pre) != MOD_OK) {
+    if (dusk::mods::hook_add_pre<CopyTex>(svc_hook, on_copy_tex_pre) != MOD_OK) {
         return dusk::mods::set_error(error, MOD_ERROR, "failed to hook GXCopyTex");
     }
     UiModsPanelDesc panelDesc = UI_MODS_PANEL_DESC_INIT;

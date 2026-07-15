@@ -27,10 +27,10 @@
 #include "dusk/config.hpp"
 #include "dusk/menu_pointer.h"
 #include "dusk/randomizer/game/randomizer_context.hpp"
-#include "dusk/string.hpp"
 #include "dusk/ui/modal.hpp"
 #include "dusk/ui/rando_config.hpp"
 #include "dusk/ui/ui.hpp"
+#include "helpers/string.hpp"
 
 namespace {
 constexpr u8 pointer_target(u8 group, u8 index) noexcept {

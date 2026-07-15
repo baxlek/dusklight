@@ -10,10 +10,10 @@
 #include <cstring>
 
 #if TARGET_PC
-#include "dusk/string.hpp"
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/tools.h"
 #endif
+#include "helpers/string.hpp"
 
 static DUSK_CONSTEXPR daNpc_GetParam1 l_bmdData[3] = {
     {3, 1},

@@ -57,12 +57,12 @@
 #include "dusk/settings.h"
 #include "res/Object/Alink.h"
 #include <cstring>
-#include <dusk/string.hpp>
 #include "dusk/cosmetics/color_utils.hpp"
 #include "dusk/randomizer/game/flags.h"
 #include "dusk/randomizer/game/stages.h"
 #include "dusk/randomizer/game/tools.h"
 #endif
+#include <helpers/string.hpp>
 
 static int daAlink_Create(fopAc_ac_c* i_this);
 static int daAlink_Delete(daAlink_c* i_this);

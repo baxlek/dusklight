@@ -17,9 +17,9 @@
 
 #if TARGET_PC
 #include "dusk/randomizer/game/randomizer_context.hpp"
-#include "dusk/string.hpp"
 #include "battery/embed.hpp"
 #endif
+#include "helpers/string.hpp"
 
 enum ITEMICON_RES_FILE_ID {
     ITEMICON_BTI_ARI_MESU_00=0x3,

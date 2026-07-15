@@ -14,7 +14,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include "dusk/string.hpp"
+#include "helpers/string.hpp"
 #include "dusk/version.hpp"
 
 dFile_info_c::dFile_info_c(JKRArchive* i_archive, u8 param_1) {
@@ -122,12 +122,12 @@ int dFile_info_c::setSaveData(dSv_save_c* i_savedata, BOOL i_validChksum, u8 i_d
             if (!curFileSeedHash.empty()) {
                 // Overwrite "Save time" text with "Randomizer"
                 auto saveTimeText = (J2DTextBox*)mFileInfo.Scr->search(MULTI_CHAR('f_s_t_02'));
-                dusk::SafeStringCopy(saveTimeText->getStringPtr(), "Randomizer");
+                SafeStringCopy(saveTimeText->getStringPtr(), "Randomizer");
                 saveTimeText->setHBinding(J2DTextBoxHBinding::HBIND_LEFT);
 
                 // Overwrite the "Total play time" text with the seed hash
                 auto playTimeText = (J2DTextBox*)mFileInfo.Scr->search(MULTI_CHAR('f_p_t_02'));
-                dusk::SafeStringCopy(playTimeText->getStringPtr(), curFileSeedHash.c_str());
+                SafeStringCopy(playTimeText->getStringPtr(), curFileSeedHash.c_str());
 
                 // Give the text double the space on the menu incase the seed hash is long
                 playTimeText->setHBinding(J2DTextBoxHBinding::HBIND_LEFT);

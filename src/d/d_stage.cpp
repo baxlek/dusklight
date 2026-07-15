@@ -25,11 +25,13 @@
 
 #if TARGET_PC
 #include "dusk/logging.h"
-#include "dusk/string.hpp"
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/flags.h"
 #include "dusk/randomizer/game/stages.h"
 #include "dusk/randomizer/game/tools.h"
+#endif
+#include "helpers/string.hpp"
+#if TARGET_PC
 #include <format>
 #include <fmt/ranges.h>
 #endif
@@ -162,7 +164,7 @@ void dStage_startStage_c::set(const char* i_Name, s8 i_RoomNo, s16 i_Point, s8 i
 #if TARGET_PC
     // UB fix.
     if (mName != i_Name) {
-        dusk::SafeStringCopy(mName, i_Name);
+        SafeStringCopy(mName, i_Name);
     }
 #else
     strcpy(mName, i_Name);
