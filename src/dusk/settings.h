@@ -186,6 +186,7 @@ struct UserSettings {
         ConfigVar<bool> enableDeselectSwords;
         ConfigVar<bool> enableDeselectShields;
         ConfigVar<bool> enableDeselectClothes;
+        ConfigVar<bool> timeSync;
 
         // Preferences
         ConfigVar<bool> enableMirrorMode;
@@ -259,6 +260,8 @@ struct UserSettings {
         ConfigVar<bool> infiniteOil;
         ConfigVar<bool> infiniteOxygen;
         ConfigVar<bool> infiniteRupees;
+        ConfigVar<bool> infiniteBottle;
+        ConfigVar<bool> infiniteBait;
         ConfigVar<bool> enableIndefiniteItemDrops;
         ConfigVar<bool> moonJump;
         ConfigVar<bool> superClawshot;
