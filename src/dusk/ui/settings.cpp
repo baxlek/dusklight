@@ -1249,7 +1249,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Prevents Link from playing a struggle animation when grabbing ledges or "
             "climbing on vines.");
         addOption("No Rupee Returns", getSettings().game.noReturnRupees,
-      
+            "Always collect Rupees even if your Wallet is too full.");
+            
         leftPane.add_section("Equipment");
         leftPane.register_control(
             leftPane.add_select_button({
@@ -1417,10 +1418,6 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             });
         addCheat("Invincible Enemies", getSettings().game.invincibleEnemies,
             "Prevents enemies from taking damage.");
-
-        leftPane.add_section("World");
-        addCheat("System Time Sync", getSettings().game.systemTimeSync,
-            "Synchronizes in-game time with the system clock.");
     });
 
     add_tab("Interface", [this](Rml::Element* content) {
