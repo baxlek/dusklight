@@ -24,7 +24,6 @@
 #include "mods/service.hpp"
 #include "mods/svc/camera.h"
 #include "mods/svc/config.h"
-#include "mods/svc/game.h"
 #include "mods/svc/gfx.h"
 #include "mods/svc/hook.h"
 #include "mods/svc/log.h"
@@ -45,7 +44,6 @@ IMPORT_SERVICE(UiService, svc_ui);
 IMPORT_SERVICE(GfxService, svc_gfx);
 IMPORT_SERVICE(CameraService, svc_camera);
 IMPORT_SERVICE(HookService, svc_hook);
-IMPORT_SERVICE(GameService, svc_game);
 IMPORT_SERVICE(LogService, svc_log);
 
 namespace {
@@ -93,10 +91,15 @@ constexpr float kMaxLightLookahead = 10000.0f;
 constexpr float kSunMoonDistance = 80000.0f;
 constexpr float kSunMoonZDistance = -48000.0f;
 
-using ClipperSphereClip = int (J3DUClipper::*)(f32 const (*)[4], Vec, f32) const;
-using ClipperBoxClip = int (J3DUClipper::*)(f32 const (*)[4], Vec*, Vec*) const;
-constexpr ClipperSphereClip kClipperSphereClip = static_cast<ClipperSphereClip>(&J3DUClipper::clip);
-constexpr ClipperBoxClip kClipperBoxClip = static_cast<ClipperBoxClip>(&J3DUClipper::clip);
+DEFINE_HOOK(&dDlst_shadowControl_c::imageDraw, GameShadowImageDraw);
+DEFINE_HOOK(&dDlst_shadowControl_c::draw, GameShadowDraw);
+DEFINE_HOOK(&drawCloudShadow, CloudShadowDraw);
+DEFINE_HOOK(static_cast<int (J3DUClipper::*)(f32 const (*)[4], Vec, f32) const>(&J3DUClipper::clip),
+    ClipperSphereClip);
+DEFINE_HOOK(
+    static_cast<int (J3DUClipper::*)(f32 const (*)[4], Vec*, Vec*) const>(&J3DUClipper::clip),
+    ClipperBoxClip);
+DEFINE_HOOK(GXCopyTex, CopyTex);
 
 // Mirror of the WGSL Uniforms struct (keep in sync with res/shadow.wgsl).
 struct ShadowUniforms {
@@ -942,7 +945,7 @@ ModResult register_bool_option(
     cvarDesc.type = CONFIG_VAR_BOOL;
     cvarDesc.default_bool = defaultValue;
     if (svc_config->register_var(mod_ctx, &cvarDesc, &outHandle) != MOD_OK) {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to register shadow option");
+        return mods::set_error(error, MOD_ERROR, "failed to register shadow option");
     }
     return MOD_OK;
 }
@@ -954,7 +957,7 @@ ModResult register_int_option(
     cvarDesc.type = CONFIG_VAR_INT;
     cvarDesc.default_int = defaultValue;
     if (svc_config->register_var(mod_ctx, &cvarDesc, &outHandle) != MOD_OK) {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to register shadow option");
+        return mods::set_error(error, MOD_ERROR, "failed to register shadow option");
     }
     return MOD_OK;
 }
@@ -966,7 +969,7 @@ extern "C" {
 MOD_EXPORT ModResult mod_initialize(ModError* error) {
     ModResult result = svc_resource->load(mod_ctx, "shadow.wgsl", &g_shaderSource);
     if (result != MOD_OK || g_shaderSource.data == nullptr) {
-        return dusk::mods::set_error(error, result, "failed to load shadow.wgsl");
+        return mods::set_error(error, result, "failed to load shadow.wgsl");
     }
 
     result = register_bool_option("effectEnabled", false, g_cvarEnabled, error);
@@ -1011,58 +1014,56 @@ MOD_EXPORT ModResult mod_initialize(ModError* error) {
     }
 
     if (svc_gfx->get_device_info(mod_ctx, &g_deviceInfo) != MOD_OK) {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to query device info");
+        return mods::set_error(error, MOD_ERROR, "failed to query device info");
     }
     if (!build_composite_pipeline(true, g_compositePipeline, g_compositeLayout) ||
         !build_composite_pipeline(false, g_compositeDebugPipeline, g_compositeDebugLayout))
     {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to create composite pipeline");
+        return mods::set_error(error, MOD_ERROR, "failed to create composite pipeline");
     }
 
     GfxDrawTypeDesc drawDesc = GFX_DRAW_TYPE_DESC_INIT;
     drawDesc.label = "shadow composite";
     drawDesc.draw = on_draw;
     if (svc_gfx->register_draw_type(mod_ctx, &drawDesc, &g_drawType) != MOD_OK) {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to register draw type");
+        return mods::set_error(error, MOD_ERROR, "failed to register draw type");
     }
     GfxStageHookDesc stageDesc = GFX_STAGE_HOOK_DESC_INIT;
     stageDesc.callback = on_scene_begin;
     if (svc_gfx->register_stage_hook(
             mod_ctx, GFX_STAGE_SCENE_BEGIN, &stageDesc, &g_sceneBeginHook) != MOD_OK)
     {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to register stage hook");
+        return mods::set_error(error, MOD_ERROR, "failed to register stage hook");
     }
     stageDesc.callback = on_scene_after_terrain;
     if (svc_gfx->register_stage_hook(
             mod_ctx, GFX_STAGE_SCENE_AFTER_TERRAIN, &stageDesc, &g_sceneAfterTerrainHook) != MOD_OK)
     {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to register stage hook");
+        return mods::set_error(error, MOD_ERROR, "failed to register stage hook");
     }
     stageDesc.callback = on_frame_before_hud;
     if (svc_gfx->register_stage_hook(
             mod_ctx, GFX_STAGE_FRAME_BEFORE_HUD, &stageDesc, &g_frameBeforeHudHook) != MOD_OK)
     {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to register stage hook");
+        return mods::set_error(error, MOD_ERROR, "failed to register stage hook");
     }
 
     // Skip the game's own shadow rendering while the dynamic pass is active: the
     // shadowControl pair covers the actor real/blob shadows, drawCloudShadow the weather
     // cloud shadows.
-    if (dusk::mods::hook_add_pre<&dDlst_shadowControl_c::imageDraw>(svc_hook, on_game_shadow_pre) !=
-            MOD_OK ||
-        dusk::mods::hook_add_pre<&dDlst_shadowControl_c::draw>(svc_hook, on_game_shadow_pre) !=
-            MOD_OK ||
-        dusk::mods::hook_add_pre<&drawCloudShadow>(svc_hook, on_game_shadow_pre) != MOD_OK)
+    if (mods::hook_add_pre<GameShadowImageDraw>(svc_hook, on_game_shadow_pre) != MOD_OK ||
+        mods::hook_add_pre<GameShadowDraw>(svc_hook, on_game_shadow_pre) != MOD_OK ||
+        mods::hook_add_pre<CloudShadowDraw>(svc_hook, on_game_shadow_pre) != MOD_OK)
     {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to hook game shadow rendering");
+        return mods::set_error(error, MOD_ERROR, "failed to hook game shadow rendering");
     }
-    if (dusk::mods::hook_add_pre<kClipperSphereClip>(svc_hook, on_frustum_clip_pre) != MOD_OK ||
-        dusk::mods::hook_add_pre<kClipperBoxClip>(svc_hook, on_frustum_clip_pre) != MOD_OK)
+    if (mods::hook_add_pre<ClipperSphereClip>(svc_hook, on_frustum_clip_pre) != MOD_OK ||
+        mods::hook_add_pre<ClipperBoxClip>(svc_hook, on_frustum_clip_pre) != MOD_OK)
     {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to hook frustum clipping");
+        return mods::set_error(error, MOD_ERROR, "failed to hook frustum clipping");
     }
-    if (dusk::mods::hook_add_pre<GXCopyTex>(svc_hook, on_copy_tex_pre) != MOD_OK) {
-        return dusk::mods::set_error(error, MOD_ERROR, "failed to hook GXCopyTex");
+    if (mods::hook_add_pre<CopyTex>(svc_hook, on_copy_tex_pre) != MOD_OK) {
+        return mods::set_error(error, MOD_ERROR, "failed to hook GXCopyTex");
     }
     UiModsPanelDesc panelDesc = UI_MODS_PANEL_DESC_INIT;
     panelDesc.build = build_panel;
