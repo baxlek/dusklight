@@ -1263,7 +1263,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,
             "Transform instantly by pressing R and Y simultaneously.");
 
-        leftPane.add_section("Equipments");
+        leftPane.add_section("Equipment");
         leftPane.register_control(
             leftPane.add_select_button({
                 .key = "Equipment Deselection",
@@ -1426,10 +1426,6 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             });
         addCheat("Invincible Enemies", getSettings().game.invincibleEnemies,
             "Prevents enemies from taking damage.");
-
-        leftPane.add_section("World");
-        addCheat("System Time Sync", getSettings().game.systemTimeSync,
-            "Synchronizes in-game time with the system clock.");
     });
 
     add_tab("Interface", [this](Rml::Element* content) {
