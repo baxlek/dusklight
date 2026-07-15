@@ -101,6 +101,13 @@ constexpr std::array kMenuScalingModeLabels = {
     "Dusklight",
 };
 
+constexpr std::array kWalletSizes = {
+    "Default", 
+    "HD", 
+    "Large", 
+    "Uncapped"
+};
+
 constexpr std::array kMagicArmorModes = {
     "Normal",
     "On Damage",
@@ -1186,8 +1193,46 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Hearts will never drop from enemies, pots, and various other places.");
 
         leftPane.add_section("Quality of Life");
-        addOption("Bigger Wallets", getSettings().game.biggerWallets,
-            "Wallet sizes are like in the HD version. (500, 1000, 2000)");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Wallet Sizes",
+                .getValue =
+                    [] {
+                        const int idx = getSettings().game.walletSizes.getValue();
+                        return Rml::String{kWalletSizes[idx]};
+                    },
+                .isModified =
+                    [] {
+                        const auto& walletSizes = getSettings().game.walletSizes;
+                        return walletSizes.getValue() != walletSizes.getDefaultValue();
+                    },
+            }),
+            rightPane, [](Pane& pane) {
+                for (int i = 0; i < static_cast<int>(kWalletSizes.size()); ++i) {
+                    pane.add_button(
+                            {
+                                .text = kWalletSizes[i],
+                                .isSelected =
+                                    [i] { return getSettings().game.walletSizes.getValue() == i;
+                                    },
+                            })
+                        .on_pressed([i] {
+                            mDoAud_seStartMenu(kSoundItemChange);
+                            getSettings().game.walletSizes.setValue(i);
+                            config::save();
+                        });
+                }
+                pane.add_rml(R"(
+                    <br/>Modifies the maximum number of rupees the wallets can hold. 
+                    <ul style="display: block; margin-left: 20px;">
+                        <li style="display: block; margin-bottom: 4px;">• Default: 300, 600, 1 000</li>
+                        <li style="display: block; margin-bottom: 4px;">• HD: 500, 1 000, 2 000</li>
+                        <li style="display: block; margin-bottom: 4px;">• Large: 1 000, 5 000, 9 999</li>
+                        <li style="display: block; margin-bottom: 4px;">• Uncapped: 9 999</li>
+                    </ul>
+                )");
+            });
+
         addOption("Disable Rupee Cutscenes", getSettings().game.disableRupeeCutscenes,
             "Rupees will not play cutscenes after you have collected them the first time.");
         addOption("Faster Climbing", getSettings().game.fastClimbing,
@@ -1204,24 +1249,56 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Prevents Link from playing a struggle animation when grabbing ledges or "
             "climbing on vines.");
         addOption("No Rupee Returns", getSettings().game.noReturnRupees,
-            "Always collect Rupees even if your Wallet is too full.");
-        addOption("No Sword Recoil", getSettings().game.noSwordRecoil,
-            "Link will not recoil when his sword hits walls.");
-        addOption("No 2nd Fish for Cat", getSettings().game.no2ndFishForCat,
-            "Skip needing to catch a second fish for Sera's cat.");
-        addOption("Button Fishing", getSettings().game.buttonFishing,
-            "Allow fishing with the Fishing Rod using the button the item is assigned to.");
-        addOption("Show Poe Count on Map", getSettings().game.enhancedMapMenus,
-            "Displays collected/total number of Poe Souls for a region on the map.");
-        addSpeedrunDisabledOption("Sun's Song (R+X)", getSettings().game.sunsSong,
-            "Allows Wolf Link to howl and change the time of day.");
-        addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,
-            "Transform instantly by pressing R and Y simultaneously.");
+      
+        leftPane.add_section("Equipment");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Equipment Deselection",
+                .getValue = [] {
+                    int count = 0;
+                    int total = 0;
+                    auto check = [&](bool enabled) { total++; if (enabled) count++; };
+                    check(getSettings().game.enableDeselectSwords.getValue());
+                    check(getSettings().game.enableDeselectShields.getValue());
+                    check(getSettings().game.enableDeselectClothes.getValue());
+                    static thread_local char buf[12];
+                    std::snprintf(buf, sizeof(buf), "%d / %d", count, total);
+                    return Rml::String{buf};
+                },
+                .isModified = [] {
+                    return getSettings().game.enableDeselectSwords.getValue() !=
+                               getSettings().game.enableDeselectSwords.getDefaultValue()
+                           || getSettings().game.enableDeselectShields.getValue() !=
+                                  getSettings().game.enableDeselectShields.getDefaultValue()
+                           || getSettings().game.enableDeselectClothes.getValue() !=
+                                  getSettings().game.enableDeselectClothes.getDefaultValue();
+                },
+            }),
+            rightPane, [](Pane& pane) {
+                pane.clear();
+                pane.add_rml(
+                    "Allows deselection of equipped items from the Collections menu.");
+
+                auto addSubToggle = [&pane](const Rml::String& text, ConfigVar<bool>& var) {
+                    pane.add_button({
+                        .text = text,
+                        .isSelected = [&var] { return var.getValue(); },
+                    }).on_pressed([&var] {
+                        mDoAud_seStartMenu(kSoundItemChange);
+                        var.setValue(!var.getValue());
+                        config::save();
+                    });
+                };
+
+                addSubToggle("Deselect Swords", getSettings().game.enableDeselectSwords);
+                addSubToggle("Deselect Shields", getSettings().game.enableDeselectShields);
+                addSubToggle("Deselect Clothes", getSettings().game.enableDeselectClothes);
+            });
 
         leftPane.add_section("World");
         addSpeedrunDisabledOption("Time Sync", getSettings().game.timeSync,
             "Synchronizes in-game time with the device clock.");
-
+                  
         leftPane.add_section("Speedrunning");
         config_bool_select(leftPane, rightPane, getSettings().game.speedrunMode,
             {
@@ -1284,6 +1361,10 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Keeps your underwater oxygen meter full.");
         addCheat(
             "Infinite Rupees", getSettings().game.infiniteRupees, "Keeps your rupee count full.");
+        addCheat("Infinite Bottle Contents", getSettings().game.infiniteBottle,
+            "Using the contents of a bottle does not consume them.");
+        addCheat("Infinite Fishing Bait", getSettings().game.infiniteBait,
+            "Catching a fish while bobber fishing with bait does not consume the bait.");
         addCheat("No Item Timer", getSettings().game.enableIndefiniteItemDrops,
             "Item drops such as rupees and hearts will never disappear after they drop.");
 
@@ -1336,6 +1417,10 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             });
         addCheat("Invincible Enemies", getSettings().game.invincibleEnemies,
             "Prevents enemies from taking damage.");
+
+        leftPane.add_section("World");
+        addCheat("System Time Sync", getSettings().game.systemTimeSync,
+            "Synchronizes in-game time with the system clock.");
     });
 
     add_tab("Interface", [this](Rml::Element* content) {

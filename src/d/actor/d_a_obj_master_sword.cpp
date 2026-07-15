@@ -9,6 +9,9 @@
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_meter2_info.h"
+#if TARGET_PC
+#include "dusk/settings.h"
+#endif
 
 DUSK_GAME_DATA daObjMasterSword_Attr_c const daObjMasterSword_c::mAttr = {1.0f};
 
@@ -46,6 +49,11 @@ void daObjMasterSword_c::executeWait() {
 
     if (fopAcM_checkCarryNow(this)) {
         dMeter2Info_setCloth(dItemNo_WEAR_KOKIRI_e, false);
+#if TARGET_PC
+        if (dusk::getSettings().game.enableDeselectClothes) {
+            daPy_getPlayerActorClass()->setClothesChange(0);
+        }
+#endif
         fopAcM_orderMapToolEvent(this, getEventID(), 0xFF, 0xFFFF, 1, 0);
     }
 }
