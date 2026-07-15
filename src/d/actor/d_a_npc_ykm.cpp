@@ -20,6 +20,9 @@
 #include "d/d_tresure.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
 
 enum ykM_RES_File_ID {
     /* BCK */
@@ -947,6 +950,9 @@ BOOL daNpc_ykM_c::isDelete() {
             return FALSE;
 
         case TYPE_COOK:
+#if TARGET_PC
+            if (randomizer_IsActive()) return false; // We don't want cooking Yeto to leave the dungeon, even if the BK is obtained.
+#endif
             return dComIfGs_isDungeonItemBossKey();
 
         case TYPE_2:

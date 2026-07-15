@@ -120,7 +120,10 @@ public:
     BOOL chkAction(actionFunc action) { return action == mAction; }
 
     static DUSK_GAME_DATA eventFunc mEvtSeqList[1];
-
+#if TARGET_PC
+    // Keep track of last given bug for rando
+    static DUSK_GAME_DATA u8 mGivenInsectId;
+#endif
 private:
     /* 0xB48 */ Z2Creature mSound;
     /* 0xBD8 */ J3DModel* mpUmbrellaModel;

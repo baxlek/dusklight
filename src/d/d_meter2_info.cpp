@@ -15,6 +15,10 @@
 
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#include "battery/embed.hpp"
+#endif
 #include "helpers/string.hpp"
 
 enum ITEMICON_RES_FILE_ID {
@@ -815,6 +819,11 @@ int dMeter2Info_c::readItemTexture(u8 i_itemNo, void* i_texBuf1, J2DPicture* i_p
         } else if ((itemType == ItemType_POU_FIRE || itemType == ItemType_FAIRY || itemType == ItemType_BEE_CHILD || itemType == ItemType_WORM) && i_texBuf3 == NULL) {
             u32 size = JKRReadIdxResource(i_texBuf1, 0xC00, get2ndTexture(itemType), dComIfGp_getItemIconArchive());
             JUT_ASSERT(1222, size != 0);
+#if TARGET_PC
+        } else if (randomizer_IsActive() && i_itemNo == dItemNo_Randomizer_MAGIC_LV1_e) {
+            auto shadowCrystalBti = b::embed<RANDO_ASSETS_PATH "textures/shadow_crystal.bti">();
+            std::memcpy(i_texBuf1, shadowCrystalBti.data(), shadowCrystalBti.size());
+#endif
         } else {
             u32 size;
             if (param_9 >= 0) {
