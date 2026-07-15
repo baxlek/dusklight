@@ -1360,17 +1360,21 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         };
 
         leftPane.add_section("Resources");
-        addCheat("Infinite Hearts", getSettings().game.infiniteHearts, "Keeps your health full.");
-        addCheat(
-            "Infinite Arrows", getSettings().game.infiniteArrows, "Keeps your arrow count full.");
-        addCheat("Infinite Seeds", getSettings().game.infiniteSeeds, "Keeps your slingshot pellets (seeds) full.");
-        addCheat("Infinite Bombs", getSettings().game.infiniteBombs, "Keeps all bomb bags full.");
-        addCheat("Infinite Oil", getSettings().game.infiniteOil, "Keeps your lantern oil full.");
-        addCheat("Infinite Oxygen", getSettings().game.infiniteOxygen,
+        addCheat("Infinite Hearts", getSettings().game.infiniteHearts, 
+            "Keeps your health full.");
+        addCheat("Infinite Arrows", getSettings().game.infiniteArrows, 
+            "Keeps your arrow count full.");
+        addCheat("Infinite Seeds", getSettings().game.infiniteSeeds, 
+            "Keeps your slingshot pellets (seeds) full.");
+        addCheat("Infinite Bombs", getSettings().game.infiniteBombs, 
+            "Keeps all bomb bags full.");
+        addCheat("Infinite Oil", getSettings().game.infiniteOil, 
+            "Keeps your lantern oil full.");
+        addCheat("Infinite Oxygen", getSettings().game.infiniteOxygen, 
             "Keeps your underwater oxygen meter full.");
-        addCheat(
-            "Infinite Rupees", getSettings().game.infiniteRupees, "Keeps your rupee count full.");
-        addCheat("Infinite Bottle Contents", getSettings().game.infiniteBottle,
+        addCheat("Infinite Rupees", getSettings().game.infiniteRupees, 
+            "Keeps your rupee count full.");
+        addCheat("Infinite Bottle Contents", getSettings().game.infiniteBottle, 
             "Using the contents of a bottle does not consume them.");
         addCheat("Infinite Fishing Bait", getSettings().game.infiniteBait,
             "Catching a fish while bobber fishing with bait does not consume the bait.");
