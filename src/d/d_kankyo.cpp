@@ -1553,8 +1553,10 @@ void dScnKy_env_light_c::setDaytime() {
                         (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) || // Kakariko Graveyard
                         (!strcmp(dComIfGp_getStartStageName(), "F_SP118")) || // Bulblin Camp
                         (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) { // Hidden Village
+
                         if (dusk::getSettings().game.timeSync) {
-                    //  Replace OSGetTime() with actual device time
+
+                        //  Replace OSGetTime() with actual device time
                             auto now = std::chrono::system_clock::now();
                             auto time_t_now = std::chrono::system_clock::to_time_t(now);
                             struct tm* timeinfo = std::localtime(&time_t_now);
@@ -1590,34 +1592,34 @@ void dScnKy_env_light_c::setDaytime() {
                         #else
                         daytime += time_change_rate;
                         #endif
-                        
+
                         // Stage is Fishing Pond or Hena's Hut
                         if (dusk::getSettings().game.timeSync == false) {
-                           if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
-                               !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
-                        {
-                               if (daytime >= 300.0f || daytime <= 60.0f) {
-                                   daytime += time_change_rate;
-                                   daytime += time_change_rate;
-                               } else if (daytime >= 150.0f && daytime <= 195.0f) {
-                                   daytime = daytime + time_change_rate;
-                               }
-                           }
+                            if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
+                                !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
+                            {
+                                if (daytime >= 300.0f || daytime <= 60.0f) {
+                                    daytime += time_change_rate;
+                                    daytime += time_change_rate;
+                                } else if (daytime >= 150.0f && daytime <= 195.0f) {
+                                    daytime = daytime + time_change_rate;
+                                }
+                            }
 
-                           if ((u32)daytime >= 360.0f) {
-                               daytime = 0.0f;
-                               mDate++;
-                               dKankyo_DayProc();
-                           }
-                           if (!strcmp(dComIfGp_getStartStageName(), "F_SP00") ||  // Ordon Ranch
-                               !strcmp(dComIfGp_getStartStageName(), "F_SP103") || // Ordon Village
-                               !strcmp(dComIfGp_getStartStageName(), "F_SP104") || // Ordon Spring
-                               !strcmp(dComIfGp_getStartStageName(), "F_SP109") || // Kakariko Village
-                               !strcmp(dComIfGp_getStartStageName(), "F_SP111") || // Kakariko Graveyard
-                               !strcmp(dComIfGp_getStartStageName(), "F_SP118") || // Bulblin Camp
-                               !strcmp(dComIfGp_getStartStageName(), "F_SP128")) { // Hidden Village
-                               time_change_rate = 0.0f;
-                           }
+                            if ((u32)daytime >= 360.0f) {
+                                daytime = 0.0f;
+                                mDate++;
+                                dKankyo_DayProc();
+                            }
+                            if (!strcmp(dComIfGp_getStartStageName(), "F_SP00") ||  // Ordon Ranch
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP103") || // Ordon Village
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP104") || // Ordon Spring
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP109") || // Kakariko Village
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP111") || // Kakariko Graveyard
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP118") || // Bulblin Camp
+                                !strcmp(dComIfGp_getStartStageName(), "F_SP128")) { // Hidden Village
+                                time_change_rate = 0.0f;
+                            }
                         }
                     } else {
                         #if DEBUG
