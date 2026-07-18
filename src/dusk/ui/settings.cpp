@@ -15,6 +15,7 @@
 #include "dusk/io.hpp"
 #include "dusk/livesplit.h"
 #include "dusk/discord_presence.hpp"
+#include "dusk/speedrun.h"
 #include "graphics_tuner.hpp"
 #include "m_Do/m_Do_main.h"
 #include "menu_bar.hpp"
@@ -218,104 +219,8 @@ AuroraBackend configured_backend() {
     return configuredBackend;
 }
 
-void reset_for_speedrun_mode() {
-    mDoMain::developmentMode = -1;
-
-    getSettings().game.enableTurboKeybind.setSpeedrunValue(false);
-
-    getSettings().game.damageMultiplier.setSpeedrunValue(1);
-    getSettings().game.instantDeath.setSpeedrunValue(false);
-    getSettings().game.noHeartDrops.setSpeedrunValue(false);
-    getSettings().game.fastTransitions.setSpeedrunValue(false);
-    getSettings().game.autoSave.setSpeedrunValue(false);
-    getSettings().game.sunsSong.setSpeedrunValue(false);
-
-    getSettings().game.infiniteHearts.setSpeedrunValue(false);
-    getSettings().game.infiniteArrows.setSpeedrunValue(false);
-    getSettings().game.infiniteSeeds.setSpeedrunValue(false);
-    getSettings().game.infiniteBombs.setSpeedrunValue(false);
-    getSettings().game.infiniteOil.setSpeedrunValue(false);
-    getSettings().game.infiniteOxygen.setSpeedrunValue(false);
-    getSettings().game.infiniteRupees.setSpeedrunValue(false);
-    getSettings().game.enableIndefiniteItemDrops.setSpeedrunValue(false);
-    getSettings().game.moonJump.setSpeedrunValue(false);
-    getSettings().game.superClawshot.setSpeedrunValue(false);
-    getSettings().game.alwaysGreatspin.setSpeedrunValue(false);
-    getSettings().game.enableFastIronBoots.setSpeedrunValue(false);
-    getSettings().game.canTransformAnywhere.setSpeedrunValue(false);
-    getSettings().game.fastRoll.setSpeedrunValue(false);
-    getSettings().game.fastSpinner.setSpeedrunValue(false);
-    getSettings().game.armorRupeeDrain.setSpeedrunValue(MagicArmorMode::NORMAL);
-    getSettings().game.invincibleEnemies.setSpeedrunValue(false);
-
-    getSettings().game.pauseOnFocusLost.setSpeedrunValue(false);
-    aurora_set_pause_on_focus_lost(false);
-
-    getSettings().backend.enableAdvancedSettings.setSpeedrunValue(false);
-    getSettings().game.recordingMode.setSpeedrunValue(false);
-    getSettings().game.debugFlyCam.setSpeedrunValue(false);
-}
-
-void clear_speedrun_overrides() {
-    config::EnumerateRegistered([](config::ConfigVarBase& cvar) {
-        cvar.clearSpeedrunOverride();
-    });
-}
-
-void restore_from_speedrun_mode() {
-    clear_speedrun_overrides();
-    aurora_set_pause_on_focus_lost(getSettings().game.pauseOnFocusLost.getValue());
-}
-
-std::filesystem::path normalized_display_path(const std::filesystem::path& path) {
-    std::error_code ec;
-    auto normalized = std::filesystem::weakly_canonical(path, ec);
-    if (!ec) {
-        return normalized;
-    }
-
-    normalized = std::filesystem::absolute(path, ec);
-    if (!ec) {
-        return normalized.lexically_normal();
-    }
-
-    return path.lexically_normal();
-}
-
-std::filesystem::path user_home_path() {
-    const char* homePath = SDL_GetUserFolder(SDL_FOLDER_HOME);
-    if (homePath == nullptr || homePath[0] == '\0') {
-        return {};
-    }
-    return std::filesystem::path{reinterpret_cast<const char8_t*>(homePath)};
-}
-
-Rml::String abbreviated_data_path_string() {
-    const auto path = data::configured_data_path();
-    const auto homePath = user_home_path();
-    if (path.empty() || homePath.empty()) {
-        return io::fs_path_to_string(path);
-    }
-
-    const auto normalizedPath = normalized_display_path(path);
-    const auto normalizedHome = normalized_display_path(homePath);
-    if (normalizedPath == normalizedHome) {
-        return "~";
-    }
-
-    const auto relativePath = normalizedPath.lexically_relative(normalizedHome);
-    if (!relativePath.empty() && !relativePath.is_absolute()) {
-        const auto it = relativePath.begin();
-        if (it == relativePath.end() || *it != "..") {
-            return io::fs_path_to_string(std::filesystem::path{"~"} / relativePath);
-        }
-    }
-
-    return io::fs_path_to_string(path);
-}
-
 Rml::String configured_data_path_display_name() {
-    const auto path = abbreviated_data_path_string();
+    const auto path = data::abbreviated_path_string(data::configured_data_path());
     if (path.empty()) {
         return "(none)";
     }
@@ -332,8 +237,9 @@ public:
     explicit DataFolderPathText(Rml::Element* parent) : Component(append(parent, "div")) {}
 
     void update() override {
-        const Rml::String rml = "<span class=\"data-folder-current\">Current data folder:<br/>" +
-                                escape(abbreviated_data_path_string()) + "</span>";
+        const Rml::String rml =
+            "<span class=\"data-folder-current\">Current data folder:<br/>" +
+            escape(data::abbreviated_path_string(data::configured_data_path())) + "</span>";
         if (rml != mCurrentRml) {
             mRoot->SetInnerRML(rml);
             mCurrentRml = rml;
@@ -469,7 +375,7 @@ void add_speedrun_disabled_option(Pane& leftPane, Pane& rightPane, ConfigVar<boo
     config_bool_select(leftPane, rightPane, var, {
         .key = key,
         .helpText = helpText,
-        .isDisabled = [] { return getSettings().game.speedrunMode; },
+        .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
     });
 }
 
@@ -504,7 +410,7 @@ SelectButton& config_int_select(Pane& leftPane, Pane& rightPane, ConfigVar<int>&
     std::string suffix = "") {
     auto& button = leftPane.add_child<NumberButton>(NumberButton::Props{
         .key = std::move(key),
-        .getValue = [&var] { return var; },
+        .getValue = [&var] { return var.getValue(); },
         .setValue =
             [&var, min, max, callback = std::move(onChange)](int value) {
                 const int clampedValue = std::clamp(value, min, max);
@@ -530,7 +436,7 @@ SelectButton& config_int_select(Pane& leftPane, Pane& rightPane, ConfigVar<int>&
 
 template <typename T>
 void graphics_tuner_control(Window& window, Pane& leftPane, Pane& rightPane, ConfigVar<T>& var,
-    const GraphicsTunerProps& props, bool prelaunch) {
+    const GraphicsTunerProps& props) {
     leftPane.register_control(
         leftPane
             .add_select_button({
@@ -548,10 +454,10 @@ void graphics_tuner_control(Window& window, Pane& leftPane, Pane& rightPane, Con
                 .isModified = [&var] { return var.getValue() != var.getDefaultValue(); },
                 .submit = false,
             })
-            .on_nav_command([&window, props, prelaunch](Rml::Event&, NavCommand cmd) {
+            .on_nav_command([&window, props](Rml::Event&, NavCommand cmd) {
                 if (cmd == NavCommand::Confirm || cmd == NavCommand::Left ||
                     cmd == NavCommand::Right) {
-                    window.push(std::make_unique<GraphicsTuner>(props, prelaunch));
+                    window.push(std::make_unique<GraphicsTuner>(props));
                     return true;
                 }
                 return false;
@@ -566,7 +472,6 @@ void graphics_tuner_control(Window& window, Pane& leftPane, Pane& rightPane, Con
 
 SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
     if (prelaunch) {
-        mSuppressNavFallback = true;
         add_tab("Prelaunch", [this](Rml::Element* content) {
             auto& leftPane = add_child<Pane>(content, Pane::Type::Controlled);
             auto& rightPane = add_child<Pane>(content, Pane::Type::Uncontrolled);
@@ -787,7 +692,6 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             {
                 .key = "Pause on Focus Lost",
                 .helpText = "Pause the game when window focus is lost.",
-                .onChange = [](bool value) { aurora_set_pause_on_focus_lost(value); },
                 .isDisabled = [] { return IsMobile || getSettings().game.speedrunMode; },
             });
         leftPane.register_control(
@@ -866,7 +770,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = 0,
                 .valueMax = 12,
                 .defaultValue = 0,
-            }, mPrelaunch);
+            });
         graphics_tuner_control(*this, leftPane, rightPane,
             getSettings().game.shadowResolutionMultiplier,
             GraphicsTunerProps{
@@ -876,7 +780,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = 1,
                 .valueMax = 8,
                 .defaultValue = 1,
-            }, mPrelaunch);
+            });
         graphics_tuner_control(*this, leftPane, rightPane, getSettings().game.resampler,
             GraphicsTunerProps{
                 .option = GraphicsOption::Resampler,
@@ -885,7 +789,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = static_cast<int>(Resampler::Bilinear),
                 .valueMax = static_cast<int>(Resampler::Area),
                 .defaultValue = static_cast<int>(Resampler::Bilinear),
-            }, mPrelaunch);
+            });
 
         leftPane.add_section("Post-Processing");
         graphics_tuner_control(*this, leftPane, rightPane, getSettings().game.bloomMode,
@@ -896,7 +800,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = static_cast<int>(BloomMode::Off),
                 .valueMax = static_cast<int>(BloomMode::Dusk),
                 .defaultValue = static_cast<int>(BloomMode::Classic),
-            }, mPrelaunch);
+            });
         graphics_tuner_control(*this, leftPane, rightPane, getSettings().game.bloomMultiplier,
             GraphicsTunerProps{
                 .option = GraphicsOption::BloomMultiplier,
@@ -906,8 +810,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMax = 100,
                 .defaultValue = 100,
                 .step = 10,
-            },
-            mPrelaunch);
+            });
         graphics_tuner_control(*this, leftPane, rightPane, getSettings().game.depthOfFieldMode,
             GraphicsTunerProps{
                 .option = GraphicsOption::DepthOfFieldMode,
@@ -916,8 +819,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = static_cast<int>(DepthOfFieldMode::Off),
                 .valueMax = static_cast<int>(DepthOfFieldMode::Dusk),
                 .defaultValue = static_cast<int>(DepthOfFieldMode::Classic),
-            },
-            mPrelaunch);
+            });
 
         leftPane.add_section("Rendering");
         graphics_tuner_control(*this, leftPane, rightPane,
@@ -929,8 +831,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .valueMin = static_cast<int>(false),
                 .valueMax = static_cast<int>(true),
                 .defaultValue = static_cast<int>(false),
-            },
-            mPrelaunch);
+            });
         leftPane.register_control(
             leftPane.add_select_button({
                 .key = "Unlock Framerate",
@@ -996,7 +897,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
 
         leftPane.add_section("Inputs");
         leftPane.register_control(leftPane.add_button("Configure Inputs").on_pressed([this] {
-            push(std::make_unique<ControllerConfigWindow>(mPrelaunch));
+            push(std::make_unique<ControllerConfigWindow>());
         }),
             rightPane, [](Pane& pane) {
                 pane.clear();
@@ -1152,7 +1053,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         leftPane.add_section("Tools");
         addOption("Turbo Key", getSettings().game.enableTurboKeybind,
             "Hold Tab to increase game speed by up to 4x.",
-            [] { return getSettings().game.speedrunMode; });
+            [] { return getSettings().game.speedrunMode.getValue(); });
         addOption("Reset Key (" + Rml::String{hotkeys::DO_RESET} + ")",
             getSettings().game.enableResetKeybind,
             "Press " + Rml::String{hotkeys::DO_RESET} + " to reset the game.");
@@ -1265,7 +1166,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                         getSettings().game.damageMultiplier.setValue(value);
                         config::save();
                     },
-                .isDisabled = [] { return getSettings().game.speedrunMode; },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
                 .isModified =
                     [] {
                         return getSettings().game.damageMultiplier.getValue() !=
@@ -1289,8 +1190,6 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Wallet sizes are like in the HD version. (500, 1000, 2000)");
         addOption("Disable Rupee Cutscenes", getSettings().game.disableRupeeCutscenes,
             "Rupees will not play cutscenes after you have collected them the first time.");
-        addSpeedrunDisabledOption("Faster Scene Transitions", getSettings().game.fastTransitions,
-            "Reduces how long the transitions take when changing maps.");
         addOption("Faster Climbing", getSettings().game.fastClimbing,
             "Quicker climbing on ladders and vines like the HD version.");
         addOption("Faster Tears of Light", getSettings().game.fastTears,
@@ -1328,19 +1227,14 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .onChange =
                     [](bool enabled) {
                         if (enabled) {
-                            reset_for_speedrun_mode();
+                            resetForSpeedrunMode();
                         } else {
-                            restore_from_speedrun_mode();
+                            restoreFromSpeedrunMode();
                             if (getSettings().game.liveSplitEnabled) {
                                 speedrun::disconnectLiveSplit();
                             }
                         }
-                        for (auto& doc : get_document_stack()) {
-                            if (dynamic_cast<MenuBar*>(doc.get())) {
-                                doc = std::make_unique<MenuBar>();
-                                break;
-                            }
-                        }
+                        MenuBar::rebuild();
                     },
             });
         config_bool_select(leftPane, rightPane, getSettings().game.liveSplitEnabled,
@@ -1411,7 +1305,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     [] {
                         return kMagicArmorModes[static_cast<u8>(getSettings().game.armorRupeeDrain.getValue())];
                     },
-                .isDisabled = [] { return getSettings().game.speedrunMode; },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
                 .isModified =
                     [] {
                         return getSettings().game.armorRupeeDrain.getValue() !=
@@ -1574,16 +1468,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .helpText = "Show advanced settings and debugging tools with "
                             "Shift+F1.<br/><br/><icon class=\"warning\"/> WARNING: Debugging tools "
                             "can easily break your game. Do not use on a regular save!",
-                .onChange =
-                    [](bool) {
-                        for (auto& doc : get_document_stack()) {
-                            if (dynamic_cast<MenuBar*>(doc.get())) {
-                                doc = std::make_unique<MenuBar>();
-                                break;
-                            }
-                        }
-                    },
-                .isDisabled = [] { return getSettings().game.speedrunMode; },
+                .onChange = [](bool) { MenuBar::rebuild(); },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
             });
         config_bool_select(leftPane, rightPane, getSettings().game.showInputViewer,
             {
@@ -1620,14 +1506,12 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                                 [i] {
                                     return getSettings().game.menuScalingMode.getValue() ==
                                            static_cast<MenuScaling>(i);
-                                    ;
                                 },
                         })
                         .on_pressed([i] {
                             mDoAud_seStartMenu(kSoundItemChange);
                             getSettings().game.menuScalingMode.setValue(
                                 static_cast<MenuScaling>(i));
-                            ;
                             config::save();
                         });
                 }
