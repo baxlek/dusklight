@@ -1544,15 +1544,15 @@ void dScnKy_env_light_c::setDaytime() {
                         temp_r29 = false;
                     }
                     
-               #if TARGET_PC
+                #if TARGET_PC
                     if (dComIfGp_roomControl_getTimePass() && !field_0x130a && temp_r29 ||
-                        (!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||  // Ordon Ranch
-                        (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) || // Ordon Village
-                        (!strcmp(dComIfGp_getStartStageName(), "F_SP104")) || // Ordon Spring
-                        (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) || // Kakariko Village
-                        (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) || // Kakariko Graveyard
-                        (!strcmp(dComIfGp_getStartStageName(), "F_SP118")) || // Bulblin Camp
-                        (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) { // Hidden Village
+                       (!strcmp(dComIfGp_getStartStageName(), "F_SP00")) ||  // Ordon Ranch
+                       (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) || // Ordon Village
+                       (!strcmp(dComIfGp_getStartStageName(), "F_SP104")) || // Ordon Spring
+                       (!strcmp(dComIfGp_getStartStageName(), "F_SP109")) || // Kakariko Village
+                       (!strcmp(dComIfGp_getStartStageName(), "F_SP111")) || // Kakariko Graveyard
+                       (!strcmp(dComIfGp_getStartStageName(), "F_SP118")) || // Bulblin Camp
+                       (!strcmp(dComIfGp_getStartStageName(), "F_SP128"))) { // Hidden Village
 
                         if (dusk::getSettings().game.timeSync) {
 
@@ -1589,12 +1589,11 @@ void dScnKy_env_light_c::setDaytime() {
                                 g_env_light.time_change_rate = 0.012f;
                             }
                         }
-                        #else
+                #else
                         daytime += time_change_rate;
-                        #endif
 
-                        // Stage is Fishing Pond or Hena's Hut
                         if (dusk::getSettings().game.timeSync == false) {
+                            // Stage is Fishing Pond or Hena's Hut
                             if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") ||
                                 !strcmp(dComIfGp_getStartStageName(), "R_SP127"))
                             {
@@ -1611,6 +1610,7 @@ void dScnKy_env_light_c::setDaytime() {
                                 mDate++;
                                 dKankyo_DayProc();
                             }
+                            // Reset certain stages to default
                             if (!strcmp(dComIfGp_getStartStageName(), "F_SP00") ||  // Ordon Ranch
                                 !strcmp(dComIfGp_getStartStageName(), "F_SP103") || // Ordon Village
                                 !strcmp(dComIfGp_getStartStageName(), "F_SP104") || // Ordon Spring
@@ -1621,6 +1621,7 @@ void dScnKy_env_light_c::setDaytime() {
                                 time_change_rate = 0.0f;
                             }
                         }
+                #endif
                     } else {
                         #if DEBUG
                         if (fapGmHIO_get2Ddraw()) {
