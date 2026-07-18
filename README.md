@@ -1,6 +1,9 @@
 This branch includes the following unmerged PRs:
+<br/>
 "Equipment Deselection Toggles" by xiedada05
+<br/>
 "Uncapped Wallets" by DarkZant
+<br/>
 "Infinite Bottle Contents & Infinite Fishing Bait" by DarkZant
 
 <div align="center">
