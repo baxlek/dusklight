@@ -1195,6 +1195,50 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         leftPane.add_section("Quality of Life");
         leftPane.register_control(
             leftPane.add_select_button({
+                .key = "Equipment Deselection",
+                .getValue = [] {
+                    int count = 0;
+                    int total = 0;
+                    auto check = [&](bool enabled) { total++; if (enabled) count++; };
+                    check(getSettings().game.enableDeselectSwords.getValue());
+                    check(getSettings().game.enableDeselectShields.getValue());
+                    check(getSettings().game.enableDeselectClothes.getValue());
+                    static thread_local char buf[12];
+                    std::snprintf(buf, sizeof(buf), "%d / %d", count, total);
+                    return Rml::String{buf};
+                },
+                .isModified = [] {
+                    return getSettings().game.enableDeselectSwords.getValue() !=
+                               getSettings().game.enableDeselectSwords.getDefaultValue()
+                           || getSettings().game.enableDeselectShields.getValue() !=
+                                  getSettings().game.enableDeselectShields.getDefaultValue()
+                           || getSettings().game.enableDeselectClothes.getValue() !=
+                                  getSettings().game.enableDeselectClothes.getDefaultValue();
+                },
+            }),
+            rightPane, [](Pane& pane) {
+                pane.clear();
+                pane.add_rml(
+                    "Allows deselection of equipped items from the Collections menu.");
+
+                auto addSubToggle = [&pane](const Rml::String& text, ConfigVar<bool>& var) {
+                    pane.add_button({
+                        .text = text,
+                        .isSelected = [&var] { return var.getValue(); },
+                    }).on_pressed([&var] {
+                        mDoAud_seStartMenu(kSoundItemChange);
+                        var.setValue(!var.getValue());
+                        config::save();
+                    });
+                };
+
+                addSubToggle("Deselect Swords", getSettings().game.enableDeselectSwords);
+                addSubToggle("Deselect Shields", getSettings().game.enableDeselectShields);
+                addSubToggle("Deselect Clothes", getSettings().game.enableDeselectClothes);
+            });
+        
+        leftPane.register_control(
+            leftPane.add_select_button({
                 .key = "Wallet Sizes",
                 .getValue =
                     [] {
@@ -1262,51 +1306,6 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Allows Wolf Link to howl and change the time of day.");
         addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,
             "Transform instantly by pressing R and Y simultaneously.");
-
-        leftPane.add_section("Equipment");
-        leftPane.register_control(
-            leftPane.add_select_button({
-                .key = "Equipment Deselection",
-                .getValue = [] {
-                    int count = 0;
-                    int total = 0;
-                    auto check = [&](bool enabled) { total++; if (enabled) count++; };
-                    check(getSettings().game.enableDeselectSwords.getValue());
-                    check(getSettings().game.enableDeselectShields.getValue());
-                    check(getSettings().game.enableDeselectClothes.getValue());
-                    static thread_local char buf[12];
-                    std::snprintf(buf, sizeof(buf), "%d / %d", count, total);
-                    return Rml::String{buf};
-                },
-                .isModified = [] {
-                    return getSettings().game.enableDeselectSwords.getValue() !=
-                               getSettings().game.enableDeselectSwords.getDefaultValue()
-                           || getSettings().game.enableDeselectShields.getValue() !=
-                                  getSettings().game.enableDeselectShields.getDefaultValue()
-                           || getSettings().game.enableDeselectClothes.getValue() !=
-                                  getSettings().game.enableDeselectClothes.getDefaultValue();
-                },
-            }),
-            rightPane, [](Pane& pane) {
-                pane.clear();
-                pane.add_rml(
-                    "Allows deselection of equipped items from the Collections menu.");
-
-                auto addSubToggle = [&pane](const Rml::String& text, ConfigVar<bool>& var) {
-                    pane.add_button({
-                        .text = text,
-                        .isSelected = [&var] { return var.getValue(); },
-                    }).on_pressed([&var] {
-                        mDoAud_seStartMenu(kSoundItemChange);
-                        var.setValue(!var.getValue());
-                        config::save();
-                    });
-                };
-
-                addSubToggle("Deselect Swords", getSettings().game.enableDeselectSwords);
-                addSubToggle("Deselect Shields", getSettings().game.enableDeselectShields);
-                addSubToggle("Deselect Clothes", getSettings().game.enableDeselectClothes);
-            });
 
         leftPane.add_section("Speedrunning");
         config_bool_select(leftPane, rightPane, getSettings().game.speedrunMode,
