@@ -1213,12 +1213,10 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Allow fishing with the Fishing Rod using the button the item is assigned to.");
         addOption("Show Poe Count on Map", getSettings().game.enhancedMapMenus,
             "Displays collected/total number of Poe Souls for a region on the map.");
-        addSpeedrunDisabledOption("Sun's Song (R+X)", getSettings().game.sunsSong,
-            "Allows Wolf Link to howl and change the time of day.");
         addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,
             "Transform instantly by pressing R and Y simultaneously.");
-
-        leftPane.add_section("World");
+        addSpeedrunDisabledOption("Sun's Song (R+X)", getSettings().game.sunsSong,
+            "Allows Wolf Link to howl and change the time of day.");
         addSpeedrunDisabledOption("Time Sync", getSettings().game.timeSync,
             "Synchronizes in-game time with the device clock.");
 
