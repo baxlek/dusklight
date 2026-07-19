@@ -51,6 +51,7 @@ UserSettings g_userSettings = {
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
+        .timeSync{"game.timeSync", false},
 
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
@@ -256,6 +257,7 @@ void registerSettings() {
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
     Register(g_userSettings.game.enhancedMapMenus);
+    Register(g_userSettings.game.timeSync);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
     Register(g_userSettings.game.invertCameraYAxis);
