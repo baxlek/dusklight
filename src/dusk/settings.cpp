@@ -34,9 +34,10 @@ UserSettings g_userSettings = {
         // Quality of Life
         .enableQuickTransform {"game.enableQuickTransform", false},
         .hideTvSettingsScreen {"game.hideTvSettingsScreen", true},
-        .biggerWallets {"game.biggerWallets", false},
+        .walletSizes{"game.walletSizes", 0},
         .noReturnRupees {"game.noReturnRupees", false},
         .disableRupeeCutscenes {"game.disableRupeeCutscenes", false},
+        .fastTransitions {"game.fastTransitions", false},
         .noSwordRecoil {"game.noSwordRecoil", false},
         .damageMultiplier {"game.damageMultiplier", 1},
         .noHeartDrops {"game.noHeartDrops", false},
@@ -51,6 +52,10 @@ UserSettings g_userSettings = {
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
+        .timeSync{"game.timeSync", false},
+        .enableDeselectSwords {"game.enableDeselectSwords", false},
+        .enableDeselectShields {"game.enableDeselectShields", false},
+        .enableDeselectClothes {"game.enableDeselectClothes", false},
 
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
@@ -129,6 +134,8 @@ UserSettings g_userSettings = {
         .infiniteOil {"game.infiniteOil", false},
         .infiniteOxygen {"game.infiniteOxygen", false},
         .infiniteRupees {"game.infiniteRupees", false},
+        .infiniteBottle {"game.infiniteBottle", false},
+        .infiniteBait {"game.infiniteBait", false},
         .enableIndefiniteItemDrops {"game.enableIndefiniteItemDrops", false},
         .moonJump {"game.moonJump", false},
         .superClawshot {"game.superClawshot", false},
@@ -206,6 +213,37 @@ UserSettings g_userSettings = {
             ActionBindConfigVar{"actionBindings.turboButton_port2", PAD_NATIVE_BUTTON_INVALID},
             ActionBindConfigVar{"actionBindings.turboButton_port3", PAD_NATIVE_BUTTON_INVALID},
         },
+    },
+
+    .randomizer = {
+        ConfigVar<std::string>{"randomizer.file1SeedHash", ""},
+         ConfigVar<std::string>{"randomizer.file2SeedHash", ""},
+        ConfigVar<std::string>{"randomizer.file3SeedHash", ""},
+    },
+
+    .cosmetics = {
+        .herosTunicCapColor = {"cosmetics.hatColor", ""},
+        .herosTunicTorsoColor = {"cosmetics.tunicBodyColor", ""},
+        .herosTunicSkirtColor = {"cosmetics.tunicSkirtColor", ""},
+        .zoraArmorCapColor = {"cosmetics.zoraArmorCapColor", ""},
+        .zoraArmorHelmetColor = {"cosmetics.zoraArmorHelmetColor", ""},
+        .zoraArmorTorsoColor = {"cosmetics.zoraArmorTorsoColor", ""},
+        .zoraArmorScalesColor = {"cosmetics.zoraArmorScalesColor", ""},
+        .zoraArmorFlippersColor = {"cosmetics.zoraArmorFlippersColor", ""},
+        .lanternGlowColor = {"cosmetics.lanternGlowColor", ""},
+        .woodenSwordColor = {"cosmetics.woodenSwordColor", ""},
+        .msBladeColor = {"cosmetics.msBladeColor", ""},
+        .msHandleColor = {"cosmetics.msHandleColor", ""},
+        .lightSwordGlowColor = {"cosmetics.lightSwordGlowColor", ""},
+        .boomerangColor = {"cosmetics.boomerangColor", ""},
+        .ironBootsColor = {"cosmetics.ironBootsColor", ""},
+        .spinnerColor = {"cosmetics.spinnerColor", ""},
+        .midnaHairBaseColor = {"cosmetics.midnaHairBaseColor", "Default"},
+        .midnaHairTipsColor = {"cosmetics.midnaHairTipsColor", "Default"},
+        .midnaChargeRingColor = {"cosmetics.midnaChargeRingColor", ""},
+        .linkHairColor = {"cosmetics.linkHairColor", ""},
+        .wolfLinkColor = {"cosmetics.wolfLinkColor", ""},
+        .eponaColor = {"cosmetics.eponaColor", ""},
     }
 };
 
@@ -239,9 +277,10 @@ void registerSettings() {
     Register(g_userSettings.game.language);
     Register(g_userSettings.game.enableQuickTransform);
     Register(g_userSettings.game.hideTvSettingsScreen);
-    Register(g_userSettings.game.biggerWallets);
+    Register(g_userSettings.game.walletSizes);
     Register(g_userSettings.game.noReturnRupees);
     Register(g_userSettings.game.disableRupeeCutscenes);
+    Register(g_userSettings.game.fastTransitions);
     Register(g_userSettings.game.noSwordRecoil);
     Register(g_userSettings.game.damageMultiplier);
     Register(g_userSettings.game.noHeartDrops);
@@ -255,6 +294,10 @@ void registerSettings() {
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
     Register(g_userSettings.game.enhancedMapMenus);
+    Register(g_userSettings.game.timeSync);
+    Register(g_userSettings.game.enableDeselectSwords);
+    Register(g_userSettings.game.enableDeselectShields);
+    Register(g_userSettings.game.enableDeselectClothes);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
     Register(g_userSettings.game.invertCameraYAxis);
@@ -310,6 +353,8 @@ void registerSettings() {
     Register(g_userSettings.game.infiniteOil);
     Register(g_userSettings.game.infiniteOxygen);
     Register(g_userSettings.game.infiniteRupees);
+    Register(g_userSettings.game.infiniteBottle);
+    Register(g_userSettings.game.infiniteBait);
     Register(g_userSettings.game.enableIndefiniteItemDrops);
     Register(g_userSettings.game.moonJump);
     Register(g_userSettings.game.superClawshot);
@@ -377,6 +422,33 @@ void registerSettings() {
     Register(g_userSettings.actionBindings.turboSpeedButton[1]);
     Register(g_userSettings.actionBindings.turboSpeedButton[2]);
     Register(g_userSettings.actionBindings.turboSpeedButton[3]);
+
+    Register(g_userSettings.randomizer.seedHashes[0]);
+    Register(g_userSettings.randomizer.seedHashes[1]);
+    Register(g_userSettings.randomizer.seedHashes[2]);
+
+    Register(g_userSettings.cosmetics.herosTunicCapColor);
+    Register(g_userSettings.cosmetics.herosTunicTorsoColor);
+    Register(g_userSettings.cosmetics.herosTunicSkirtColor);
+    Register(g_userSettings.cosmetics.zoraArmorCapColor);
+    Register(g_userSettings.cosmetics.zoraArmorHelmetColor);
+    Register(g_userSettings.cosmetics.zoraArmorTorsoColor);
+    Register(g_userSettings.cosmetics.zoraArmorScalesColor);
+    Register(g_userSettings.cosmetics.zoraArmorFlippersColor);
+    Register(g_userSettings.cosmetics.lanternGlowColor);
+    Register(g_userSettings.cosmetics.woodenSwordColor);
+    Register(g_userSettings.cosmetics.msBladeColor);
+    Register(g_userSettings.cosmetics.msHandleColor);
+    Register(g_userSettings.cosmetics.lightSwordGlowColor);
+    Register(g_userSettings.cosmetics.boomerangColor);
+    Register(g_userSettings.cosmetics.ironBootsColor);
+    Register(g_userSettings.cosmetics.spinnerColor);
+    Register(g_userSettings.cosmetics.midnaHairBaseColor);
+    Register(g_userSettings.cosmetics.midnaHairTipsColor);
+    Register(g_userSettings.cosmetics.midnaChargeRingColor);
+    Register(g_userSettings.cosmetics.linkHairColor);
+    Register(g_userSettings.cosmetics.wolfLinkColor);
+    Register(g_userSettings.cosmetics.eponaColor);
 }
 
 // Transient settings

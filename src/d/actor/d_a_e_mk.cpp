@@ -22,6 +22,10 @@
 #include <cstring>
 
 #include "dusk/version.hpp"
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#include "dusk/randomizer/game/tools.h"
+#endif
 
 class daE_MK_HIO_c : public JORReflexible {
 public:
@@ -1730,6 +1734,11 @@ static void demo_camera_end(e_mk_class* i_this) {
                     work.z = AREG_F(2) + -20.0f;
                     MtxPosition(&work, &pos);
                     pos += i_this->crownPos;
+                    #if TARGET_PC
+                    if (randomizer_IsActive()) {
+                        checkTransformFromWolf(); // If the player is wolf, they will void and lose the boomerang check.
+                    }
+                    #endif
                     fopAcM_createDisappear(actor, &pos, 5, 0, 0xff);
                 }
 

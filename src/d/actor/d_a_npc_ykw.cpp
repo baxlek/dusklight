@@ -20,6 +20,10 @@
 #include "m_Do/m_Do_ext.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#include "dusk/randomizer/game/verify_item_functions.h"
+#endif
 #include "helpers/string.hpp"
 
 #if DEBUG
@@ -575,6 +579,9 @@ int daNpc_ykW_c::isDelete() {
     case 0:
         return 0;
     case 1:
+#if TARGET_PC
+        if (randomizer_IsActive()) return false;// We don't want Yeta to leave the dungeon, even if the BK is obtained.
+#endif
         return dComIfGs_isDungeonItemBossKey();
     case 2:
         return !dComIfGs_isDungeonItemBossKey() ||
@@ -2213,6 +2220,11 @@ int daNpc_ykW_c::cutEndSnowboardRace(int param_0) {
             switch (eventId) {
             case 1:
                 if (mItemPartnerId == fpcM_ERROR_PROCESS_ID_e) {
+#if TARGET_PC
+                    if (randomizer_IsActive()) {
+                        itemId = verifyProgressiveItem(randomizer_getItemAtLocation("Snowboard Racing Prize"));
+                    }
+#endif
                     mItemPartnerId = fopAcM_createItemForPresentDemo(&current.pos, itemId, 0,
                                                             -1, -1, 0, 0);
                 }
@@ -2911,6 +2923,12 @@ int daNpc_ykW_c::talk(void* param_0) {
                     switch (eventId) {
                     case 1:
                         if (mItemPartnerId == fpcM_ERROR_PROCESS_ID_e) {
+#if TARGET_PC
+                            if (randomizer_IsActive()) {
+                                itemNo = verifyProgressiveItem(randomizer_getItemAtLocation("Snowpeak Ruins Mansion Map"));
+                                randomizer_setTempFlagForLocation("Snowpeak Ruins Mansion Map");
+                            }
+#endif
                             mItemPartnerId =
                                 fopAcM_createItemForPresentDemo(&current.pos, itemNo, 0, -1, -1, 0, 0);
                         }
