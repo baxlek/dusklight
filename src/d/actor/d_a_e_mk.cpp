@@ -21,6 +21,7 @@
 #include "Z2AudioLib/Z2Instances.h"
 #include <cstring>
 
+#include "dusk/version.hpp"
 #if TARGET_PC
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/tools.h"
@@ -617,8 +618,10 @@ static void e_mk_shoot(e_mk_class* i_this) {
                 i_this->sound.startCreatureVoice(Z2SE_EN_MK_V_CATCH_BOOM, -1);
                 i_this->sound.startCreatureSound(Z2SE_EN_MK_CATCH_BOOM, 0, -1);
 
-#if VERSION == VERSION_GCN_JPN
+#if TARGET_PC || VERSION == VERSION_GCN_JPN
+                IF_DUSK_BLOCK(dusk::version::isRegionJpn())
                 return;
+                IF_DUSK_BLOCK_END
 #endif
             }
         }

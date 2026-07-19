@@ -27,6 +27,7 @@
 #include "dusk/imgui/ImGuiConsole.hpp"
 #include "dusk/settings.h"
 #include "dusk/speedrun.h"
+#include "dusk/version.hpp"
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #endif
 
@@ -4701,8 +4702,10 @@ void daAlink_c::checkWarpStart() {
         if (dMeter2Info_getWarpStatus() == WARP_STATUS_DECIDED_e ||
             dComIfGp_event_compulsory(this, 0, 0xFFFF))
         {
-            #if VERSION != VERSION_GCN_JPN && VERSION != VERSION_SHIELD_DEBUG
+            #if TARGET_PC || (VERSION != VERSION_GCN_JPN && VERSION != VERSION_SHIELD_DEBUG)
+            IF_DUSK_BLOCK(!dusk::version::isRegionJpn())
             onNoResetFlg0(FLG0_UNK_4000);
+            IF_DUSK_BLOCK_END
             #endif
 
             if (dMeter2Info_getWarpStatus() == WARP_STATUS_DECIDED_e) {
@@ -4730,8 +4733,10 @@ void daAlink_c::checkWarpStart() {
                 fopAcM_orderOtherEvent(this, portal, 0xFFFF, 1, 1);
             } else {
                 mDemo.setSpecialDemoType();
-                #if VERSION == VERSION_GCN_JPN || VERSION == VERSION_SHIELD_DEBUG
+                #if TARGET_PC || (VERSION == VERSION_GCN_JPN || VERSION == VERSION_SHIELD_DEBUG)
+                IF_DUSK_BLOCK(dusk::version::isRegionJpn())
                 onNoResetFlg0(FLG0_UNK_4000);
+                IF_DUSK_BLOCK_END
                 #endif
 
                 if (dMeter2Info_getWarpStatus() == 1) {
@@ -4815,10 +4820,12 @@ int daAlink_c::procCoWarpInit(int param_0, int param_1) {
                 soundId = Z2SE_WOLF_WARP_IN_TATE;
             }
 
-            #if VERSION == VERSION_GCN_JPN || VERSION == VERSION_SHIELD_DEBUG
+            #if TARGET_PC || (VERSION == VERSION_GCN_JPN || VERSION == VERSION_SHIELD_DEBUG)
+            IF_DUSK_BLOCK(dusk::version::isRegionJpn())
             if (param_1) {
                 onNoResetFlg0(FLG0_UNK_4000);
             }
+            IF_DUSK_BLOCK_END
             #endif
 
             if (param_1) {
