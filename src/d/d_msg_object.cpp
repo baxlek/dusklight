@@ -31,6 +31,7 @@
 
 #if TARGET_PC
 #include "d/d_item.h"
+#include "dusk/randomizer/game/custom_flow_ids.hpp"
 #include "dusk/randomizer/game/messages.hpp"
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/stages.h"
@@ -43,6 +44,13 @@
 #include <vector>
 #include <array>
 #include <algorithm>
+#endif
+
+// Macro to call our custom function for getting attributes
+#if TARGET_PC
+#define ENTRIES(i) getEntry(i)
+#else
+#define ENTRIES(i) entries[i]
 #endif
 
 static void dMsgObject_addFundRaising(s16 param_0);
@@ -701,7 +709,7 @@ void dMsgObject_c::setMessageIndex(u32 revoIndex, u32 param_2, bool param_3) {
     JMSMesgInfo_c* pMsg = (JMSMesgInfo_c*)((char*)mpMsgDt + 0x20);
     u8* iVar2 = (u8*)pMsg + pMsg->header.size;
     u32 msg_id = getMessageIndex(revoIndex);
-    dComIfGp_setMesgCameraAttrInfo(pMsg->entries[msg_id].camera_id);
+    dComIfGp_setMesgCameraAttrInfo(pMsg->ENTRIES(msg_id).camera_id);
     if (field_0x15c == 1000) {
         mpRefer->setSelMsgPtr(NULL);
     } else {
@@ -714,6 +722,10 @@ void dMsgObject_c::setMessageIndex(u32 revoIndex, u32 param_2, bool param_3) {
             // This is where the game sets the pointer to the string for message choices.
             // If any of our custom messages are for message choices, override them here
             if (randomizer_IsActive()) {
+                // Change to custom group if we have a custom message index
+                if (msgIndex >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+                    groupID = CUSTOM_BMG_GROUP;
+                }
                 auto override = GetTextOverride(groupID, field_0x15c);
                 if (override != NULL) {
                     my_ptr = override;
@@ -750,7 +762,7 @@ void dMsgObject_c::setMessageIndexDemo(u32 revoMsgIndex, bool param_2) {
     JMSMesgInfo_c* info_header_p = (JMSMesgInfo_c*)((char*)mpMsgDt + 0x20);
     JMSMesgInfo_c* reg_25 = (JMSMesgInfo_c*)((char*) info_header_p + info_header_p->header.size);
     int ind = getMessageIndex(revoMsgIndex);
-    dComIfGp_setMesgCameraAttrInfo(info_header_p->entries[ind].camera_id);
+    dComIfGp_setMesgCameraAttrInfo(info_header_p->ENTRIES(ind).camera_id);
     mpRefer->setSelMsgPtr(NULL);
     if (param_2) {
         mpCtrl->setMessageID(mMessageID, 0, NULL);
@@ -758,6 +770,13 @@ void dMsgObject_c::setMessageIndexDemo(u32 revoMsgIndex, bool param_2) {
 }
 
 u32 dMsgObject_c::getMessageIndex(u32 param_0) {
+#if TARGET_PC
+    // Directly return our index if it's above the custom id base
+    if (randomizer_IsActive() && param_0 >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+        return param_0;
+    }
+#endif
+
     u32 i = 0;
     JMSMesgInfo_c* pMsg = (JMSMesgInfo_c*)((char*)mpMsgDt + 0x20);
     u32 msgIndexCount = *((BE(u16)*)((char*)mpMsgDt + 0x28));
@@ -778,6 +797,11 @@ u32 dMsgObject_c::getMessageIndex(u32 param_0) {
 u32 dMsgObject_c::getRevoMessageIndex(u32 param_1) {
 #if TARGET_PC
     if (randomizer_IsActive()) {
+        // Directly return our index if it's custom
+        if (param_1 >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+            return param_1;
+        }
+
         // Special case for Ilia Memory Reward Text (param_1 is msgId)
         // If we're in the sanctuary cutscene where we get the reward, override the text.
         // Otherwise, the regular item text for the horse call would be overridden if we find it

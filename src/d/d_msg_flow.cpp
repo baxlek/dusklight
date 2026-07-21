@@ -16,11 +16,27 @@
 #include <cstring>
 
 #if TARGET_PC
+#include "dusk/randomizer/game/custom_flow_ids.hpp"
 #include "dusk/randomizer/game/flags.h"
 #include "dusk/randomizer/game/tools.h"
 #include "dusk/randomizer/game/stages.h"
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/verify_item_functions.h"
+#endif
+
+// Macros for somewhat gracefully handling custom flow ids
+// The game likes to directly index into the flow node table a lot, so this macro keeps
+// reletively the same syntax in all the places that happens
+#if TARGET_PC
+#define M_FLOW_NODE_TBL(index) \
+            (*(index >= BASE_CUSTOM_MSG_AND_FLOW_ID && index != 0xFFFF && randomizer_IsActive() ? \
+            reinterpret_cast<mesg_flow*>(&randomizer_GetContext().mFlowPatches.at((CUSTOM_BMG_GROUP << 16) | (index))) : \
+            &mFlowNodeTBL[index]))
+// If we're indexing into the flow index table, just return the custom index directly
+#define M_FLOW_IDX_TBL(index) index >= BASE_CUSTOM_MSG_AND_FLOW_ID && randomizer_IsActive() ? index : mFlowIdxTBL[index]
+#else
+#define M_FLOW_NODE_TBL(index) mFlowNodeTBL[index]
+#define M_FLOW_IDX_TBL(index) mFlowIdxTBL[index]
 #endif
 
 dMsgFlow_c::dMsgFlow_c() {
@@ -115,7 +131,7 @@ int dMsgFlow_c::checkOpenDoor(fopAc_ac_c* i_speaker_p, int* param_2) {
     mesg_flow_node_event* event_node = NULL;
 
     while ((nodeIdx != 0xFFFF && !var_r27) && !var_r25) {
-        u8 type = mFlowNodeTBL[nodeIdx].message.type;
+        u8 type = M_FLOW_NODE_TBL(nodeIdx).message.type;
 
 #if TARGET_PC
         randoPatchNodeType(type, nodeIdx);
@@ -123,13 +139,13 @@ int dMsgFlow_c::checkOpenDoor(fopAc_ac_c* i_speaker_p, int* param_2) {
 
         switch(type) {
         case NODETYPE_MESSAGE_e: {
-            msg_node = &mFlowNodeTBL[nodeIdx].message;
+            msg_node = &M_FLOW_NODE_TBL(nodeIdx).message;
             nodeIdx = msg_node->next_node_idx;
             var_r26++;
             break;
         }
         case NODETYPE_BRANCH_e: {
-            branch_node = (mesg_flow_node_branch*)&mFlowNodeTBL[nodeIdx].branch;
+            branch_node = (mesg_flow_node_branch*)&M_FLOW_NODE_TBL(nodeIdx).branch;
 
 #if TARGET_PC
             randoPatchBranchNode(branch_node, nodeIdx);
@@ -149,10 +165,20 @@ int dMsgFlow_c::checkOpenDoor(fopAc_ac_c* i_speaker_p, int* param_2) {
             u16 query_ret = (this->*mQueryList[branch_node->query_idx])(branch_node, i_speaker_p, 0);
             u16 spE = branch_node->next_node_idx + query_ret;
             nodeIdx = mFlowIdxTBL[spE];
+#if TARGET_PC
+            // Overwrite the node we branch to if applicable
+            if (randomizer_IsActive()) {
+                auto& branchOverrides = randomizer_GetContext().mFlowPatchesBranchOverrides;
+                auto key = getKeyForIndex(nodeIdx);
+                if (branchOverrides.contains(key)) {
+                    nodeIdx = branchOverrides[key][query_ret];
+                }
+            }
+#endif
             break;
         }
         case NODETYPE_EVENT_e: {
-            event_node = &mFlowNodeTBL[nodeIdx].event;
+            event_node = &M_FLOW_NODE_TBL(nodeIdx).event;
 
 #if TARGET_PC
             randoPatchEventNode(event_node, nodeIdx);
@@ -171,7 +197,7 @@ int dMsgFlow_c::checkOpenDoor(fopAc_ac_c* i_speaker_p, int* param_2) {
                 var_r25 = TRUE;
                 break;
             default:
-                nodeIdx = mFlowIdxTBL[event_node->next_node_idx];
+                nodeIdx = M_FLOW_IDX_TBL(event_node->next_node_idx);
                 break;
             }
             break;
@@ -413,7 +439,7 @@ void dMsgFlow_c::setNodeIndex(u16 i_nodeIdx, fopAc_ac_c** i_talkPartners) {
         dMsgObject_endFlowGroup();
         field_0x26 = 1;
     } else {
-        switch (mFlowNodeTBL[i_nodeIdx].message.type) {
+        switch (M_FLOW_NODE_TBL(i_nodeIdx).message.type) {
         case 0:
             break;
         case NODETYPE_MESSAGE_e:
@@ -423,7 +449,11 @@ void dMsgFlow_c::setNodeIndex(u16 i_nodeIdx, fopAc_ac_c** i_talkPartners) {
             break;
         case NODETYPE_EVENT_e:
             mesg_flow_node_event* node = NULL;
-            node = &mFlowNodeTBL[i_nodeIdx].event;
+            node = &M_FLOW_NODE_TBL(i_nodeIdx).event;
+
+#if TARGET_PC
+            randoPatchEventNode(node, i_nodeIdx);
+#endif
 
             if (node->event_idx == 21 || node->event_idx == 32 || node->event_idx == 33) {
                 if (node->event_idx == 21) {
@@ -476,9 +506,21 @@ int dMsgFlow_c::setSelectMsg(mesg_flow_node* i_flowNode_p, mesg_flow_node* param
     inf_p = (BE(u16)*)getMsgDataBlock("INF1");
 
     var_r29 = param_2;
+#if TARGET_PC
+    // Don't index our msg index if it's a custom one (the custom one is already the correct value)
+    if (randomizer_IsActive() && var_r29->msg_index >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+        temp_r25 = var_r29->msg_index;
+    } else
+#endif
     temp_r25 = ((inf_p + (var_r29->msg_index) * 10))[10];
 
     var_r29 = i_flowNode_p;
+#if TARGET_PC
+    // Same as above
+    if (randomizer_IsActive() && var_r29->msg_index >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+        msg_no = var_r29->msg_index;
+    } else
+#endif
     msg_no = ((inf_p + (var_r29->msg_index) * 10))[10];
 
     // "Message Set (Select)"
@@ -523,6 +565,12 @@ int dMsgFlow_c::setNormalMsg(mesg_flow_node* i_flowNode_p, fopAc_ac_c* i_speaker
 
     var_r29 = i_flowNode_p;
     inf_p = (BE(u16)*)getMsgDataBlock("INF1");
+#if TARGET_PC
+    // Don't index our msg index if it's a custom one (the custom one is already the correct value)
+    if (randomizer_IsActive() && var_r29->msg_index >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+        msg_no = var_r29->msg_index;
+    } else
+#endif
     msg_no = (inf_p + (var_r29->msg_index) * 10)[10];
 
 #if TARGET_PC
@@ -581,31 +629,42 @@ int dMsgFlow_c::setNormalMsg(mesg_flow_node* i_flowNode_p, fopAc_ac_c* i_speaker
 
 int dMsgFlow_c::messageNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
     mesg_flow_node* flowNode_p = NULL;
-    flowNode_p = &mFlowNodeTBL[mNodeIdx].message;
+    flowNode_p = &M_FLOW_NODE_TBL(mNodeIdx).message;
+
+#if TARGET_PC
+    randoPatchMessageNode(flowNode_p, mNodeIdx);
+#endif
 
     if (field_0x25 != 0) {
         if (mSelType != SELTYPE_NONE_e) {
             u16 aNextNodeIndex = flowNode_p->next_node_idx;
             JUT_ASSERT(1051, 0xFFFF != aNextNodeIndex);
 
-            if (mSelType == SELTYPE_VERTICAL_e && mFlowNodeTBL[aNextNodeIndex].message.type == NODETYPE_MESSAGE_e) {
-                JUT_ASSERT(1056, NODETYPE_MESSAGE_e == mFlowNodeTBL[aNextNodeIndex].message.type);
-                if (setSelectMsg(&mFlowNodeTBL[mNodeIdx].message, &mFlowNodeTBL[aNextNodeIndex].message, i_speaker_p)) {
+#if TARGET_PC
+            mesg_flow_node* nextFlowNode_p = &M_FLOW_NODE_TBL(aNextNodeIndex).message;
+            randoPatchMessageNode(nextFlowNode_p, aNextNodeIndex);
+            // The code really likes directly indexing over and over again here, so we have to put
+            // in some ugly DUSK_IF_ELSEs
+#endif
+
+            if (mSelType == SELTYPE_VERTICAL_e && DUSK_IF_ELSE(nextFlowNode_p->, mFlowNodeTBL[aNextNodeIndex].message.)type == NODETYPE_MESSAGE_e) {
+                JUT_ASSERT(1056, NODETYPE_MESSAGE_e == DUSK_IF_ELSE(nextFlowNode_p->, mFlowNodeTBL[aNextNodeIndex].message.)type);
+                if (setSelectMsg(DUSK_IF_ELSE(flowNode_p, &mFlowNodeTBL[mNodeIdx].message), DUSK_IF_ELSE(nextFlowNode_p, &mFlowNodeTBL[aNextNodeIndex].message), i_speaker_p)) {
                     mNodeIdx = aNextNodeIndex;
                     mSelType = SELTYPE_NONE_e;
                     field_0x25 = 0;
                 }
-            } else if (mSelType == SELTYPE_HORIZONTAL_e && mFlowNodeTBL[aNextNodeIndex].message.type == NODETYPE_BRANCH_e) {
-                if (setNormalMsg(&mFlowNodeTBL[mNodeIdx].message, i_speaker_p)) {
+            } else if (mSelType == SELTYPE_HORIZONTAL_e && DUSK_IF_ELSE(nextFlowNode_p->, mFlowNodeTBL[aNextNodeIndex].message.)type == NODETYPE_BRANCH_e) {
+                if (setNormalMsg(DUSK_IF_ELSE(flowNode_p, &mFlowNodeTBL[mNodeIdx].message), i_speaker_p)) {
                     mSelType = SELTYPE_NONE_e;
                     field_0x25 = 0;
                 }
             } else {
-                OS_REPORT("★sel select mesg ===> %d, %d, %d\n", mSelType, aNextNodeIndex, mFlowNodeTBL[aNextNodeIndex].message.type);
+                OS_REPORT("★sel select mesg ===> %d, %d, %d\n", mSelType, aNextNodeIndex, DUSK_IF_ELSE(nextFlowNode_p->, mFlowNodeTBL[aNextNodeIndex].message.)type);
                 JUT_ASSERT(1077, FALSE);
             }
         } else {
-            if (setNormalMsg(&mFlowNodeTBL[mNodeIdx].message, i_speaker_p)) {
+            if (setNormalMsg(DUSK_IF_ELSE(flowNode_p, &mFlowNodeTBL[mNodeIdx].message), i_speaker_p)) {
                 field_0x25 = 0;
             }
         }
@@ -654,7 +713,7 @@ int dMsgFlow_c::messageNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPart
         case 18:
             setNodeIndex(flowNode_p->next_node_idx, i_talkPartners);
 
-            mesg_flow_node* var_r26 = &mFlowNodeTBL[flowNode_p->next_node_idx].message;
+            mesg_flow_node* var_r26 = &M_FLOW_NODE_TBL(flowNode_p->next_node_idx).message;
             if (var_r26->field_0x1 == 0x15 || var_r26->field_0x1 == 0x20 || var_r26->field_0x1 == 0x21) {
                 return 0;
             }
@@ -668,7 +727,7 @@ int dMsgFlow_c::messageNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPart
 
 int dMsgFlow_c::branchNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
     mesg_flow_node_branch* node = NULL;
-    node = &mFlowNodeTBL[mNodeIdx].branch;
+    node = &M_FLOW_NODE_TBL(mNodeIdx).branch;
 
 #if TARGET_PC
     randoPatchBranchNode(node, mNodeIdx);
@@ -677,13 +736,25 @@ int dMsgFlow_c::branchNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartn
     u16 proc_status = (this->*mQueryList[node->query_idx])(node, i_speaker_p, 1);
 
     u16 var_r28 = node->next_node_idx + proc_status;
+#if TARGET_PC
+    // Overwrite the node we branch to if applicable
+    if (randomizer_IsActive()) {
+        auto& branchOverrides = randomizer_GetContext().mFlowPatchesBranchOverrides;
+        auto key = getKeyForIndex(mNodeIdx);
+        u16 nextIndex = mFlowIdxTBL[var_r28];
+        if (branchOverrides.contains(key)) {
+            nextIndex = branchOverrides[key][proc_status];
+        }
+        setNodeIndex(nextIndex, i_talkPartners);
+    } else
+#endif
     setNodeIndex(mFlowIdxTBL[var_r28], i_talkPartners);
     return 1;
 }
 
 int dMsgFlow_c::eventNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
     mesg_flow_node_event* node = NULL;
-    node = &mFlowNodeTBL[mNodeIdx].event;
+    node = &M_FLOW_NODE_TBL(mNodeIdx).event;
 #if TARGET_PC
     randoPatchEventNode(node, mNodeIdx);
 #endif
@@ -692,7 +763,7 @@ int dMsgFlow_c::eventNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartne
     switch (node->event_idx) {
     case 8: {
         getParam(&mEventId, &field_0x30, node->params);
-        setNodeIndex(mFlowIdxTBL[node->next_node_idx], i_talkPartners);
+        setNodeIndex(M_FLOW_IDX_TBL(node->next_node_idx), i_talkPartners);
 
         if (field_0x26 != 0) {
             break;
@@ -737,7 +808,7 @@ int dMsgFlow_c::eventNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartne
             return 0;
         }
     default:
-        setNodeIndex(mFlowIdxTBL[node->next_node_idx], i_talkPartners);
+        setNodeIndex(M_FLOW_IDX_TBL(node->next_node_idx), i_talkPartners);
     }
 
     return 1;
@@ -758,7 +829,7 @@ int dMsgFlow_c::nodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
             aSpeaker_p = i_talkPartners[field_0x38];
         }
 
-        u8 type = mFlowNodeTBL[mNodeIdx].message.type;
+        u8 type = M_FLOW_NODE_TBL(mNodeIdx).message.type;
 #if TARGET_PC
         randoPatchNodeType(type, mNodeIdx);
 #endif
@@ -801,7 +872,7 @@ int dMsgFlow_c::getParam(u8* params) {
     return *(BE(int)*)params;
 }
 
-DUSK_GAME_DATA queryFunc dMsgFlow_c::mQueryList[DUSK_IF_ELSE(54, 53)] = {
+DUSK_GAME_DATA queryFunc dMsgFlow_c::mQueryList[DUSK_IF_ELSE(56, 53)] = {
     &dMsgFlow_c::query005, &dMsgFlow_c::query001, &dMsgFlow_c::query002, &dMsgFlow_c::query003,
     &dMsgFlow_c::query006, &dMsgFlow_c::query007, &dMsgFlow_c::query004, &dMsgFlow_c::query008,
     &dMsgFlow_c::query009, &dMsgFlow_c::query010, &dMsgFlow_c::query011, &dMsgFlow_c::query012,
@@ -817,7 +888,7 @@ DUSK_GAME_DATA queryFunc dMsgFlow_c::mQueryList[DUSK_IF_ELSE(54, 53)] = {
     &dMsgFlow_c::query049, &dMsgFlow_c::query050, &dMsgFlow_c::query051, &dMsgFlow_c::query052,
     &dMsgFlow_c::query053,
 #if TARGET_PC
-    &dMsgFlow_c::query054,
+    &dMsgFlow_c::query054, &dMsgFlow_c::query055, &dMsgFlow_c::query056
 #endif
 };
 
@@ -1836,6 +1907,7 @@ u16 dMsgFlow_c::query053(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
+#if TARGET_PC
 // Like query 1, but instead returns 1 if true, and 0 if false
 u16 dMsgFlow_c::query054(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u16 prm0 = i_flowNode_p->param;
@@ -1850,7 +1922,33 @@ u16 dMsgFlow_c::query054(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-DUSK_GAME_DATA eventFunc dMsgFlow_c::mEventList[DUSK_IF_ELSE(45, 43)] = {
+// Return 0 if can change ToD, else 1 if cannot.
+u16 dMsgFlow_c::query055(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
+    // This function is based on query044 which is used to determine whether to show the Midna menu which includes
+    // "Warp" or not. We also add a check to ensure the current environment is not twilight. "R_SP161" is STAR tent.
+    if (!dKy_darkworld_check() && !daAlink_c::checkForestOldCentury() &&
+        (daAlink_c::checkField() || daAlink_c::checkCastleTown()) &&
+        !daAlink_c::checkStageName("R_SP161"))
+    {
+        return 0;
+    }
+    return 1;
+}
+
+// Return 0 if can return to dungeon entrance, 1 if in dungeon but can only return to spawn, or 2 if not in dungeon.
+u16 dMsgFlow_c::query056(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
+    // Darkhammer is highest numbered dungeon map stage id
+    if (getStageID() <= Darkhammer) {
+        if (randomizer_GetContext().mReturnToPlaceOverrides.contains(getStageID())) {
+            return 0;
+        }
+        return 1;
+    }
+    return 2;
+}
+#endif
+
+DUSK_GAME_DATA eventFunc dMsgFlow_c::mEventList[DUSK_IF_ELSE(46, 43)] = {
     &dMsgFlow_c::event000, &dMsgFlow_c::event001, &dMsgFlow_c::event002, &dMsgFlow_c::event003,
     &dMsgFlow_c::event004, &dMsgFlow_c::event005, &dMsgFlow_c::event006, &dMsgFlow_c::event007,
     &dMsgFlow_c::event008, &dMsgFlow_c::event009, &dMsgFlow_c::event010, &dMsgFlow_c::event011,
@@ -1863,7 +1961,7 @@ DUSK_GAME_DATA eventFunc dMsgFlow_c::mEventList[DUSK_IF_ELSE(45, 43)] = {
     &dMsgFlow_c::event036, &dMsgFlow_c::event037, &dMsgFlow_c::event038, &dMsgFlow_c::event039,
     &dMsgFlow_c::event040, &dMsgFlow_c::event041, &dMsgFlow_c::event042,
 #if TARGET_PC
-    &dMsgFlow_c::event043, &dMsgFlow_c::event044,
+    &dMsgFlow_c::event043, &dMsgFlow_c::event044, &dMsgFlow_c::event045
 #endif
 };
 
@@ -2733,17 +2831,44 @@ int dMsgFlow_c::event044(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
+int dMsgFlow_c::event045(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
+    int prm0 = getParam(i_flowNode_p->params);
+    randomizer_returnToSpawn(prm0);
+    return 1;
+}
+
 // Rando patch funcs
+
+u32 dMsgFlow_c::getKeyForIndex(u16 nodeIdx) {
+    u32 key = (dMsgObject_getGroupID() << 16) | nodeIdx;
+    // Change group to custom group if custom index
+    if (nodeIdx >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+        key = (CUSTOM_BMG_GROUP << 16) | nodeIdx;
+    }
+    // Dirty check to see if this node is part of bmg 0
+    else if (*(reinterpret_cast<u16*>(&mFlowNodeTBL[0])) == 0x0803) {
+        key &= 0x0000FFFF;
+    }
+
+    return key;
+}
+
 void dMsgFlow_c::randoPatchNodeType(u8& type, u16 nodeIdx) {
     // Overwrite the type if we have a patch for this index
     if (randomizer_IsActive()) {
-        u32 key = (dMsgObject_getGroupID() << 16) | nodeIdx;
-        // Dirty check to see if this node is part of bmg 0
-        if (*(reinterpret_cast<u16*>(&mFlowNodeTBL[0])) == 0x0803) {
-            key &= 0x0000FFFF;
-        }
+        auto key = getKeyForIndex(nodeIdx);
         if (randomizer_GetContext().mFlowPatches.contains(key)) {
             type = reinterpret_cast<mesg_flow_node*>(&randomizer_GetContext().mFlowPatches[key])->type;
+        }
+    }
+}
+
+void dMsgFlow_c::randoPatchMessageNode(mesg_flow_node*& message_node, u16 nodeIdx) {
+    // Overwrite this node if we have a patch for it
+    if (randomizer_IsActive()) {
+        auto key = getKeyForIndex(nodeIdx);
+        if (randomizer_GetContext().mFlowPatches.contains(key)) {
+            message_node = reinterpret_cast<mesg_flow_node*>(&randomizer_GetContext().mFlowPatches[key]);
         }
     }
 }
@@ -2751,11 +2876,7 @@ void dMsgFlow_c::randoPatchNodeType(u8& type, u16 nodeIdx) {
 void dMsgFlow_c::randoPatchBranchNode(mesg_flow_node_branch*& branch_node, u16 nodeIdx) {
     // Overwrite this node if we have a patch for it
     if (randomizer_IsActive()) {
-        u32 key = (dMsgObject_getGroupID() << 16) | nodeIdx;
-        // Dirty check to see if this node is part of bmg 0
-        if (*(reinterpret_cast<u16*>(&mFlowNodeTBL[0])) == 0x0803) {
-            key &= 0x0000FFFF;
-        }
+        auto key = getKeyForIndex(nodeIdx);
         if (randomizer_GetContext().mFlowPatches.contains(key)) {
             branch_node = reinterpret_cast<mesg_flow_node_branch*>(&randomizer_GetContext().mFlowPatches[key]);
         }
@@ -2765,11 +2886,7 @@ void dMsgFlow_c::randoPatchBranchNode(mesg_flow_node_branch*& branch_node, u16 n
 void dMsgFlow_c::randoPatchEventNode(mesg_flow_node_event*& event_node, u16 nodeIdx) {
     // Overwrite this node if we have a patch for it
     if (randomizer_IsActive()) {
-        u32 key = (dMsgObject_getGroupID() << 16) | nodeIdx;
-        // Dirty check to see if this node is part of bmg 0
-        if (*(reinterpret_cast<u16*>(&mFlowNodeTBL[0])) == 0x0803) {
-            key &= 0x0000FFFF;
-        }
+        auto key = getKeyForIndex(nodeIdx);
         if (randomizer_GetContext().mFlowPatches.contains(key)) {
             event_node = reinterpret_cast<mesg_flow_node_event*>(&randomizer_GetContext().mFlowPatches[key]);
         }

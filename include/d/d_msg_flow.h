@@ -133,6 +133,8 @@ public:
     u16 query053(mesg_flow_node_branch*, fopAc_ac_c*, int);
 #if TARGET_PC
     u16 query054(mesg_flow_node_branch*, fopAc_ac_c*, int);
+    u16 query055(mesg_flow_node_branch*, fopAc_ac_c*, int);
+    u16 query056(mesg_flow_node_branch*, fopAc_ac_c*, int);
 #endif
     int event000(mesg_flow_node_event*, fopAc_ac_c*);
     int event001(mesg_flow_node_event*, fopAc_ac_c*);
@@ -181,6 +183,7 @@ public:
     // events for rando
     int event043(mesg_flow_node_event*, fopAc_ac_c*);
     int event044(mesg_flow_node_event*, fopAc_ac_c*);
+    int event045(mesg_flow_node_event*, fopAc_ac_c*);
 #endif
 
     void initWord(fopAc_ac_c*, const char*, u8, int, fopAc_ac_c**);
@@ -196,12 +199,14 @@ public:
     void setMsg(u32 msg) { mMsg = msg; }
     bool checkEndFlow() { return (u32)field_0x26 == 1; }
 
-    static DUSK_GAME_DATA queryFunc mQueryList[DUSK_IF_ELSE(54, 53)];
-    static DUSK_GAME_DATA eventFunc mEventList[DUSK_IF_ELSE(45, 43)];
+    static DUSK_GAME_DATA queryFunc mQueryList[DUSK_IF_ELSE(56, 53)];
+    static DUSK_GAME_DATA eventFunc mEventList[DUSK_IF_ELSE(46, 43)];
 
 #if TARGET_PC
     // patch funcs for rando
+    u32 getKeyForIndex(u16 nodeIdx);
     void randoPatchNodeType(u8& type, u16 nodeIdx);
+    void randoPatchMessageNode(mesg_flow_node*& message_node, u16 nodeIdx);
     void randoPatchBranchNode(mesg_flow_node_branch*& branch_node, u16 nodeIdx);
     void randoPatchEventNode(mesg_flow_node_event*& event_node, u16 nodeIdx);
 #endif

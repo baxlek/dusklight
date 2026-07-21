@@ -37,6 +37,26 @@ public:
     /* 0x12 */ BE(u16) unk_0x12;
 };
 
+#if TARGET_PC
+// Default attributes for custom text ids
+static JMSMesgEntry_c defaultEntry{
+    .string_offset = 0,
+    .message_id = 0,
+    .event_label_id = 0,
+    .se_speaker = 0x15,
+    .fuki_kind = 0x0D,
+    .output_type = 0x01,
+    .fuki_pos_type = 0x00,
+    .unk_0xc = 0xFF,
+    .unk_0xd = 0x00,
+    .se_mood = 0x0D,
+    .camera_id = 0x0,
+    .base_anm_id = 0x1F,
+    .face_anm_id = 0x1F,
+    .unk_0x12 = 0x400,
+};
+#endif
+
 class JMSMesgInfo_c {
 public:
     /* 0x00 */ bmg_section_t header;  // section header
@@ -44,6 +64,9 @@ public:
     /* 0x0A */ BE(u16) entry_size;        // size of an entry
     /* 0x0C */ u8 padding[4];         // padding
     /* 0x10 */ JMSMesgEntry_c entries[0];
+#if TARGET_PC
+    JMSMesgEntry_c& getEntry(u16 index);
+#endif
 };
 
 class COutFont_c;

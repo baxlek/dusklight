@@ -15,6 +15,8 @@
 #if TARGET_PC
 #include "dusk/menu_pointer.h"
 #include "dusk/scope_guard.hpp"
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#include "dusk/randomizer/game/custom_flow_ids.hpp"
 #endif
 
 #if REGION_JPN
@@ -35,6 +37,34 @@
 #define CHAR_CODE_THIN_RIGHT_ARROW 0xBC
 #define CHAR_CODE_THIN_UP_ARROW 0xBD
 #define CHAR_CODE_THIN_DOWN_ARROW 0xBE
+#endif
+
+#if TARGET_PC
+// Custom function to return custom entries if applicable
+JMSMesgEntry_c& JMSMesgInfo_c::getEntry(u16 index) {
+    u32 key{};
+    auto& attributeOverrides = randomizer_GetContext().mAttributeOverrides;
+    if (index < BASE_CUSTOM_MSG_AND_FLOW_ID) {
+        // Regular entry
+        u8 group = dComIfGp_getMsgObjectClass()->getMessageGroup(index);
+        key = group << 16 | index;
+        // Override attributes if we modified them for this index
+        if (attributeOverrides.contains(key)) {
+            return *reinterpret_cast<JMSMesgEntry_c*>(&attributeOverrides[key]);
+        }
+        return entries[index];
+    }
+
+    // We have a custom index, use the custom index group
+    key = CUSTOM_BMG_GROUP << 16 | index;
+    if (attributeOverrides.contains(key)) {
+        return *reinterpret_cast<JMSMesgEntry_c*>(&attributeOverrides[key]);
+    }
+
+    // If we didn't specify attributes for the custom index, use the default
+    defaultEntry.message_id = index;
+    return defaultEntry;
+}
 #endif
 
 static bool checkCharInfoCharactor(int c) {
