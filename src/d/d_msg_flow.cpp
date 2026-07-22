@@ -407,6 +407,12 @@ u8* dMsgFlow_c::getMsgDataBlock(char const* block_tag) {
 }
 
 u16 dMsgFlow_c::getInitNodeIndex(u16 param_1) {
+#if TARGET_PC
+    // If we have a custom flow index, just return it directly
+    if (param_1 >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+        return param_1;
+    }
+#endif
     u8* var_r30 = NULL;
     u16 var_r27 = -1;
 
