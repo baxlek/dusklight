@@ -72,8 +72,8 @@ JMSMesgEntry_c& JMSMesgInfo_c::getEntry(u16 index) {
     }
 
     // If we didn't specify attributes for the custom index, use the default
-    defaultEntry.message_id = index;
-    return defaultEntry;
+    defaultJMSMesgEntry.message_id = index;
+    return defaultJMSMesgEntry;
 }
 #endif
 

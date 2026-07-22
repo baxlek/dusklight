@@ -43,7 +43,7 @@ public:
 
 #if TARGET_PC
 // Default attributes for custom text ids
-static JMSMesgEntry_c defaultEntry{
+static JMSMesgEntry_c defaultJMSMesgEntry{
     .string_offset = 0,
     .message_id = 0,
     .event_label_id = 0,
