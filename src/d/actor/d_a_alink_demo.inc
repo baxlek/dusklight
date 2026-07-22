@@ -27,6 +27,7 @@
 #include "dusk/imgui/ImGuiConsole.hpp"
 #include "dusk/settings.h"
 #include "dusk/speedrun.h"
+#include "dusk/version.hpp"
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/version.hpp"
 #endif
@@ -1317,7 +1318,12 @@ BOOL daAlink_c::checkDeadAction(int param_0) {
             }
         } else if (dComIfGs_getLife() == 0 && !checkResetFlg0(RFLG0_UNK_400) && dComIfGs_checkBottle(dItemNo_FAIRY_e)) {
             makeFairy(&current.pos, 0);
+            #if TARGET_PC
+            if (!dusk::getSettings().game.infiniteBottle)
+                dComIfGs_setBottleItemIn(dItemNo_FAIRY_e, dItemNo_EMPTY_BOTTLE_e);
+            #else
             dComIfGs_setBottleItemIn(dItemNo_FAIRY_e, dItemNo_EMPTY_BOTTLE_e);
+            #endif
         }
     }
 

@@ -29,6 +29,8 @@
 
 #include <cstdio>
 
+#include "dusk/version.hpp"
+
 #if TARGET_PC
 #include "dusk/frame_interpolation.h"
 #include "dusk/game_clock.h"

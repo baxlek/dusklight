@@ -34,9 +34,10 @@ UserSettings g_userSettings = {
         // Quality of Life
         .enableQuickTransform {"game.enableQuickTransform", false},
         .hideTvSettingsScreen {"game.hideTvSettingsScreen", true},
-        .biggerWallets {"game.biggerWallets", false},
+        .walletSizes{"game.walletSizes", 0},
         .noReturnRupees {"game.noReturnRupees", false},
         .disableRupeeCutscenes {"game.disableRupeeCutscenes", false},
+        .fastTransitions {"game.fastTransitions", false},
         .noSwordRecoil {"game.noSwordRecoil", false},
         .damageMultiplier {"game.damageMultiplier", 1},
         .noHeartDrops {"game.noHeartDrops", false},
@@ -51,6 +52,10 @@ UserSettings g_userSettings = {
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
+        .timeSync{"game.timeSync", false},
+        .enableDeselectSwords {"game.enableDeselectSwords", false},
+        .enableDeselectShields {"game.enableDeselectShields", false},
+        .enableDeselectClothes {"game.enableDeselectClothes", false},
 
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
@@ -129,6 +134,8 @@ UserSettings g_userSettings = {
         .infiniteOil {"game.infiniteOil", false},
         .infiniteOxygen {"game.infiniteOxygen", false},
         .infiniteRupees {"game.infiniteRupees", false},
+        .infiniteBottle {"game.infiniteBottle", false},
+        .infiniteBait {"game.infiniteBait", false},
         .enableIndefiniteItemDrops {"game.enableIndefiniteItemDrops", false},
         .moonJump {"game.moonJump", false},
         .superClawshot {"game.superClawshot", false},
@@ -270,9 +277,10 @@ void registerSettings() {
     Register(g_userSettings.game.language);
     Register(g_userSettings.game.enableQuickTransform);
     Register(g_userSettings.game.hideTvSettingsScreen);
-    Register(g_userSettings.game.biggerWallets);
+    Register(g_userSettings.game.walletSizes);
     Register(g_userSettings.game.noReturnRupees);
     Register(g_userSettings.game.disableRupeeCutscenes);
+    Register(g_userSettings.game.fastTransitions);
     Register(g_userSettings.game.noSwordRecoil);
     Register(g_userSettings.game.damageMultiplier);
     Register(g_userSettings.game.noHeartDrops);
@@ -286,6 +294,10 @@ void registerSettings() {
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
     Register(g_userSettings.game.enhancedMapMenus);
+    Register(g_userSettings.game.timeSync);
+    Register(g_userSettings.game.enableDeselectSwords);
+    Register(g_userSettings.game.enableDeselectShields);
+    Register(g_userSettings.game.enableDeselectClothes);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
     Register(g_userSettings.game.invertCameraYAxis);
@@ -341,6 +353,8 @@ void registerSettings() {
     Register(g_userSettings.game.infiniteOil);
     Register(g_userSettings.game.infiniteOxygen);
     Register(g_userSettings.game.infiniteRupees);
+    Register(g_userSettings.game.infiniteBottle);
+    Register(g_userSettings.game.infiniteBait);
     Register(g_userSettings.game.enableIndefiniteItemDrops);
     Register(g_userSettings.game.moonJump);
     Register(g_userSettings.game.superClawshot);
