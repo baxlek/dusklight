@@ -25,6 +25,7 @@
 #if TARGET_PC
 #include "dusk/randomizer/game/randomizer_context.hpp"
 #include "dusk/randomizer/game/tools.h"
+#include "dusk/version.hpp"
 #endif
 
 class daE_MK_HIO_c : public JORReflexible {

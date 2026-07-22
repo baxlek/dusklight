@@ -3,6 +3,7 @@
 #include "JSystem/JMessage/control.h"
 #include "d/d_msg_class.h"
 #include "randomizer_context.hpp"
+#include "custom_flow_ids.hpp"
 
 #include "dusk/version.hpp"
 
@@ -76,6 +77,29 @@ void HandleTextOverrides(JMessage::TControl* control, JMessage::TProcessor const
             control->pMessageText_begin_ = GetFormatedTextOverride(key, textOverrides[language][key]);
         }
     }
+}
+
+bool HandleCustomText(JMessage::TControl* control, u16 msgId) {
+    if (randomizer_IsActive()) {
+        u32 key = (CUSTOM_BMG_GROUP << 16) | msgId;
+        auto& textOverrides = randomizer_GetContext().mTextOverrides;
+        u8 language = getLanguageForOverride();
+        if (textOverrides.at(language).contains(key)) {
+            control->pMessageText_begin_ = GetFormatedTextOverride(key, textOverrides[language][key]);
+
+            // Get the attributes for this text-box if they were specified
+            auto& attributeOverrides = randomizer_GetContext().mAttributeOverrides;
+            if (attributeOverrides.contains(key)) {
+                control->pEntry_ = reinterpret_cast<void*>(&attributeOverrides[key]);
+            // Otherwise, use the default entry
+            } else {
+                defaultJMSMesgEntry.message_id = msgId;
+                control->pEntry_ = &defaultJMSMesgEntry;
+            }
+            return true;
+        }
+    }
+    return false;
 }
 
 // Used in special cases

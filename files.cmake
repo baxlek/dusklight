@@ -1634,6 +1634,7 @@ set(DUSK_FILES
         src/dusk/cosmetics/texture_utils.hpp
         src/dusk/cosmetics/texture_utils.cpp
         # Randomizer files
+        src/dusk/randomizer/game/custom_flow_ids.hpp
         src/dusk/randomizer/game/flags.cpp
         src/dusk/randomizer/game/flags.h
         src/dusk/randomizer/game/messages.cpp

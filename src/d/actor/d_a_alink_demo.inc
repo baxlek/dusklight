@@ -29,6 +29,7 @@
 #include "dusk/speedrun.h"
 #include "dusk/version.hpp"
 #include "dusk/randomizer/game/randomizer_context.hpp"
+#include "dusk/version.hpp"
 #endif
 
 BOOL daAlink_c::checkEventRun() const {
