@@ -3912,6 +3912,16 @@ public:
     u16 getReadyItem() { return dComIfGp_getSelectItem(mSelectItemId); }
 
     static u32 getOtherHeapSize() { return 0xF0A60; }
+    
+#if TARGET_PC
+    u16 getEventId() { return mMsgFlow.getEventId(); }
+
+    bool checkSwimming() {return checkModeFlg(MODE_SWIMMING);}
+
+    BE<short>** getDomeLockChromaTable() {
+        return &field_0x0724->mAnmCRegDataR;
+    }
+#endif
 
     static DUSK_GAME_DATA daAlink_BckData const m_mainBckShield[20];
     static DUSK_GAME_DATA daAlink_BckData const m_mainBckSword[5];
@@ -6391,7 +6401,8 @@ public:
 
 class daAlinkHIO_huLight_c0 {
 public:
-    static DUSK_GAME_DATA daAlinkHIO_huLight_c1 const m;
+    static DUSK_GAME_DATA daAlinkHIO_huLight_c1 IF_NOT_DUSK(const) m;
+    IF_DUSK(static DUSK_GAME_DATA daAlinkHIO_huLight_c1 const original;)
 };
 
 class daAlinkHIO_wlLight_c1 {
@@ -6465,7 +6476,8 @@ public:
 
 class daAlinkHIO_kandelaar_c0 {
 public:
-    static DUSK_GAME_DATA daAlinkHIO_kandelaar_c1 const m;
+    static DUSK_GAME_DATA daAlinkHIO_kandelaar_c1 IF_NOT_DUSK(const) m;
+    IF_DUSK(static DUSK_GAME_DATA daAlinkHIO_kandelaar_c1 const original;)
 };
 
 class daAlinkHIO_kandelaar_c : public daAlinkHIO_data_c {
