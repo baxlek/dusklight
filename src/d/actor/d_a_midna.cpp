@@ -3297,7 +3297,7 @@ int daMidna_c::execute() {
 
     if (eventInfo.checkCommandTalk()) {
 #if TARGET_PC
-        if (!checkShadowModeTalkWait() || fopAcM_getTalkEventPartner(link) == this
+        if ((!checkShadowModeTalkWait() || fopAcM_getTalkEventPartner(link) == this) &&
             !dusk::getSettings().game.canTransformAnywhere) {
 #endif
             if (!checkStateFlg0(FLG0_UNK_8000) {
