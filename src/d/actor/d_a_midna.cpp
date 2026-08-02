@@ -3315,7 +3315,7 @@ int daMidna_c::execute() {
             } else if (mMsgFlow.doFlow(this, NULL, 0)) {
                 int item_id;
                 u16 event_id = mMsgFlow.getEventId(&item_id);
-                if (checkStateFlg0(FLG0_NO_DRAW)) {
+                if (checkStateFlg0(FLG0_NO_DRAW) && !dusk::getSettings().game.canTransformAnywhere) {
                     if (field_0x84e == 3) {
                         field_0x84e = 4;
                     } else {
@@ -3323,10 +3323,7 @@ int daMidna_c::execute() {
                     }
                 }
 
-#if TARGET_PC
-                if ((event_id == 4 || event_id == 5) &&
-                    !dusk::getSettings().game.canTransformAnywhere) {
-#endif
+                if (event_id == 4 || event_id == 5) {
                     dComIfGp_getEvent()->reset(this);
                     offStateFlg0(FLG0_UNK_8000);
                     fopAcM_orderPotentialEvent(this, 0x400, 0xffff, 1);
