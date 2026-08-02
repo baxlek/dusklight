@@ -3300,7 +3300,7 @@ int daMidna_c::execute() {
         if ((!checkShadowModeTalkWait() || fopAcM_getTalkEventPartner(link) == this) &&
             !dusk::getSettings().game.canTransformAnywhere) {
 #endif
-            if (!checkStateFlg0(FLG0_UNK_8000) {
+            if (!checkStateFlg0(FLG0_UNK_8000)) {
                 offStateFlg0((daMidna_FLG0)(FLG0_NPC_NEAR | FLG0_NPC_FAR));
                 BOOL far_;
                 if (fopAcIt_Judge((fopAcIt_JudgeFunc)daMidna_searchNpc, &far_)) {
