@@ -3296,11 +3296,11 @@ int daMidna_c::execute() {
     mSound.framework(0, mReverb);
 
     if (eventInfo.checkCommandTalk()) {
-        if (!checkShadowModeTalkWait() || fopAcM_getTalkEventPartner(link) == this) {
 #if TARGET_PC
-            if (!checkStateFlg0(FLG0_UNK_8000) &&
-                !dusk::getSettings().game.canTransformAnywhere) {
+        if (!checkShadowModeTalkWait() || fopAcM_getTalkEventPartner(link) == this
+            !dusk::getSettings().game.canTransformAnywhere) {
 #endif
+            if (!checkStateFlg0(FLG0_UNK_8000) {
                 offStateFlg0((daMidna_FLG0)(FLG0_NPC_NEAR | FLG0_NPC_FAR));
                 BOOL far_;
                 if (fopAcIt_Judge((fopAcIt_JudgeFunc)daMidna_searchNpc, &far_)) {
