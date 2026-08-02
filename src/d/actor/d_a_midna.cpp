@@ -3324,8 +3324,8 @@ int daMidna_c::execute() {
                 }
 
 #if TARGET_PC
-                if (event_id == 4 || event_id == 5) &&
-                    !dusk::getSettings().game.canTransformAnywhere {
+                if ((event_id == 4 || event_id == 5) &&
+                    !dusk::getSettings().game.canTransformAnywhere) {
 #endif
                     dComIfGp_getEvent()->reset(this);
                     offStateFlg0(FLG0_UNK_8000);
