@@ -3315,7 +3315,7 @@ int daMidna_c::execute() {
             } else if (mMsgFlow.doFlow(this, NULL, 0)) {
                 int item_id;
                 u16 event_id = mMsgFlow.getEventId(&item_id);
-                if (checkStateFlg0(FLG0_NO_DRAW) && !dusk::getSettings().game.canTransformAnywhere) {
+                if checkStateFlg0(FLG0_NO_DRAW) {
                     if (field_0x84e == 3) {
                         field_0x84e = 4;
                     } else {
@@ -3342,7 +3342,10 @@ int daMidna_c::execute() {
                         onStateFlg0(FLG0_UNK_2000000);
                     }
                 } else if (
-                    !checkStateFlg0(FLG0_NO_DRAW) || (checkSetAnime(0, ANM_S_RETURN) && mpMorf->isStop())
+#if TARGET_PC
+                    (!checkStateFlg0(FLG0_NO_DRAW) || (checkSetAnime(0, ANM_S_RETURN) && mpMorf->isStop()) &&
+                     !dusk::getSettings().game.canTransformAnywhere)
+#endif
                 ) {
                     if (event_id == 0xB) {
                         dMeter2Info_setPauseStatus(6);
