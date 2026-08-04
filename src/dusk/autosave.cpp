@@ -5,6 +5,7 @@
 #include "imgui/ImGuiConsole.hpp"
 #include "mods/svc/save.hpp"
 #include "dusk/randomizer/game/randomizer_context.hpp"
+#include "mods/svc/save.hpp"
 
 bool shouldAutoSave = false;
 u8 mSaveBuffer[QUEST_LOG_SIZE * 3];

@@ -1878,6 +1878,7 @@ void dFile_select_c::nameInput2() {
         if (!randomizer_GetContext().mHash.empty()) {
             dComIfGs_setupRandomizerSave();
         }
+        dusk::mods::svc::save_slot_new(mSelectNum);
 #endif
         mDataSelProc = DATASELPROC_NEXT_MODE_WAIT;
     }
