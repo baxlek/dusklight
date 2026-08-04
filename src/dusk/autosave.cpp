@@ -3,6 +3,7 @@
 #include "dusk/config.hpp"
 #include "dusk/ui/ui.hpp"
 #include "imgui/ImGuiConsole.hpp"
+#include "mods/svc/save.hpp"
 #include "dusk/randomizer/game/randomizer_context.hpp"
 
 bool shouldAutoSave = false;
@@ -115,6 +116,9 @@ void waitingForWrite() {
 }
 
 void endAutoSave() {
+    const int slot = dComIfGs_getDataNum();
+    dusk::mods::svc::save_slot_written(slot, mSaveBuffer + slot * QUEST_LOG_SIZE);
+
     dusk::ui::push_toast({
         .type = "autosave",
         .duration = std::chrono::milliseconds(1500),
