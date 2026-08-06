@@ -7,6 +7,8 @@ This branch includes the following unmerged PRs:
 "Infinite Bottle Contents & Infinite Fishing Bait" by DarkZant
 <br/>
 "Faster Scene Transitions" by t0mtee
+<br/>
+"Can Transform Anywhere fix" by baxlek
 
 <div align="center">
   <img src="res/logo.png" alt="Logo" width="640">
