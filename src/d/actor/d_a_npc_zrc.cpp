@@ -10,6 +10,10 @@
 #include "SSystem/SComponent/c_math.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "Z2AudioLib/Z2Instances.h"
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#include "dusk/randomizer/game/verify_item_functions.h"
+#endif
 
 enum Event_Cut_Nums {
     /* 0x2 */ NUM_EVT_CUTS_e = 0x2,
@@ -882,7 +886,11 @@ u8 daNpc_zrC_c::getTypeFromParam() {
 
 int daNpc_zrC_c::isDelete() {
     if (mType == 4 || mType == 0 || mType == 1 || (mType == 2 && daNpcF_chkEvtBit(0x108)
+#if TARGET_PC
+        && (!daNpcF_chkEvtBit(0x10A) || randomizer_IsActive())) || mType == 3)
+#else
         && !daNpcF_chkEvtBit(0x10A)) || mType == 3)
+#endif
     {
         return false;
     }

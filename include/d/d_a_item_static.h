@@ -114,6 +114,10 @@ public:
 
     bool checkBoomWindTgTimer() { return mBoomWindTgTimer == 0; }
 
+#if TARGET_PC
+    void setRandomizerItem(bool setFoolishItemModel = false);
+#endif    
+
     static DUSK_GAME_DATA procFunc mFuncPtr[];
     static DUSK_GAME_DATA const dCcD_SrcCyl m_cyl_src;
     static DUSK_GAME_DATA s32 m_timer_max;
