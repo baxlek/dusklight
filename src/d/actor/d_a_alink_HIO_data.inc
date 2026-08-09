@@ -1624,7 +1624,7 @@ DUSK_GAME_DATA const daAlinkHIO_bomb_c1 daAlinkHIO_bomb_c0::m = {
 
 #pragma push
 #pragma force_active on
-DUSK_GAME_DATA const daAlinkHIO_huLight_c1 daAlinkHIO_huLight_c0::m = {
+DUSK_GAME_DATA IF_NOT_DUSK(const) daAlinkHIO_huLight_c1 daAlinkHIO_huLight_c0::m = {
     0,
     3,
 	0,
@@ -1638,8 +1638,25 @@ DUSK_GAME_DATA const daAlinkHIO_huLight_c1 daAlinkHIO_huLight_c0::m = {
 	0.0f,
 };
 #pragma pop
+#if TARGET_PC
+// Save original lantern colors incase player reverts to default
+DUSK_GAME_DATA const daAlinkHIO_huLight_c1 daAlinkHIO_huLight_c0::original = {
+    0,
+    3,
+    0,
+    181,
+    112,
+    40,
+    -70,
+    1.0f,
+    50.0f,
+    350.0f,
+    0.0f,
+};
+#endif
 
-DUSK_GAME_DATA const daAlinkHIO_kandelaar_c1 daAlinkHIO_kandelaar_c0::m = {
+
+DUSK_GAME_DATA IF_NOT_DUSK(const) daAlinkHIO_kandelaar_c1 daAlinkHIO_kandelaar_c0::m = {
 	{
 		30,
         1.1f,
@@ -1671,6 +1688,42 @@ DUSK_GAME_DATA const daAlinkHIO_kandelaar_c1 daAlinkHIO_kandelaar_c0::m = {
     200,
     0.5f,
 };
+
+#if TARGET_PC
+// Save original lantern colors incase player reverts to default
+DUSK_GAME_DATA const daAlinkHIO_kandelaar_c1 daAlinkHIO_kandelaar_c0::original = {
+    {
+        30,
+        1.1f,
+        2.0f,
+        3.0f,
+        17.0f,
+    },
+    {
+        11,
+        1.0f,
+        0.0f,
+        3.0f,
+        12.0f,
+    },
+    {
+        17,
+        1.0f,
+        0.0f,
+        3.0f,
+        18.0f,
+    },
+    80,
+    40,
+    20,
+    40,
+    30,
+    10,
+    3,
+    200,
+    0.5f,
+};
+#endif
 
 DUSK_GAME_DATA const daAlinkHIO_fmChain_c1 daAlinkHIO_fmChain_c0::m = {
 	{

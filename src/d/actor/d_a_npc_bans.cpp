@@ -13,6 +13,10 @@
 #include "d/actor/d_a_npc_len.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 enum Bans_RES_File_ID {
     /* BCK */
     /* 0x06 */ BCK_BANS_F_TALK_A = 0x6,
@@ -618,6 +622,7 @@ BOOL daNpc_Bans_c::isDelete() {
                 Delete if TYPE_MAKING_BOMBS and:
                 Horseback Battle Not Cleared or Goron Mines Cleared
             */
+            IF_DUSK(if (randomizer_IsActive()) { return TRUE;}) // Always delete this type in randomizer
             return !daNpcT_chkEvtBit(85) || // dSv_event_flag_c::M_052 - Main Event - Horseback battle clear
                     daNpcT_chkEvtBit(64); // dSv_event_flag_c::M_031 - Goron Mines - Goron Mines clear
 
@@ -626,6 +631,7 @@ BOOL daNpc_Bans_c::isDelete() {
                 Delete if TYPE_SHOP and:
                 Goron Mines Cleared
             */
+            IF_DUSK(if (randomizer_IsActive()) { return FALSE;}) // Never delete this type in randomizer
             return !daNpcT_chkEvtBit(64); // dSv_event_flag_c::M_031 - Goron Mines - Goron Mines clear
 
         default:
