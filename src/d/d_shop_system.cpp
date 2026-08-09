@@ -19,7 +19,6 @@
 #include "d/actor/d_a_tag_shop_item.h"
 #include <cstring>
 
-
 static daTag_ShopItem_c* dShopSystem_itemActor[7] = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 };
