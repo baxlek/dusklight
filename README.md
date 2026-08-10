@@ -9,8 +9,6 @@ This branch includes the following unmerged PRs:
 "Faster Scene Transitions" by t0mtee
 <br/>
 "Can Transform Anywhere fix" by baxlek
-<br/>
-"Aiming Reticle for Bow and Slingshot" by baxlek
 
 <div align="center">
   <img src="res/logo.png" alt="Logo" width="640">
