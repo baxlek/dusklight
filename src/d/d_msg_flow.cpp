@@ -1506,12 +1506,7 @@ u16 dMsgFlow_c::query042(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     daMidna_c* midna_p = daPy_py_c::getMidnaActor();
 
     u8 ret = 0;
-#if TARGET_PC
-    if (strcmp("F_SP116", dComIfGp_getStartStageName()) == 0 && dComIfGs_isSaveDunSwitch(60) &&
-        !dusk::getSettings().game.canTransformAnywhere) {
-#else
-    if (strcmp("F_SP116", dComIfGp_getStartStageName()) == 0 && dComIfGs_isSaveDunSwitch(60)) {
-#endif
+    if (strcmp("F_SP116", dComIfGp_getStartStageName()) == 0 && dComIfGs_isSaveDunSwitch(60) && IF_DUSK(!dusk::getSettings().game.canTransformAnywhere)) {
         ret = 4;
     } else if (midna_p->checkNpcNear()) {
         ret = 1;
