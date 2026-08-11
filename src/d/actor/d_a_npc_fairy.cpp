@@ -11,6 +11,10 @@
 #include "JSystem/JHostIO/JORFile.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 enum fairy_RES_File_ID {
     /* BCK */
     /* 0x09 */ BCK_FAIRY_F_SAD = 0x9,
@@ -1269,7 +1273,7 @@ void daNpc_Fairy_c::AppearDemoCall() {
             } else {
                 mEvtNo = EVT_APPEAR_50F_02;
             }
-        } else if (dComIfGs_checkEmptyBottle()) {
+        } else if (dComIfGs_checkEmptyBottle() IF_DUSK(|| randomizer_IsActive())) {
             mEvtNo = EVT_APPEAR_50F_01;
         } else {
             mEvtNo = EVT_APPEAR_50F_04;
