@@ -9,6 +9,8 @@ This branch includes the following unmerged PRs:
 "Faster Scene Transitions" by t0mtee
 <br/>
 "Can Transform Anywhere fix" by baxlek
+<br/>
+"Disable Targeting Letterboxing" by samkleespies
 
 <div align="center">
   <img src="res/logo.png" alt="Logo" width="640">
