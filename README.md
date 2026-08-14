@@ -10,7 +10,7 @@ This branch includes the following unmerged PRs:
 <br/>
 "Can Transform Anywhere fix" by baxlek
 <br/>
-"Disable Targeting Letterboxing" by samkleespies
+"Disable Targeting Letterbox" by samkleespies
 
 <div align="center">
   <img src="res/logo.png" alt="Logo" width="640">
