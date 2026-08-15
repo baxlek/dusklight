@@ -71,8 +71,8 @@ enum class MagicArmorMode : u8 {
 enum class LetterboxMode : u8 {
     Off = 0,
     On = 1,
-    CutsceneOnly = 2,
-    GameplayOnly = 3,
+    CutsceneOnly = 3,
+    GameplayOnly = 2,
 };
 
 namespace config {
