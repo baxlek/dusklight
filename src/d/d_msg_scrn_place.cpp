@@ -24,7 +24,11 @@ dMsgScrnPlace_c::dMsgScrnPlace_c() {
     init();
 
     dCamera_c* camera = dCam_getBody();
-    if (camera->mTrimSize && dCam_getBody()->mTrimSize != 4) {
+#if TARGET_PC
+    if (camera->mTrimSize && camera->mTrimSize != 4 && !dusk::getSettings().game.disableLetterboxing) {
+#else
+    if (camera->mTrimSize && camera->mTrimSize != 4) {
+#endif
         mScaleX = g_MsgObject_HIO_c.mStageTitleCharPosY;
         mScaleY = g_MsgObject_HIO_c.mStageTitleBasePosY;
     } else {
