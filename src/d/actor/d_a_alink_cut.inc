@@ -817,20 +817,18 @@ BOOL daAlink_c::checkDownAttackState() {
 }
 
 BOOL daAlink_c::checkCutLargeTurnState() const {
-    const bool hasGreatspinSkill =
-        dComIfGs_isEventBit(dSv_event_flag_c::F_0344) || checkNoResetFlg3(FLG3_TRANING_CUT_LARGE_TURN);
-
-    #if TARGET_PC
+#if TARGET_PC
     const auto alwaysGreatspinMode = dusk::getSettings().game.alwaysGreatspin.getValue();
     if (alwaysGreatspinMode == dusk::AlwaysGreatspinMode::ALWAYS) {
         return TRUE;
     }
-    if (alwaysGreatspinMode == dusk::AlwaysGreatspinMode::AFTER_SKILL && hasGreatspinSkill) {
+    if (alwaysGreatspinMode == dusk::AlwaysGreatspinMode::AFTER_SKILL && 
+        (dComIfGs_isEventBit(dSv_event_flag_c::F_0344) || checkNoResetFlg3(FLG3_TRANING_CUT_LARGE_TURN)) {
         return TRUE;
     }
-    #endif
-
-    return (hasGreatspinSkill
+#else
+    return ((dComIfGs_isEventBit(dSv_event_flag_c::F_0344) || checkNoResetFlg3(FLG3_TRANING_CUT_LARGE_TURN))
+#endif
             && dComIfGs_getLife() == dComIfGs_getMaxLifeGauge()
             )
             || (mDemo.getDemoMode() == daPy_demo_c::DEMO_UNK_36_e && mDemo.getParam0() == 0x33);
