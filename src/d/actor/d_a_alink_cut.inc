@@ -823,7 +823,7 @@ BOOL daAlink_c::checkCutLargeTurnState() const {
         return TRUE;
     }
     if (alwaysGreatspinMode == dusk::AlwaysGreatspinMode::AFTER_SKILL && 
-        (dComIfGs_isEventBit(dSv_event_flag_c::F_0344) || checkNoResetFlg3(FLG3_TRANING_CUT_LARGE_TURN)) {
+        (dComIfGs_isEventBit(dSv_event_flag_c::F_0344) || checkNoResetFlg3(FLG3_TRANING_CUT_LARGE_TURN))) {
         return TRUE;
     }
 #endif
