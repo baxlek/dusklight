@@ -180,7 +180,6 @@ const char* daShopItem_c::getShopArcname() {
 #endif
 
     return SHOP_RESOURCE_DATA.get_arcName();
-    return M_SHOP_DATA[mShopItemID].get_arcName();
 }
 
 DUSK_GAME_DATA const f32 daShopItem_c::m_cullfar_max = 5000.0f;
@@ -221,11 +220,6 @@ void daShopItem_c::CreateInit() {
     } else {
         scale.set(SHOP_RESOURCE_DATA.get_scale(), SHOP_RESOURCE_DATA.get_scale(),
             SHOP_RESOURCE_DATA.get_scale());
-        scale.set(M_SHOP_DATA[mShopItemID].get_scale() * 0.8f, M_SHOP_DATA[mShopItemID].get_scale() * 0.8f,
-                  M_SHOP_DATA[mShopItemID].get_scale() * 0.8f);
-    } else {
-        scale.set(M_SHOP_DATA[mShopItemID].get_scale(), M_SHOP_DATA[mShopItemID].get_scale(),
-                  M_SHOP_DATA[mShopItemID].get_scale());
     }
 
     home.pos = current.pos;
@@ -241,8 +235,6 @@ void daShopItem_c::set_mtx() {
     } else {
         mDoMtx_stack_c::transS(
             current.pos.x, current.pos.y + SHOP_RESOURCE_DATA.get_offsetY(), current.pos.z);
-        mDoMtx_stack_c::transS(current.pos.x, current.pos.y + M_SHOP_DATA[mShopItemID].get_offsetY(),
-                               current.pos.z);
     }
 
     MTXCopy(mDoMtx_stack_c::get(), mMtx);
@@ -253,8 +245,6 @@ void daShopItem_c::set_mtx() {
     } else {
         mDoMtx_stack_c::ZXYrotM(mAngleX + SHOP_RESOURCE_DATA.get_angleX(),
             SHOP_RESOURCE_DATA.get_angleY(), SHOP_RESOURCE_DATA.get_angleZ());
-        mDoMtx_stack_c::ZXYrotM(mAngleX + M_SHOP_DATA[mShopItemID].get_angleX(),
-                                M_SHOP_DATA[mShopItemID].get_angleY(), M_SHOP_DATA[mShopItemID].get_angleZ());
     }
 
     mDoMtx_stack_c::ZXYrotM(current.angle.x, current.angle.y, current.angle.z);
@@ -263,7 +253,6 @@ void daShopItem_c::set_mtx() {
         mDoMtx_stack_c::XrotM(0);
     } else {
         mDoMtx_stack_c::XrotM(SHOP_RESOURCE_DATA.get_angleOffsetX());
-        mDoMtx_stack_c::XrotM(M_SHOP_DATA[mShopItemID].get_angleOffsetX());
     }
 
     mpModel->setBaseTRMtx(mDoMtx_stack_c::get());
@@ -321,28 +310,6 @@ u8 daShopItem_c::getCollisionR() {
 }
 
 #undef SHOP_RESOURCE_DATA
-    return M_SHOP_DATA[mShopItemID].get_flag() & i_flag;
-}
-
-s8 daShopItem_c::getTevFrm() {
-    return M_SHOP_DATA[mShopItemID].get_tevfrm();
-}
-
-s8 daShopItem_c::getBtpFrm() {
-    return M_SHOP_DATA[mShopItemID].get_btpfrm();
-}
-
-u8 daShopItem_c::getShadowSize() {
-    return M_SHOP_DATA[mShopItemID].get_shadowSize();
-}
-
-u8 daShopItem_c::getCollisionH() {
-    return M_SHOP_DATA[mShopItemID].get_collisionH();
-}
-
-u8 daShopItem_c::getCollisionR() {
-    return M_SHOP_DATA[mShopItemID].get_collisionR();
-}
 
 #if TARGET_PC
 // Custom function to check if this shop item is randomized

@@ -548,7 +548,6 @@ inline void getItemFunc(u8 i_itemNo) {
 }
 
 void execItemGet(u8 i_itemNo IF_DUSK_ARG(u32 i_itemGiveTag) IF_DUSK_ARG(fopAc_ac_c* i_giver)) {
-void execItemGet(u8 i_itemNo) {
 #if TARGET_PC
     if (randomizer_IsActive()) {
         i_itemNo = verifyProgressiveItem(i_itemNo);

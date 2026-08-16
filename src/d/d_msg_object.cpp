@@ -41,7 +41,6 @@
 #include "dusk/version.hpp"
 #include "dusk/menu_pointer.h"
 #include "dusk/settings.h"
-#include "dusk/version.hpp"
 #include <vector>
 #include <array>
 #include <algorithm>
