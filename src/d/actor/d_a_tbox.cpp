@@ -12,6 +12,12 @@
 #include <cmath>
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#include "dusk/randomizer/game/tools.h"
+#include "dusk/randomizer/game/verify_item_functions.h"
+#endif
+
 static const f32 l_cull_size_box[6] = { -150.0f, -10.0f, -150.0f, 150.0f, 300.0f, 100.0f };
 
 static const cM3dGCylS l_cyl_info[3] = {
@@ -1795,6 +1801,16 @@ cPhs_Step daTbox_c::create1st() {
         mOriginalItemNo = (home.angle.z >> 8) & 0xFF;
         const u8 resolvedItem = dusk::mods::item_check_chest(getTboxNo(), mOriginalItemNo, this);
         home.angle.z = static_cast<s16>((home.angle.z & ~0xFF00) | (resolvedItem << 8));
+        // The upper 8 bits of home.angle.z hold the itemId. Replace with our randomized
+        // item in randomizer
+        if (randomizer_IsActive()) {
+            home.angle.z &= ~0xFF00;
+            auto stage = getStageID();
+            auto tboxId = static_cast<u8>(getTboxNo());
+            u16 key = (stage << 8) | tboxId;
+            u8 itemId = randomizer_GetContext().mTreasureChestOverrides[key];
+            home.angle.z |= verifyProgressiveItem(itemId) << 8;
+        }
 #endif
         field_0x982 = home.angle.z;
         home.angle.z = 0;

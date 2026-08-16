@@ -14,6 +14,10 @@
 #include "Z2AudioLib/Z2Instances.h"
 #include <cstring>
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#include "dusk/randomizer/game/tools.h"
+#endif
 
 static s16 mAttackNo = 3;
 
@@ -1136,12 +1140,16 @@ static void e_po_dead(e_po_class* i_this) {
             if (dusk::mods::item_check_poe(i_this->BitSW, dItemNo_POU_SPIRIT_e, a_this) ==
                 dItemNo_POU_SPIRIT_e)
             {
+            if (!randomizer_IsActive()) {
 #endif
                 dComIfGs_addPohSpiritNum();
 #if !PLATFORM_SHIELD
-            if (dComIfGs_getPohSpiritNum() == 0x14) {
-                /* dSv_event_flag_c::F_0457 - Castle Town - Revived cat */
-                dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[457]);
+                if (dComIfGs_getPohSpiritNum() == 0x14) {
+                    /* dSv_event_flag_c::F_0457 - Castle Town - Revived cat */
+                    dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[457]);
+                }
+#endif
+#if TARGET_PC
             }
 #endif
 #if TARGET_PC
@@ -1279,6 +1287,13 @@ static void e_po_dead(e_po_class* i_this) {
                 i_this->field_0x75C = fopAcM_createItemForPresentDemo(&a_this->current.pos, itemNo,
                     0, -1, -1, NULL, NULL, dusk::mods::item_give_tag_poe(i_this->BitSW));
 #else
+                if (randomizer_IsActive()) {
+                    u16 key = getStageID() << 8 | i_this->BitSW;
+                    u8 itemId = randomizer_GetContext().mPoeOverrides[key];
+                    i_this->field_0x75C = fopAcM_createItemForPresentDemo(&a_this->current.pos, itemId, 0,
+                                                                      -1, -1, NULL, NULL);
+                } else
+#endif
                 i_this->field_0x75C = fopAcM_createItemForPresentDemo(&a_this->current.pos, 0xE0, 0,
                                                                       -1, -1, NULL, NULL);
 #endif
