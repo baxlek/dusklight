@@ -1626,13 +1626,10 @@ set(DUSK_FILES
         src/dusk/mods/svc/ui.hpp
         src/dusk/mods/svc/registry.cpp
         src/dusk/mods/svc/registry.hpp
-        src/dusk/discord.cpp
-        src/dusk/discord.hpp
+        src/dusk/discord_presence.hpp
         src/dusk/discord_presence.cpp
         src/dusk/version.cpp
         src/dusk/action_bindings.cpp
-        src/dusk/update_check.cpp
-        src/dusk/update_check.hpp
         src/dusk/version.cpp
         src/dusk/cosmetics/color_utils.hpp
         src/dusk/cosmetics/color_utils.cpp
