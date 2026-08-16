@@ -95,18 +95,18 @@ constexpr std::array kMenuScalingModeLabels = {
     "Dusklight",
 };
 
+constexpr std::array kAlwaysGreatspinModes = {
+    "Off",
+    "Always",
+    "After Skill",
+};
+
 constexpr std::array kMagicArmorModes = {
     "Normal",
     "On Damage",
     "Double Defense",
     "Invincible",
     "Cosmetic",
-};
-
-constexpr std::array kAlwaysGreatspinModes = {
-    "Off",
-    "Always",
-    "After Skill",
 };
 
 bool try_parse_backend(std::string_view backend, AuroraBackend& outBackend) {
