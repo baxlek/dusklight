@@ -13,16 +13,9 @@
 
 #if TARGET_PC
 #include "d/d_item_data.h"
-
-const ResourceData& daShopItem_c::getResourceData() const {
-    if (mItemOverridden) {
-        return mOverrideData;
-    }
-    return mData[mShopItemID];
-}
-#define SHOP_RESOURCE_DATA getResourceData()
-#else
-#define SHOP_RESOURCE_DATA mData[mShopItemID]
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#include "dusk/randomizer/game/tools.h"
+#include "dusk/randomizer/game/verify_item_functions.h"
 #endif
 
 const char* daShopItem_c::getShopArcname() {
@@ -103,28 +96,63 @@ const char* daShopItem_c::getShopArcname() {
     }
 
 #if TARGET_PC
-    if (m_itemNo != dItemNo_NONE_e && mItemGiveOriginalNo == dItemNo_NONE_e) {
-        mItemGiveOriginalNo = m_itemNo;
-        const u8 resolvedItem = dusk::mods::item_check_shop(mItemGiveOriginalNo, this);
-        mItemOverridden = resolvedItem != mItemGiveOriginalNo;
-        if (mItemOverridden) {
-            mOverrideData = mData[mShopItemID];
-            mOverrideData.mArcName = dItem_data::getArcName(resolvedItem);
-            mOverrideData.mBmdName = dItem_data::getBmdName(resolvedItem);
-            mOverrideData.mBtkName = dItem_data::getBtkName(resolvedItem);
-            mOverrideData.mBckName = dItem_data::getBckName(resolvedItem);
-            mOverrideData.mBrkName = dItem_data::getBrkName(resolvedItem);
-            mOverrideData.mBtpName = dItem_data::getBtpName(resolvedItem);
-            mOverrideData.mTevFrm = dItem_data::getTevFrm(resolvedItem);
-            mOverrideData.mBtpFrm = -1;
-            mOverrideData.mFlag = static_cast<u32>(-1);
-            mOverrideData.mOffsetY = mShopItemID == SHOP_ITEMNO_ARMOR ? 60.0f : 15.0f;
-            mOverrideData.mScale = 1.0f;
+    if (isRandomized()) {
+        // Override the item model with whichever item is randomized to this shop item
+        u8 stage = getStageID();
+        u16 key = (stage << 8) | m_itemNo;
+        u8 itemId = randomizer_GetContext().mShopOverrides.at(key);
+        itemId = verifyProgressiveItem(itemId);
+
+        if (itemId == dItemNo_Randomizer_FOOLISH_ITEM_e) {
+            if (home.angle.x != -1) {
+                home.angle.z = randomizer_getRandomFoolishItemModelID();
+                home.angle.x = -1;
+            }
+            itemId = home.angle.z;
+
+        }
+
+        // Replace the necessary index in daShopItem_c::mRandoData with the model data from dItem_data
+        auto& shopModel = mRandoData[mShopItemID];
+        shopModel.mArcName = dItem_data::getArcName(itemId);
+        shopModel.mBmdName = dItem_data::getBmdName(itemId);
+        shopModel.mBtkName = dItem_data::getBtkName(itemId);
+        shopModel.mBckName = dItem_data::getBckName(itemId);
+        shopModel.mBrkName = dItem_data::getBrkName(itemId);
+        shopModel.mBtpName = dItem_data::getBtpName(itemId);
+        shopModel.mTevFrm = dItem_data::getTevFrm(itemId);
+        shopModel.mBtpFrm = -1;
+        shopModel.mFlag = -1;
+
+        // Move the item higher up if it's the magic armor slot
+        if (mShopItemID == SHOP_ITEMNO_ARMOR) {
+            switch (itemId) {
+            case dItemNo_Randomizer_GREEN_RUPEE_e:
+            case dItemNo_Randomizer_BLUE_RUPEE_e:
+            case dItemNo_Randomizer_YELLOW_RUPEE_e:
+            case dItemNo_Randomizer_RED_RUPEE_e:
+            case dItemNo_Randomizer_PURPLE_RUPEE_e:
+            case dItemNo_Randomizer_ORANGE_RUPEE_e:
+            case dItemNo_Randomizer_SILVER_RUPEE_e:
+            case dItemNo_Randomizer_LINKS_SAVINGS_e:
+                shopModel.mOffsetY = 65.0f;
+            default:
+                shopModel.mOffsetY = 60.0f;
+            }
+        } else {
+            shopModel.mOffsetY = 15.0f;
+        }
+
+        // Scale down the Master Sword model so it looks better
+        if (itemId == dItemNo_Randomizer_MASTER_SWORD_e || itemId == dItemNo_Randomizer_LIGHT_SWORD_e) {
+            shopModel.mScale = 0.35f;
+        } else {
+            shopModel.mScale = 1.0f;
         }
     }
 #endif
 
-    return SHOP_RESOURCE_DATA.get_arcName();
+    return M_SHOP_DATA[mShopItemID].get_arcName();
 }
 
 DUSK_GAME_DATA const f32 daShopItem_c::m_cullfar_max = 5000.0f;
@@ -140,11 +168,6 @@ u16 daShopItem_c::getHeapSize() {
     OS_REPORT("ShopItemID [%u]\n", a_ShopItemID);
     ASSERT(a_ShopItemID < SHOP_ITEMNO_MAX);
 
-#if TARGET_PC
-    if (mItemOverridden) {
-        return 0x8000;
-    }
-#endif
     return HeapSizeTbl[a_ShopItemID];
 }
 
@@ -160,11 +183,11 @@ void daShopItem_c::CreateInit() {
 
     if (strcmp("R_SP109", dComIfGp_getStartStageName()) == 0 && dComIfGp_getStartStageRoomNo() == 1)
     {
-        scale.set(SHOP_RESOURCE_DATA.get_scale() * 0.8f, SHOP_RESOURCE_DATA.get_scale() * 0.8f,
-            SHOP_RESOURCE_DATA.get_scale() * 0.8f);
+        scale.set(M_SHOP_DATA[mShopItemID].get_scale() * 0.8f, M_SHOP_DATA[mShopItemID].get_scale() * 0.8f,
+                  M_SHOP_DATA[mShopItemID].get_scale() * 0.8f);
     } else {
-        scale.set(SHOP_RESOURCE_DATA.get_scale(), SHOP_RESOURCE_DATA.get_scale(),
-            SHOP_RESOURCE_DATA.get_scale());
+        scale.set(M_SHOP_DATA[mShopItemID].get_scale(), M_SHOP_DATA[mShopItemID].get_scale(),
+                  M_SHOP_DATA[mShopItemID].get_scale());
     }
 
     home.pos = current.pos;
@@ -178,8 +201,8 @@ void daShopItem_c::set_mtx() {
     if (daShopItem_prm::getGroup(this) == 15) {
         mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
     } else {
-        mDoMtx_stack_c::transS(
-            current.pos.x, current.pos.y + SHOP_RESOURCE_DATA.get_offsetY(), current.pos.z);
+        mDoMtx_stack_c::transS(current.pos.x, current.pos.y + M_SHOP_DATA[mShopItemID].get_offsetY(),
+                               current.pos.z);
     }
 
     MTXCopy(mDoMtx_stack_c::get(), mMtx);
@@ -188,8 +211,8 @@ void daShopItem_c::set_mtx() {
     if (daShopItem_prm::getGroup(this) == 15) {
         mDoMtx_stack_c::ZXYrotM(-11300, 32700, 7300);
     } else {
-        mDoMtx_stack_c::ZXYrotM(mAngleX + SHOP_RESOURCE_DATA.get_angleX(),
-            SHOP_RESOURCE_DATA.get_angleY(), SHOP_RESOURCE_DATA.get_angleZ());
+        mDoMtx_stack_c::ZXYrotM(mAngleX + M_SHOP_DATA[mShopItemID].get_angleX(),
+                                M_SHOP_DATA[mShopItemID].get_angleY(), M_SHOP_DATA[mShopItemID].get_angleZ());
     }
 
     mDoMtx_stack_c::ZXYrotM(current.angle.x, current.angle.y, current.angle.z);
@@ -197,7 +220,7 @@ void daShopItem_c::set_mtx() {
     if (daShopItem_prm::getGroup(this) == 15) {
         mDoMtx_stack_c::XrotM(0);
     } else {
-        mDoMtx_stack_c::XrotM(SHOP_RESOURCE_DATA.get_angleOffsetX());
+        mDoMtx_stack_c::XrotM(M_SHOP_DATA[mShopItemID].get_angleOffsetX());
     }
 
     mpModel->setBaseTRMtx(mDoMtx_stack_c::get());
@@ -231,30 +254,41 @@ void daShopItem_c::setShadow() {
 }
 
 BOOL daShopItem_c::chkFlag(int i_flag) {
-    return SHOP_RESOURCE_DATA.get_flag() & i_flag;
+    return M_SHOP_DATA[mShopItemID].get_flag() & i_flag;
 }
 
 s8 daShopItem_c::getTevFrm() {
-    return SHOP_RESOURCE_DATA.get_tevfrm();
+    return M_SHOP_DATA[mShopItemID].get_tevfrm();
 }
 
 s8 daShopItem_c::getBtpFrm() {
-    return SHOP_RESOURCE_DATA.get_btpfrm();
+    return M_SHOP_DATA[mShopItemID].get_btpfrm();
 }
 
 u8 daShopItem_c::getShadowSize() {
-    return SHOP_RESOURCE_DATA.get_shadowSize();
+    return M_SHOP_DATA[mShopItemID].get_shadowSize();
 }
 
 u8 daShopItem_c::getCollisionH() {
-    return SHOP_RESOURCE_DATA.get_collisionH();
+    return M_SHOP_DATA[mShopItemID].get_collisionH();
 }
 
 u8 daShopItem_c::getCollisionR() {
-    return SHOP_RESOURCE_DATA.get_collisionR();
+    return M_SHOP_DATA[mShopItemID].get_collisionR();
 }
 
-#undef SHOP_RESOURCE_DATA
+#if TARGET_PC
+// Custom function to check if this shop item is randomized
+BOOL daShopItem_c::isRandomized() const {
+    if (randomizer_IsActive()) {
+        u8 stage = getStageID();
+        u8 itemId = m_itemNo;
+        u16 key = (stage << 8) | itemId;
+        return randomizer_GetContext().mShopOverrides.contains(key);
+    }
+    return false;
+}
+#endif
 
 int daShopItem_c::_create() {
     fopAcM_ct(this, daShopItem_c);

@@ -19,6 +19,10 @@
 #include "f_op/f_op_actor_enemy.h"
 #include "Z2AudioLib/Z2Instances.h"
 
+#if TARGET_PC
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#endif
+
 enum daB_DS_Joint {
     DS_JNT_BACKBONE1,
     DS_JNT_BACKBONE2,
@@ -4085,8 +4089,13 @@ void daB_DS_c::executeBattle2Dead() {
             dComIfGp_event_reset();
             dComIfGs_onStageBossEnemy(0x13);
 #if TARGET_PC
-            // This reward has no original grant at this point in the cutscene.
-            dusk::mods::item_check_enqueue("Arbiters Grounds Dungeon Reward", dItemNo_NONE_e);
+            if (randomizer_IsActive()) {
+                // Give the boss item
+                u8 agDungeonReward = randomizer_getItemAtLocation("Arbiters Grounds Dungeon Reward");
+                g_randomizerState.addItemToEventQueue(agDungeonReward);
+                // Set custom item flag
+                dComIfGs_onItem(0x9E, -1);
+            }
 #endif
             /* dSv_event_flag_c::F_0265 - Arbiter's Grounds - Arbiter's Grounds clear */
             dComIfGs_onEventBit(0x2010);

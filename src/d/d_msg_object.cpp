@@ -30,13 +30,27 @@
 #include "m_Do/m_Do_lib.h"
 
 #if TARGET_PC
-#include "dusk/language.hpp"
+#include "d/d_item.h"
+#include "dusk/randomizer/game/custom_flow_ids.hpp"
+#include "dusk/randomizer/game/messages.hpp"
+#include "dusk/randomizer/game/randomizer_context.hpp"
+#include "dusk/randomizer/game/stages.h"
+#include "dusk/randomizer/game/tools.h"
+#include "dusk/randomizer/game/verify_item_functions.h"
+#include "dusk/version.hpp"
 #include "dusk/menu_pointer.h"
 #include "dusk/settings.h"
 #include "dusk/version.hpp"
 #include <vector>
 #include <array>
 #include <algorithm>
+#endif
+
+// Macro to call our custom function for getting attributes
+#if TARGET_PC
+#define ENTRIES(i) getEntry(i)
+#else
+#define ENTRIES(i) entries[i]
 #endif
 
 static void dMsgObject_addFundRaising(s16 param_0);
@@ -702,7 +716,7 @@ void dMsgObject_c::setMessageIndex(u32 revoIndex, u32 param_2, bool param_3) {
     JMSMesgInfo_c* pMsg = (JMSMesgInfo_c*)((char*)mpMsgDt + 0x20);
     u8* iVar2 = (u8*)pMsg + pMsg->header.size;
     u32 msg_id = getMessageIndex(revoIndex);
-    dComIfGp_setMesgCameraAttrInfo(pMsg->entries[msg_id].camera_id);
+    dComIfGp_setMesgCameraAttrInfo(pMsg->ENTRIES(msg_id).camera_id);
     if (field_0x15c == 1000) {
         mpRefer->setSelMsgPtr(NULL);
     } else {
@@ -711,6 +725,20 @@ void dMsgObject_c::setMessageIndex(u32 revoIndex, u32 param_2, bool param_3) {
             mpRefer->setSelMsgPtr(NULL);
         } else {
             char* my_ptr = (char*) (iVar2 + pMsg->entries[msgIndex].string_offset + 8);
+#if TARGET_PC
+            // This is where the game sets the pointer to the string for message choices.
+            // If any of our custom messages are for message choices, override them here
+            if (randomizer_IsActive()) {
+                // Change to custom group if we have a custom message index
+                if (msgIndex >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+                    groupID = CUSTOM_BMG_GROUP;
+                }
+                auto override = GetTextOverride(groupID, field_0x15c);
+                if (override != NULL) {
+                    my_ptr = override;
+                }
+            }
+#endif
             mpRefer->setSelMsgPtr(my_ptr);
         }
     }
@@ -741,7 +769,7 @@ void dMsgObject_c::setMessageIndexDemo(u32 revoMsgIndex, bool param_2) {
     JMSMesgInfo_c* info_header_p = (JMSMesgInfo_c*)((char*)mpMsgDt + 0x20);
     JMSMesgInfo_c* reg_25 = (JMSMesgInfo_c*)((char*) info_header_p + info_header_p->header.size);
     int ind = getMessageIndex(revoMsgIndex);
-    dComIfGp_setMesgCameraAttrInfo(info_header_p->entries[ind].camera_id);
+    dComIfGp_setMesgCameraAttrInfo(info_header_p->ENTRIES(ind).camera_id);
     mpRefer->setSelMsgPtr(NULL);
     if (param_2) {
         mpCtrl->setMessageID(mMessageID, 0, NULL);
@@ -749,6 +777,13 @@ void dMsgObject_c::setMessageIndexDemo(u32 revoMsgIndex, bool param_2) {
 }
 
 u32 dMsgObject_c::getMessageIndex(u32 param_0) {
+#if TARGET_PC
+    // Directly return our index if it's above the custom id base
+    if (randomizer_IsActive() && param_0 >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+        return param_0;
+    }
+#endif
+
     u32 i = 0;
     JMSMesgInfo_c* pMsg = (JMSMesgInfo_c*)((char*)mpMsgDt + 0x20);
     u32 msgIndexCount = *((BE(u16)*)((char*)mpMsgDt + 0x28));
@@ -767,7 +802,40 @@ u32 dMsgObject_c::getMessageIndex(u32 param_0) {
 }
 
 u32 dMsgObject_c::getRevoMessageIndex(u32 param_1) {
-#if TARGET_PC 
+#if TARGET_PC
+    if (randomizer_IsActive()) {
+        // Directly return our index if it's custom
+        if (param_1 >= BASE_CUSTOM_MSG_AND_FLOW_ID) {
+            return param_1;
+        }
+
+        // Special case for Ilia Memory Reward Text (param_1 is msgId)
+        // If we're in the sanctuary cutscene where we get the reward, override the text.
+        // Otherwise, the regular item text for the horse call would be overridden if we find it
+        if (param_1 == 233 && playerIsInRoomStage(0, "R_SP109") && dComIfGp_getLayerNo() == 9) {
+            u8 itemId = verifyProgressiveItem(randomizer_getItemAtLocation("Ilia Memory Reward"));
+            param_1 = getItemMessageID(itemId);
+            // Store this itemId so that we can give the item when the textbox closes
+            g_randomizerState.mFlowMessageItemId = itemId;
+            // Set flag for tracker/AP
+            randomizer_setTempFlagForLocation("Ilia Memory Reward");
+        } else {
+            // Else override the text if we have an override
+            u32 key = (dMsgObject_getGroupID() << 16) | param_1;
+            auto& flowItemOverrides = randomizer_GetContext().mFlowItemMessageOverrides;
+            if (flowItemOverrides.contains(key)) {
+                u8 itemId = verifyProgressiveItem(flowItemOverrides[key].itemId);
+                param_1 = getItemMessageID(itemId);
+                // Store this itemId so that we can give the item when the textbox closes
+                g_randomizerState.mFlowMessageItemId = itemId;
+                // Set flag for tracker/AP
+                randomizer_setTempFlagForFLWOverride(key);
+            }
+        }
+    }
+#endif
+
+#if TARGET_PC
     if (!dusk::getSettings().game.enableMirrorMode) { 
         if (!g_MsgObject_HIO_c.mMessageDisplay) { return param_1; } } 
     if (param_1 == getMirrorMsgOverride(param_1)) { return param_1; } 
@@ -869,6 +937,14 @@ void dMsgObject_c::waitProc() {
             }
         }
     }
+#if TARGET_PC
+    // If we have a randomizer item to give because of a flow message override
+    // then give it if the textbox has been fully closed.
+    if (randomizer_IsActive() && g_randomizerState.mFlowMessageItemId != 0 && mpScrnDraw == NULL) {
+        execItemGet(g_randomizerState.mFlowMessageItemId);
+        g_randomizerState.mFlowMessageItemId = 0;
+    }
+#endif
 }
 
 void dMsgObject_c::openProc() {
@@ -1732,9 +1808,7 @@ void dMsgObject_c::readMessageGroupLocal(mDoDvdThd_mountXArchive_c** p_arcMount)
 #endif
 
     int msgGroup = dStage_stagInfo_GetMsgGroup(dComIfGp_getStage()->getStagInfo());
-#if TARGET_PC
-    snprintf(arcName, sizeof(arcName), "/res/%s/bmgres%d.arc", dusk::language::msg_folder(), msgGroup);
-#elif REGION_PAL
+    #if REGION_PAL
     switch (dComIfGs_getPalLanguage()) {
     case dSv_player_config_c::LANGUAGE_GERMAN:
         sprintf(arcName, "/res/Msgde/bmgres%d.arc", msgGroup);
@@ -1751,11 +1825,39 @@ void dMsgObject_c::readMessageGroupLocal(mDoDvdThd_mountXArchive_c** p_arcMount)
     default:
         sprintf(arcName, "/res/Msguk/bmgres%d.arc", msgGroup);
     }
-#elif REGION_JPN
+    #elif REGION_JPN
     sprintf(arcName, "/res/Msgjp/bmgres%d.arc", msgGroup);
+    #else
+#if TARGET_PC
+    // Original game UB
+
+    if (dusk::version::isRegionPal()) {
+        switch (dComIfGs_getPalLanguage()) {
+        case dSv_player_config_c::LANGUAGE_GERMAN:
+            snprintf(arcName, sizeof(arcName), "/res/Msgde/bmgres%d.arc", msgGroup);
+            break;
+        case dSv_player_config_c::LANGUAGE_FRENCH:
+            snprintf(arcName, sizeof(arcName), "/res/Msgfr/bmgres%d.arc", msgGroup);
+            break;
+        case dSv_player_config_c::LANGUAGE_SPANISH:
+            snprintf(arcName, sizeof(arcName), "/res/Msgsp/bmgres%d.arc", msgGroup);
+            break;
+        case dSv_player_config_c::LANGUAGE_ITALIAN:
+            snprintf(arcName, sizeof(arcName), "/res/Msgit/bmgres%d.arc", msgGroup);
+            break;
+        default:
+            snprintf(arcName, sizeof(arcName), "/res/Msguk/bmgres%d.arc", msgGroup);
+        }
+    } else if (dusk::version::isRegionJpn()) {
+        snprintf(arcName, sizeof(arcName), "/res/Msgjp/bmgres%d.arc", msgGroup);
+    } else {
+        snprintf(arcName, sizeof(arcName), "/res/Msgus/bmgres%d.arc", msgGroup);
+    }
+
 #else
     sprintf(arcName, "/res/Msgus/bmgres%d.arc", msgGroup);
 #endif
+    #endif
 
     *p_arcMount = mDoDvdThd_mountXArchive_c::create(arcName, 0, JKRArchive::MOUNT_MEM, NULL);
 
