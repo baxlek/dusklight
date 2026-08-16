@@ -56,8 +56,6 @@
 #include "SSystem/SComponent/c_API.h"
 #include "dusk/app_info.hpp"
 #include "dusk/cosmetics/midna_hair_color.hpp"
-#include "dusk/crash_handler.h"
-#include "dusk/crash_reporting.h"
 #include "dusk/data.hpp"
 #include "dusk/dusk.h"
 #include "dusk/frame_interpolation.h"
