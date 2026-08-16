@@ -33,6 +33,7 @@ enum class GameLanguage : u8 {
     French = OS_LANGUAGE_FRENCH,
     Spanish = OS_LANGUAGE_SPANISH,
     Italian = OS_LANGUAGE_ITALIAN,
+    Japanese = 6,
 };
 
 enum class DiscVerificationState : u8 {
@@ -67,6 +68,13 @@ enum class MagicArmorMode : u8 {
     COSMETIC = 4,
 };
 
+enum class LetterboxMode : u8 {
+    Off = 0,
+    On = 1,
+    CutsceneOnly = 2,
+    GameplayOnly = 3,
+};
+
 namespace config {
 template <>
 struct ConfigEnumRange<BloomMode> {
@@ -89,7 +97,7 @@ struct ConfigEnumRange<Resampler> {
 template <>
 struct ConfigEnumRange<GameLanguage> {
     static constexpr auto min = GameLanguage::English;
-    static constexpr auto max = GameLanguage::Italian;
+    static constexpr auto max = GameLanguage::Japanese;
 };
 
 template <>
@@ -120,6 +128,12 @@ template <>
 struct ConfigEnumRange<MagicArmorMode> {
     static constexpr auto min = MagicArmorMode::NORMAL;
     static constexpr auto max = MagicArmorMode::COSMETIC;
+};
+
+template <>
+struct ConfigEnumRange<LetterboxMode> {
+    static constexpr auto min = LetterboxMode::Off;
+    static constexpr auto max = LetterboxMode::GameplayOnly;
 };
 
 template <>
@@ -212,7 +226,8 @@ struct UserSettings {
         ConfigVar<Resampler> resampler;
         ConfigVar<bool> enableMapBackground;
         ConfigVar<bool> disableCutscenePillarboxing;
-        ConfigVar<bool> disableTargetingLetterbox;
+        ConfigVar<LetterboxMode> disableLetterboxing;
+        ConfigVar<bool> enableHighQualityMinimapTextures;
 
         // Audio
         ConfigVar<bool> noLowHpSound;
@@ -318,6 +333,13 @@ UserSettings& getSettings();
 
 void registerSettings();
 
+inline bool isLetterboxingDisabled(bool inCutscene) {
+    const auto mode = getSettings().game.disableLetterboxing.getValue();
+    return mode == LetterboxMode::On ||
+           (mode == LetterboxMode::CutsceneOnly && inCutscene) ||
+           (mode == LetterboxMode::GameplayOnly && !inCutscene);
+}
+
 // Transient settings
 
 struct CollisionViewSettings {
@@ -333,7 +355,7 @@ struct CollisionViewSettings {
 
 struct TransientSettings {
     CollisionViewSettings collisionView;
-    bool skipFrameRateLimit;
+    bool turboMode;
     bool moveLinkActive;
     bool stateShareLoadActive;
 };

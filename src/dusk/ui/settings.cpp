@@ -11,6 +11,7 @@
 #include "dusk/data.hpp"
 #include "dusk/imgui/ImGuiEngine.hpp"
 #include "dusk/io.hpp"
+#include "dusk/language.hpp"
 #include "dusk/presentation.hpp"
 #include <borealis/io.hpp>
 #include <borealis/file_select.hpp>
@@ -52,14 +53,6 @@
 
 namespace dusk::ui {
 namespace {
-
-constexpr std::array kLanguageNames = {
-    "English",
-    "German",
-    "French",
-    "Spanish",
-    "Italian",
-};
 
 constexpr std::array kCardFileTypes = {
     "Card Image",
@@ -115,6 +108,13 @@ constexpr std::array kMagicArmorModes = {
     "Double Defense",
     "Invincible",
     "Cosmetic",
+};
+
+constexpr std::array kLetterboxModes = {
+    "Off",
+    "On",
+    "Only During Cutscenes",
+    "Only During Gameplay",
 };
 
 bool try_parse_backend(std::string_view backend, AuroraBackend& outBackend) {
@@ -225,6 +225,18 @@ AuroraBackend configured_backend() {
         configuredBackend = BACKEND_AUTO;
     }
     return configuredBackend;
+}
+
+bool is_graphics_backend_restart_pending() {
+    return getSettings().backend.graphicsBackend.getValue() !=
+           prelaunch_state().initialGraphicsBackend;
+}
+
+Rml::String graphics_backend_display_name() {
+    if (is_graphics_backend_restart_pending()) {
+        return Rml::String{backend_name(configured_backend())};
+    }
+    return Rml::String{backend_name(aurora_get_backend())};
 }
 
 Rml::String configured_data_path_display_name() {
@@ -569,18 +581,15 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     .key = "Language",
                     .getValue =
                         [] {
-                            const auto& state = prelaunch_state();
-                            if (!state.configuredDiscCanLaunch || state.configuredDiscInfo.region != iso::Region::Europe) {
-                                return kLanguageNames[0];
-                            }
-                            const u8 idx = static_cast<u8>(getSettings().game.language.getValue());
-                            return kLanguageNames[idx];
+                            return language::language_name(getSettings().game.language.getValue());
                         },
                     .isDisabled =
                         [] {
                             const auto& state = prelaunch_state();
-                            return !state.configuredDiscCanLaunch ||
-                                   state.configuredDiscInfo.region != iso::Region::Europe;
+                            if (!state.configuredDiscCanLaunch) {
+                                return true;
+                            }
+                            return language::available_languages(state.configuredDiscInfo).size() <= 1;
                         },
                     .isModified =
                         [] {
@@ -589,18 +598,22 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                         },
                 }),
                 rightPane, [](Pane& pane) {
-                    for (int i = 0; i < kLanguageNames.size(); i++) {
+                    const auto& state = prelaunch_state();
+                    const auto languages = state.configuredDiscCanLaunch
+                                               ? language::available_languages(state.configuredDiscInfo)
+                                               : language::available_languages({});
+                    for (const GameLanguage language : languages) {
                         pane.add_button({
-                                            .text = kLanguageNames[i],
+                                            .text = language::language_name(language),
                                             .isSelected =
-                                                [i] {
+                                                [language] {
                                                     return getSettings().game.language.getValue() ==
-                                                           static_cast<GameLanguage>(i);
+                                                           language;
                                                 },
                                         })
-                            .on_pressed([i] {
+                            .on_pressed([language] {
                                 mDoAud_seStartMenu(kSoundItemChange);
-                                getSettings().game.language.setValue(static_cast<GameLanguage>(i));
+                                getSettings().game.language.setValue(language);
                                 config::save();
                             });
                     }
@@ -609,12 +622,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             leftPane.register_control(
                 leftPane.add_select_button({
                     .key = "Graphics Backend",
-                    .getValue = [] { return Rml::String{backend_name(aurora_get_backend())}; },
-                    .isModified =
-                        [] {
-                            return getSettings().backend.graphicsBackend.getValue() !=
-                                   prelaunch_state().initialGraphicsBackend;
-                        },
+                    .getValue = [] { return graphics_backend_display_name(); },
+                    .isModified = [] { return is_graphics_backend_restart_pending(); },
                 }),
                 rightPane, [](Pane& pane) {
                     const auto availableBackends = available_backends();
@@ -894,10 +903,37 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                             "during some cutscenes, particularly on ultra-wide displays. "
                             "Visuals beyond the original intended framing may appear buggy."
             });
-        config_bool_select(leftPane, rightPane, getSettings().game.disableTargetingLetterbox,
-            {
-                .key = "Disable Targeting Letterbox",
-                .helpText = "Disable the top and bottom black bars during L-targeting and lock-on camera modes."
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Disable Letterboxing",
+                .getValue =
+                    [] {
+                        return kLetterboxModes[static_cast<u8>(getSettings().game.disableLetterboxing.getValue())];
+                    },
+                .isModified =
+                    [] {
+                        return getSettings().game.disableLetterboxing.getValue() !=
+                               getSettings().game.disableLetterboxing.getDefaultValue();
+                    },
+            }),
+            rightPane, [](Pane& pane) {
+                for (int i = 0; i < static_cast<int>(kLetterboxModes.size()); i++) {
+                    pane.add_button({
+                            .text = kLetterboxModes[i],
+                            .isSelected =
+                                [i] {
+                                    return getSettings().game.disableLetterboxing.getValue() == static_cast<LetterboxMode>(i);
+                                },
+                        })
+                        .on_pressed([i] {
+                            mDoAud_seStartMenu(kSoundItemChange);
+                            getSettings().game.disableLetterboxing.setValue(static_cast<LetterboxMode>(i));
+                            config::save();
+                        });
+                }
+                pane.add_rml(
+                    "<br/>Disable the top and bottom black bars during L-targeting, aiming, "
+                    "cutscenes, dialogue, etc.");
             });
     });
 
@@ -1647,6 +1683,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
 void SettingsWindow::update() {
     if (mPrelaunch && top_document() == this) {
         try_push_verification_modal(*this);
+        try_push_language_unavailable_modal(*this);
     }
 
     Window::update();
