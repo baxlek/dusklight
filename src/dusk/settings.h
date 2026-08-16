@@ -60,18 +60,18 @@ enum class MenuScaling : u8 {
     Dusklight = 2,
 };
 
+enum class AlwaysGreatspinMode : u8 {
+    OFF = 0,
+    ALWAYS = 1,
+    AFTER_SKILL = 2,
+};
+
 enum class MagicArmorMode : u8 {
     NORMAL = 0,
     ON_DAMAGE = 1,
     DOUBLE_DEFENSE = 2,
     INVINCIBLE = 3,
     COSMETIC = 4,
-};
-
-enum class AlwaysGreatspinMode : u8 {
-    OFF = 0,
-    ALWAYS = 1,
-    AFTER_SKILL = 2,
 };
 
 namespace config {
@@ -124,15 +124,15 @@ struct ConfigEnumRange<MenuScaling> {
 };
 
 template <>
-struct ConfigEnumRange<MagicArmorMode> {
-    static constexpr auto min = MagicArmorMode::NORMAL;
-    static constexpr auto max = MagicArmorMode::COSMETIC;
-};
-
-template <>
 struct ConfigEnumRange<AlwaysGreatspinMode> {
     static constexpr auto min = AlwaysGreatspinMode::OFF;
     static constexpr auto max = AlwaysGreatspinMode::AFTER_SKILL;
+};
+
+template <>
+struct ConfigEnumRange<MagicArmorMode> {
+    static constexpr auto min = MagicArmorMode::NORMAL;
+    static constexpr auto max = MagicArmorMode::COSMETIC;
 };
 
 template <>
