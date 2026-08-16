@@ -826,9 +826,8 @@ BOOL daAlink_c::checkCutLargeTurnState() const {
         (dComIfGs_isEventBit(dSv_event_flag_c::F_0344) || checkNoResetFlg3(FLG3_TRANING_CUT_LARGE_TURN)) {
         return TRUE;
     }
-#else
-    return ((dComIfGs_isEventBit(dSv_event_flag_c::F_0344) || checkNoResetFlg3(FLG3_TRANING_CUT_LARGE_TURN))
 #endif
+    return ((dComIfGs_isEventBit(dSv_event_flag_c::F_0344) || checkNoResetFlg3(FLG3_TRANING_CUT_LARGE_TURN))
             && dComIfGs_getLife() == dComIfGs_getMaxLifeGauge()
             )
             || (mDemo.getDemoMode() == daPy_demo_c::DEMO_UNK_36_e && mDemo.getParam0() == 0x33);
