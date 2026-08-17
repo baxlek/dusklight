@@ -74,6 +74,13 @@ enum class MagicArmorMode : u8 {
     COSMETIC = 4,
 };
 
+enum class LetterboxMode : u8 {
+    Off = 0,
+    On = 1,
+    CutsceneOnly = 2,
+    GameplayOnly = 3,
+};
+
 namespace config {
 template <>
 struct ConfigEnumRange<BloomMode> {
@@ -136,6 +143,12 @@ struct ConfigEnumRange<MagicArmorMode> {
 };
 
 template <>
+struct ConfigEnumRange<LetterboxMode> {
+    static constexpr auto min = LetterboxMode::Off;
+    static constexpr auto max = LetterboxMode::GameplayOnly;
+};
+
+template <>
 struct ConfigValueTraits<ui::ControlLayout> {
     static constexpr bool enabled = true;
 };
@@ -179,9 +192,10 @@ struct UserSettings {
         // QoL
         ConfigVar<bool> enableQuickTransform;
         ConfigVar<bool> hideTvSettingsScreen;
-        ConfigVar<bool> biggerWallets;
+        ConfigVar<int> walletSizes;
         ConfigVar<bool> noReturnRupees;
         ConfigVar<bool> disableRupeeCutscenes;
+        ConfigVar<bool> fastTransitions;
         ConfigVar<bool> noSwordRecoil;
         ConfigVar<int> damageMultiplier;
         ConfigVar<bool> noHeartDrops;
@@ -197,6 +211,9 @@ struct UserSettings {
         ConfigVar<bool> autoSave;
         ConfigVar<bool> enhancedMapMenus;
         ConfigVar<bool> aimingReticle;
+        ConfigVar<bool> enableDeselectSwords;
+        ConfigVar<bool> enableDeselectShields;
+        ConfigVar<bool> enableDeselectClothes;
 
         // Preferences
         ConfigVar<bool> enableMirrorMode;
@@ -221,6 +238,7 @@ struct UserSettings {
         ConfigVar<Resampler> resampler;
         ConfigVar<bool> enableMapBackground;
         ConfigVar<bool> disableCutscenePillarboxing;
+        ConfigVar<LetterboxMode> disableLetterboxing;
         ConfigVar<bool> enableHighQualityMinimapTextures;
 
         // Audio
@@ -271,6 +289,8 @@ struct UserSettings {
         ConfigVar<bool> infiniteOil;
         ConfigVar<bool> infiniteOxygen;
         ConfigVar<bool> infiniteRupees;
+        ConfigVar<bool> infiniteBottle;
+        ConfigVar<bool> infiniteBait;
         ConfigVar<bool> enableIndefiniteItemDrops;
         ConfigVar<bool> moonJump;
         ConfigVar<bool> superClawshot;
@@ -324,6 +344,13 @@ struct UserSettings {
 UserSettings& getSettings();
 
 void registerSettings();
+
+inline bool isLetterboxingDisabled(bool inCutscene) {
+    const auto mode = getSettings().game.disableLetterboxing.getValue();
+    return mode == LetterboxMode::On ||
+           (mode == LetterboxMode::CutsceneOnly && inCutscene) ||
+           (mode == LetterboxMode::GameplayOnly && !inCutscene);
+}
 
 // Transient settings
 
