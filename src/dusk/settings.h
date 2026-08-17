@@ -59,6 +59,12 @@ enum class MenuScaling : u8 {
     Dusklight = 2,
 };
 
+enum class AlwaysGreatspinMode : u8 {
+    OFF = 0,
+    ALWAYS = 1,
+    AFTER_SKILL = 2,
+};
+
 enum class MagicArmorMode : u8 {
     NORMAL = 0,
     ON_DAMAGE = 1,
@@ -121,6 +127,12 @@ template <>
 struct ConfigEnumRange<MenuScaling> {
     static constexpr auto min = MenuScaling::GameCube;
     static constexpr auto max = MenuScaling::Dusklight;
+};
+
+template <>
+struct ConfigEnumRange<AlwaysGreatspinMode> {
+    static constexpr auto min = AlwaysGreatspinMode::OFF;
+    static constexpr auto max = AlwaysGreatspinMode::AFTER_SKILL;
 };
 
 template <>
@@ -280,7 +292,7 @@ struct UserSettings {
         ConfigVar<bool> enableIndefiniteItemDrops;
         ConfigVar<bool> moonJump;
         ConfigVar<bool> superClawshot;
-        ConfigVar<bool> alwaysGreatspin;
+        ConfigVar<AlwaysGreatspinMode> alwaysGreatspin;
         ConfigVar<bool> enableFastIronBoots;
         ConfigVar<bool> canTransformAnywhere;
         ConfigVar<bool> fastRoll;
