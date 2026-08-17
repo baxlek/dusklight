@@ -10,7 +10,9 @@ This branch includes the following unmerged PRs:
 <br/>
 "Can Transform Anywhere fix" by baxlek
 <br/>
-"Disable Targeting Letterbox" by samkleespies
+"Additional Always Greatspin Option" by baxlek
+<br/>
+"Disable Letterboxing Options" by baxlek
 
 <div align="center">
   <img src="res/logo.png" alt="Logo" width="640">
