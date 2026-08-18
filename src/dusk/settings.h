@@ -61,8 +61,8 @@ enum class MenuScaling : u8 {
 
 enum class AlwaysGreatspinMode : u8 {
     OFF = 0,
-    ALWAYS = 1,
-    AFTER_SKILL = 2,
+    AFTER_SKILL = 1,
+    ALWAYS = 2,
 };
 
 enum class MagicArmorMode : u8 {
@@ -132,7 +132,7 @@ struct ConfigEnumRange<MenuScaling> {
 template <>
 struct ConfigEnumRange<AlwaysGreatspinMode> {
     static constexpr auto min = AlwaysGreatspinMode::OFF;
-    static constexpr auto max = AlwaysGreatspinMode::AFTER_SKILL;
+    static constexpr auto max = AlwaysGreatspinMode::ALWAYS;
 };
 
 template <>
