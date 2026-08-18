@@ -76,8 +76,8 @@ enum class MagicArmorMode : u8 {
 enum class LetterboxMode : u8 {
     Off = 0,
     On = 1,
-    CutsceneOnly = 2,
-    GameplayOnly = 3,
+    GameplayOnly = 2,
+    CutsceneOnly = 3,
 };
 
 namespace config {
@@ -144,7 +144,7 @@ struct ConfigEnumRange<MagicArmorMode> {
 template <>
 struct ConfigEnumRange<LetterboxMode> {
     static constexpr auto min = LetterboxMode::Off;
-    static constexpr auto max = LetterboxMode::GameplayOnly;
+    static constexpr auto max = LetterboxMode::CutsceneOnly;
 };
 
 template <>
