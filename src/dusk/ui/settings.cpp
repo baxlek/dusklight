@@ -110,7 +110,7 @@ constexpr std::array kWalletSizes = {
 
 constexpr std::array kAlwaysGreatspinModes = {
     "Off",
-    "After Learnimg Skill",
+    "After Learning Skill",
     "Always",
 };
 
