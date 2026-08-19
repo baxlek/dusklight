@@ -327,12 +327,7 @@ UserSettings& getSettings();
 
 void registerSettings();
 
-inline bool isLetterboxingDisabled(bool inCutscene) {
-    const auto mode = getSettings().game.disableLetterboxing.getValue();
-    return mode == LetterboxMode::On ||
-           (mode == LetterboxMode::CutsceneOnly && inCutscene) ||
-           (mode == LetterboxMode::GameplayOnly && !inCutscene);
-}
+bool isLetterboxingDisabled();
 
 // Transient settings
 

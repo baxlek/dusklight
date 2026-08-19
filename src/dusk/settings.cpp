@@ -1,5 +1,6 @@
 #include "dusk/settings.h"
 #include "dusk/config.hpp"
+#include "d/d_com_inf_game.h"
 #include <aurora/aurora.h>
 
 namespace dusk {
@@ -403,6 +404,14 @@ static TransientSettings g_transientSettings = {
 
 TransientSettings& getTransientSettings() {
     return g_transientSettings;
+}
+
+bool isLetterboxingDisabled() {
+    const auto mode = getSettings().game.disableLetterboxing.getValue();
+    const bool inCutscene = dComIfGp_event_runCheck();
+    return mode == LetterboxMode::On ||
+           (mode == LetterboxMode::CutsceneOnly && inCutscene) ||
+           (mode == LetterboxMode::GameplayOnly && !inCutscene);
 }
 
 }

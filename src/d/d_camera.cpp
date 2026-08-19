@@ -1529,7 +1529,7 @@ void dCamera_c::CalcTrimSize() {
     }
 
 #if TARGET_PC
-    if (dusk::isLetterboxingDisabled(dComIfGp_event_runCheck())) {
+    if (dusk::isLetterboxingDisabled()) {
         mTrimHeight = 0.0f;
     }
 #endif
