@@ -781,6 +781,20 @@ static void duskExecute() {
     {
         static bool s_spinnerPersist = false;
         static char s_spinnerPersistSrcStage[8] = {};  // stage names are 7 chars + null
+        static s8 s_spinnerPersistSrcRoom = -1;
+        static s8 s_spinnerPersistSrcLayer = -1;
+
+        auto clearSpinnerPersist = [&]() {
+            s_spinnerPersist = false;
+            s_spinnerPersistSrcStage[0] = '\0';
+            s_spinnerPersistSrcRoom = -1;
+            s_spinnerPersistSrcLayer = -1;
+        };
+        auto isSpinnerPersistSourceScene = [&]() {
+            return std::strcmp(dComIfGp_getStartStageName(), s_spinnerPersistSrcStage) == 0 &&
+                   dComIfGp_getStartStageRoomNo() == s_spinnerPersistSrcRoom &&
+                   dComIfGp_getStartStageLayer() == s_spinnerPersistSrcLayer;
+        };
 
         if (dusk::getSettings().game.fastSpinner) {
             if (const auto link = g_dComIfG_gameInfo.play.getPlayer(0)) {
@@ -792,29 +806,36 @@ static void duskExecute() {
                             if (spinnerActor->speedF < 60.f)
                                 spinnerActor->speedF += 2.f;
                         }
+                        if (s_spinnerPersist &&
+                            (!dComIfGp_isEnableNextStage() || !isSpinnerPersistSourceScene()))
+                        {
+                            clearSpinnerPersist();
+                        }
                         if (dComIfGp_isEnableNextStage() && !s_spinnerPersist) {
                             s_spinnerPersist = true;
                             std::strncpy(s_spinnerPersistSrcStage, dComIfGp_getStartStageName(),
                                          sizeof(s_spinnerPersistSrcStage) - 1);
                             s_spinnerPersistSrcStage[sizeof(s_spinnerPersistSrcStage) - 1] = '\0';
+                            s_spinnerPersistSrcRoom = dComIfGp_getStartStageRoomNo();
+                            s_spinnerPersistSrcLayer = dComIfGp_getStartStageLayer();
                         }
                     } else if (s_spinnerPersist) {
-                        if (std::strcmp(dComIfGp_getStartStageName(), s_spinnerPersistSrcStage) != 0) {
-                            // Stage changed — a scene transition occurred. Re-activate the
-                            // spinner once the entry event has finished and Link is stable.
-                            if (!alink->checkSpinnerReady() && !alink->checkEventRun()) {
-                                s_spinnerPersist = false;
-                                alink->procSpinnerReadyInit();
-                            }
+                        if (!isSpinnerPersistSourceScene()) {
+                            // The transition finished, so drop any stale spinner persistence
+                            // state before the new scene starts ticking.
+                            clearSpinnerPersist();
                         } else if (!dComIfGp_isEnableNextStage()) {
-                            // Same stage, no transition pending — the player manually dismounted.
-                            s_spinnerPersist = false;
+                            clearSpinnerPersist();
+                        } else if (!alink->checkSpinnerReady() && !alink->checkEventRun()) {
+                            // Keep Link mounted through the fade-out by restoring the spinner
+                            // before the source scene actually changes.
+                            alink->procSpinnerReadyInit();
                         }
                     }
                 }
             }
         } else {
-            s_spinnerPersist = false;
+            clearSpinnerPersist();
         }
     }
 
