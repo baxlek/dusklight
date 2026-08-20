@@ -830,12 +830,10 @@ static void duskExecute() {
                         } else if (!dComIfGp_isEnableNextStage()) {
                             // Same scene, no transition pending — Link manually dismounted.
                             clearSpinnerPersist();
-                        } else if (!alink->checkSpinnerReady()) {
-                            // Transition pending and spinner actor gone — keep Link in
-                            // spinner-ready state through the fade-out. Skip checkEventRun
-                            // because the transition itself is treated as an event.
-                            alink->procSpinnerReadyInit();
                         }
+                        // If still in source scene with a transition pending, do nothing:
+                        // the game will dismount Link as part of the fade-out, and we wait
+                        // for the destination scene before re-mounting.
                     }
                 }
             }
