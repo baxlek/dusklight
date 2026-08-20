@@ -778,13 +778,43 @@ static void duskExecute() {
         }
     }
 
-    if (dusk::getSettings().game.fastSpinner && mDoCPd_c::getHoldR(PAD_1)) {
-        if (const auto link = g_dComIfG_gameInfo.play.getPlayer(0)) {
-            auto spinnerActor = (fopAc_ac_c*)dynamic_cast<daAlink_c*>(link)->getSpinnerActor();
-            if (spinnerActor) {
-                if (spinnerActor->speedF < 60.f)
-                    spinnerActor->speedF += 2.f;
+    {
+        static bool s_spinnerPersist = false;
+        static char s_spinnerPersistSrcStage[8] = {};  // stage names are 7 chars + null
+
+        if (dusk::getSettings().game.fastSpinner) {
+            if (const auto link = g_dComIfG_gameInfo.play.getPlayer(0)) {
+                auto* alink = dynamic_cast<daAlink_c*>(link);
+                if (alink) {
+                    auto spinnerActor = (fopAc_ac_c*)alink->getSpinnerActor();
+                    if (spinnerActor) {
+                        if (mDoCPd_c::getHoldR(PAD_1)) {
+                            if (spinnerActor->speedF < 60.f)
+                                spinnerActor->speedF += 2.f;
+                        }
+                        if (dComIfGp_isEnableNextStage() && !s_spinnerPersist) {
+                            s_spinnerPersist = true;
+                            std::strncpy(s_spinnerPersistSrcStage, dComIfGp_getStartStageName(),
+                                         sizeof(s_spinnerPersistSrcStage) - 1);
+                            s_spinnerPersistSrcStage[sizeof(s_spinnerPersistSrcStage) - 1] = '\0';
+                        }
+                    } else if (s_spinnerPersist) {
+                        if (std::strcmp(dComIfGp_getStartStageName(), s_spinnerPersistSrcStage) != 0) {
+                            // Stage changed — a scene transition occurred. Re-activate the
+                            // spinner once the entry event has finished and Link is stable.
+                            if (!alink->checkSpinnerReady() && !alink->checkEventRun()) {
+                                s_spinnerPersist = false;
+                                alink->procSpinnerReadyInit();
+                            }
+                        } else if (!dComIfGp_isEnableNextStage()) {
+                            // Same stage, no transition pending — the player manually dismounted.
+                            s_spinnerPersist = false;
+                        }
+                    }
+                }
             }
+        } else {
+            s_spinnerPersist = false;
         }
     }
 
