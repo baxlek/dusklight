@@ -821,14 +821,19 @@ static void duskExecute() {
                         }
                     } else if (s_spinnerPersist) {
                         if (!isSpinnerPersistSourceScene()) {
-                            // The transition finished, so drop any stale spinner persistence
-                            // state before the new scene starts ticking.
-                            clearSpinnerPersist();
+                            // Scene changed — we're in the new room. Re-mount Link on the
+                            // spinner once the entry event (room pan, etc.) has finished.
+                            if (!alink->checkSpinnerReady() && !alink->checkEventRun()) {
+                                alink->procSpinnerReadyInit();
+                                clearSpinnerPersist();
+                            }
                         } else if (!dComIfGp_isEnableNextStage()) {
+                            // Same scene, no transition pending — Link manually dismounted.
                             clearSpinnerPersist();
-                        } else if (!alink->checkSpinnerReady() && !alink->checkEventRun()) {
-                            // Keep Link mounted through the fade-out by restoring the spinner
-                            // before the source scene actually changes.
+                        } else if (!alink->checkSpinnerReady()) {
+                            // Transition pending and spinner actor gone — keep Link in
+                            // spinner-ready state through the fade-out. Skip checkEventRun
+                            // because the transition itself is treated as an event.
                             alink->procSpinnerReadyInit();
                         }
                     }
