@@ -1310,7 +1310,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Speeds up movement while heavy, including wearing the Iron Boots, holding the Ball and Chain, wearing Magic Armor without rupees, etc.");
         addCheat("Can Transform Anywhere", getSettings().game.canTransformAnywhere,
             "Allows transforming even if NPCs are looking.");
-        addCheat("Allow All Item Use", getSettings().game.unrestrictedItems,
+        addCheat("Unrestricted Items", getSettings().game.unrestrictedItems,
             "Removes most restrictions on when and where equipped items can be used.");
         addCheat("Fast Roll", getSettings().game.fastRoll,
             "Makes Link's roll animation and movement twice as fast.");
