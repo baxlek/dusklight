@@ -229,9 +229,7 @@ void daAlink_c::changeWolf() {
 
     changeCommon();
     onNoResetFlg1(FLG1_IS_WOLF);
-    if (!dusk::getSettings().game.unrestrictedItems.getValue()) {
-        deleteEquipItem(FALSE, FALSE);
-    }
+    deleteEquipItem(FALSE, FALSE);
     field_0x2e44.init(this, l_wolfJntColData, mpLinkModel, 18);
     offNoResetFlg1(FLG1_UNK_800000);
 
@@ -554,9 +552,7 @@ void daAlink_c::changeLink(int param_0) {
 
         resetWolfAtCollision();
         resetWolfBallGrab();
-        if (!dusk::getSettings().game.unrestrictedItems.getValue()) {
-            deleteEquipItem(FALSE, FALSE);
-        }
+        deleteEquipItem(FALSE, FALSE);
         field_0x2fb0 = 0;
 
         for (int i = 0; i < 10; i++) {
