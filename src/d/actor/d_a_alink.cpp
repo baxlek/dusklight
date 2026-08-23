@@ -12125,6 +12125,8 @@ void daAlink_c::allUnequip(BOOL param_0) {
 }
 
 BOOL daAlink_c::checkItemChangeFromButton() {
+    const bool unrestrictedItems = dusk::getSettings().game.unrestrictedItems.getValue();
+
     if (checkModeFlg(4)
         && !checkEquipAnime()
         && !checkBoomerangThrowAnime()
@@ -12136,9 +12138,10 @@ BOOL daAlink_c::checkItemChangeFromButton() {
             #if PLATFORM_GCN
             dComIfGs_getSelectEquipSword() != dItemNo_NONE_e &&
             #endif
-            !checkNotBattleStage()
-            && !checkCanoeRide()
-            && (!checkModeFlg(0x40000) || checkEquipHeavyBoots())
+            (unrestrictedItems
+                || (!checkNotBattleStage()
+                    && !checkCanoeRide()
+                    && (!checkModeFlg(0x40000) || checkEquipHeavyBoots())))
             && mEquipItem != 0x103
             && swordTrigger())
         {
