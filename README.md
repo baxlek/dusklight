@@ -13,6 +13,8 @@ This branch includes the following unmerged PRs:
 "Additional Always Greatspin Option" by baxlek
 <br/>
 "Disable Letterboxing Options" by baxlek
+<br/>
+"Unrestricted Items" by baxlek
 
 <div align="center">
   <img src="res/logo.png" alt="Logo" width="640">
