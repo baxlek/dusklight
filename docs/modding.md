@@ -474,8 +474,8 @@ per-window RCSS. A non-`MOD_OK` result from `build`/`update` fails your mod, as 
 callback.
 
 **Controls:** `pane_add_control` adds an input row described by a `UiControlDesc`: `UI_CONTROL_BUTTON`,
-`UI_CONTROL_TOGGLE`, `UI_CONTROL_NUMBER`, `UI_CONTROL_STRING`, or `UI_CONTROL_SELECT`. Values bind with callbacks or
-directly to a config var.
+`UI_CONTROL_GROUP`, `UI_CONTROL_TOGGLE`, `UI_CONTROL_NUMBER`, `UI_CONTROL_STRING`, `UI_CONTROL_SELECT`, or
+`UI_CONTROL_COLOR`. Values bind with callbacks or directly to a config var.
 
 ```cpp
 UiControlDesc control = UI_CONTROL_DESC_INIT;
@@ -488,9 +488,13 @@ svc_ui->pane_add_control(mod_ctx, leftPane, &control, nullptr);
 ```
 
 `UI_BINDING_CONFIG_VAR` wires persistence, change notifications, and the modified indicator automatically. The var
-type must match the control: `TOGGLE` = bool, `NUMBER` and `SELECT` = int, `STRING` = string. Float vars are not
-bindable; use callbacks and convert. `help_rml` and `SELECT` option lists render in a help pane, so `SELECT` controls
-are only available inside window tabs.
+type must match the control: `TOGGLE` = bool, `NUMBER` and `SELECT` = int, `STRING` and `COLOR` = string. Float vars
+are not bindable; use callbacks and convert. `help_rml` and `SELECT` option lists render in a help pane, so `SELECT`
+controls are only available inside window tabs.
+
+`pane_add_group` adds a category button to a window tab's left pane. Focusing the button clears the paired right pane
+and calls the group's build callback with that pane, which is useful for organizing related controls without adding
+more tabs.
 
 **Windows:** `window_push` pushes a tabbed two-pane window onto the document stack and shows it. Each tab's `build`
 receives the window handle plus fresh left and right pane handles on every activation. The optional per-tab `update`
@@ -512,10 +516,36 @@ svc_ui->window_push(mod_ctx, &desc, &window);
 ```
 
 **Dialogs:** `dialog_push` shows a modal dialog. `variant` picks the style, `icon` optionally overrides the variant's
-default icon, and actions become buttons. After an action's `on_pressed` returns, the dialog closes unless the action
-sets `keep_open`. A `keep_open` action can close it later (or immediately) with `dialog_close`. Cancel fires
-`on_dismiss` if present and always closes. `dialog_set_body`, `dialog_set_icon`, and `dialog_add_action` mutate a live
-dialog.
+default icon, and actions become buttons. The optional `build` callback allows you to add controls to a pane between
+the body and actions. It uses the same text, progress, and control builders as panels.
+
+```cpp
+ModResult build_dialog(ModContext*, UiElementHandle pane, void*, ModError*) {
+    UiControlDesc input = UI_CONTROL_DESC_INIT;
+    input.kind = UI_CONTROL_STRING;
+    input.label = "Name";
+    input.get = get_name;
+    input.set = set_name;
+    return svc_ui->pane_add_control(mod_ctx, pane, &input, nullptr);
+}
+
+UiDialogAction action = UI_DIALOG_ACTION_INIT;
+action.label = "Save";
+action.on_pressed = save;
+action.is_disabled = is_save_disabled;
+
+UiDialogDesc dialog = UI_DIALOG_DESC_INIT;
+dialog.title = "New Preset";
+dialog.body_rml = "Choose a name for the preset.";
+dialog.actions = &action;
+dialog.action_count = 1;
+dialog.build = build_dialog;
+svc_ui->dialog_push(mod_ctx, &dialog, nullptr);
+```
+
+After an action's `on_pressed`, the dialog closes unless the action sets `keep_open`. It can then be closed later
+(or immediately) with `dialog_close`. Cancel fires `on_dismiss` and always closes. `dialog_set_body` and 
+`dialog_set_icon` mutate a live dialog.
 
 **Toasts:** `push_toast` enqueues a notification. Titles and bodies accept RML. The optional `type` is applied as an
 RCSS class; `warning` uses the built-in warning appearance, and mods can define their own types. A duration of 0 uses
