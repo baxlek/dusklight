@@ -12138,10 +12138,9 @@ BOOL daAlink_c::checkItemChangeFromButton() {
             #if PLATFORM_GCN
             dComIfGs_getSelectEquipSword() != dItemNo_NONE_e &&
             #endif
-            (unrestrictedItems
-                || (!checkNotBattleStage()
-                    && !checkCanoeRide()
-                    && (!checkModeFlg(0x40000) || checkEquipHeavyBoots())))
+            (!checkCanoeRide()
+                && (!checkModeFlg(0x40000) || checkEquipHeavyBoots())
+                && (unrestrictedItems || !checkNotBattleStage()))
             && mEquipItem != 0x103
             && swordTrigger())
         {
