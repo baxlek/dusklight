@@ -4706,9 +4706,9 @@ int daAlink_c::setStartProcInit() {
             mEquipItem = 0x103;
         }
 
-        const bool allowAllItemUse = dusk::getSettings().game.allowAllItemUse.getValue();
+        const bool unrestrictedItems = dusk::getSettings().game.unrestrictedItems.getValue();
         if (mEquipItem == 0
-            || (!allowAllItemUse
+            || (!unrestrictedItems
                 && (!checkCastleTownUseItem(mEquipItem)
                     || (checkCloudSea() && mEquipItem != 0x103)
                     || checkCanoeStart()
@@ -14581,11 +14581,11 @@ int daAlink_c::changeItemTriggerKeepProc(u8 i_selItemIdx, int i_procType) {
  */
 int daAlink_c::checkNewItemChange(u8 i_selItemIdx) {
     u16 sel_item = dComIfGp_getSelectItem(i_selItemIdx);
-    const bool allowAllItemUse = dusk::getSettings().game.allowAllItemUse.getValue();
+    const bool unrestrictedItems = dusk::getSettings().game.unrestrictedItems.getValue();
 
     if (checkSpinnerRide()
         || sel_item == dItemNo_BOMB_BAG_LV1_e
-        || (!allowAllItemUse
+        || (!unrestrictedItems
             && (((sel_item == dItemNo_KANTERA_e || checkOilBottleItem(sel_item)) && checkWaterInKandelaarOffset(mWaterY))
                 || (checkCanoeRide() && checkStageName("F_SP127"))
                 || checkCloudSea()
