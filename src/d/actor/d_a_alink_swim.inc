@@ -12,6 +12,9 @@ BOOL daAlink_c::checkZoraWearMaskDraw() {
 }
 
 BOOL daAlink_c::checkAcceptUseItemInWater(u16 i_itemNo) const {
+    if (dusk::getSettings().game.allowAllItemUse.getValue()) {
+        return true;
+    }
     return i_itemNo == dItemNo_HVY_BOOTS_e || i_itemNo == dItemNo_WATER_BOMB_e || checkHookshotItem(i_itemNo);
 }
 

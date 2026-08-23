@@ -140,6 +140,7 @@ UserSettings g_userSettings = {
         .alwaysGreatspin {"game.alwaysGreatspin", false},
         .enableFastIronBoots {"game.enableFastIronBoots", false},
         .canTransformAnywhere {"game.canTransformAnywhere", false},
+        .allowAllItemUse {"game.allowAllItemUse", false},
         .fastRoll {"game.fastRoll", false},
         .fastSpinner {"game.fastSpinner", false},
         .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
@@ -293,6 +294,7 @@ void registerSettings() {
     Register(g_userSettings.game.enableHighQualityMinimapTextures);
     Register(g_userSettings.game.enableFastIronBoots);
     Register(g_userSettings.game.canTransformAnywhere);
+    Register(g_userSettings.game.allowAllItemUse);
     Register(g_userSettings.game.fastRoll);
     Register(g_userSettings.game.armorRupeeDrain);
     Register(g_userSettings.game.restoreWiiGlitches);
