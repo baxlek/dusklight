@@ -119,8 +119,8 @@ constexpr std::array kMagicArmorModes = {
 constexpr std::array kLetterboxModes = {
     "Off",
     "On",
-    "Only During Cutscenes",
     "Only During Gameplay",
+    "Only During Cutscenes",
 };
 
 bool try_parse_backend(std::string_view backend, AuroraBackend& outBackend) {
