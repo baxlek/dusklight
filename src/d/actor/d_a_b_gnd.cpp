@@ -3339,9 +3339,11 @@ static void demo_camera(b_gnd_class* i_this) {
         daPy_getPlayerActorClass()->changeOriginalDemo();
         daPy_getPlayerActorClass()->changeDemoMode(89, 0, 0, 0);
         Z2GetAudioMgr()->changeBgmStatus(1);
-    case 51: IF_DUSK({)
+    case 51:
         mant_p->field_0x3966 = 1;
         i_this->field_0xc70 = 20;
+
+        const bool easySumo = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.sumo, false);
 
         if (i_this->mDemoCamTimer >= 5) {
             dComIfGp_getVibration().StartQuake(VIBMODE_Q_POWER2, 1, cXyz(0.0f, 1.0f, 0.0f));
@@ -3405,8 +3407,6 @@ static void demo_camera(b_gnd_class* i_this) {
             cLib_addCalc2(&i_this->mDemoCamCenter.z, spF0.z + i_this->mDemoCamCenterTarget.z, 0.1f, 5.0f);
         }
 
-        const bool easySumo = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.sumo, false);
-
         if ((int)(easySumo ? mDoCPd_c::getHoldA(PAD_1) : mDoCPd_c::getTrigA(PAD_1)) != 0) {
             i_this->mTubazeriPushValue += 0.1f;
             if (i_this->mTubazeriPushValue > 1.0f) {
@@ -3460,7 +3460,6 @@ static void demo_camera(b_gnd_class* i_this) {
                 i_this->field_0xc44[2] = 30;
                 Z2GetAudioMgr()->changeBgmStatus(6);
             }
- IF_DUSK(})
     case 52:
         i_this->field_0xc70 = 20;
         if (i_this->mpModelMorf->isStop()) {
