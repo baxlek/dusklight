@@ -750,21 +750,21 @@ void daE_GI_c::PushButtonCount() {
             mPushButtonCount++;
         }
 
-        IF_DUSK(const bool easyQTE = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.twilitBloat, false));
+        IF_DUSK(const bool easyBloatQTE = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.twilitBloat, false));
 
-        if (easyQTE ? mDoCPd_c::getHoldA(PAD_1) : mDoCPd_c::getTrigA(PAD_1)) {
+        if (easyBloatQTE ? mDoCPd_c::getHoldA(PAD_1) : mDoCPd_c::getTrigA(PAD_1)) {
             mPushButtonCount += 2;
         }
 
-        if (easyQTE ? mDoCPd_c::getHoldB(PAD_1) : mDoCPd_c::getTrigB(PAD_1)) {
+        if (easyBloatQTE ? mDoCPd_c::getHoldB(PAD_1) : mDoCPd_c::getTrigB(PAD_1)) {
             mPushButtonCount += 2;
         }
 
-        if (easyQTE ? mDoCPd_c::getHoldL(PAD_1) : mDoCPd_c::getTrigL(PAD_1)) {
+        if (easyBloatQTE ? mDoCPd_c::getHoldL(PAD_1) : mDoCPd_c::getTrigL(PAD_1)) {
             mPushButtonCount += 2;
         }
 
-        if (easyQTE ? mDoCPd_c::getHoldR(PAD_1) : mDoCPd_c::getTrigR(PAD_1)) {
+        if (easyBloatQTE ? mDoCPd_c::getHoldR(PAD_1) : mDoCPd_c::getTrigR(PAD_1)) {
             mPushButtonCount += 2;
         }
 
