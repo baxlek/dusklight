@@ -182,6 +182,11 @@ struct UserSettings {
         ConfigVar<bool> buttonFishing;
         ConfigVar<bool> instantSaves;
         ConfigVar<bool> instantText;
+        ConfigVar<bool> holdToMash.sumo;
+        ConfigVar<bool> holdToMash.surface;
+        ConfigVar<bool> holdToMash.zoraSwim;
+        ConfigVar<bool> holdToMash.twilitBloat;
+        ConfigVar<bool> holdToMash.ganondorf;
         ConfigVar<bool> sunsSong;
         ConfigVar<bool> autoSave;
         ConfigVar<bool> enhancedMapMenus;
@@ -270,13 +275,6 @@ struct UserSettings {
         ConfigVar<bool> fastSpinner;
         ConfigVar<MagicArmorMode> armorRupeeDrain;
         ConfigVar<bool> invincibleEnemies;
-        struct {
-            ConfigVar<bool> twilitBloat;
-            ConfigVar<bool> ganondorf;
-            ConfigVar<bool> sumo;
-            ConfigVar<bool> zoraSwim;
-            ConfigVar<bool> surface;
-        } holdToMash;
 
         // Technical
         ConfigVar<bool> restoreWiiGlitches;
