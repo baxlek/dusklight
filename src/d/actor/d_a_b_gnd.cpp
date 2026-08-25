@@ -2947,6 +2947,7 @@ static void demo_camera(b_gnd_class* i_this) {
     s8 sp8 = false;
 #if TARGET_PC
     const s16 entry_demo_cam_mode = i_this->mDemoCamMode;
+    const bool easySumo = (dusk::getSettings().game.holdToMash.sumo, false);
 #endif
     switch (i_this->mDemoCamMode) {
     case 0:
@@ -3342,8 +3343,6 @@ static void demo_camera(b_gnd_class* i_this) {
     case 51:
         mant_p->field_0x3966 = 1;
         i_this->field_0xc70 = 20;
-
-        const bool easySumo = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.sumo, false);
 
         if (i_this->mDemoCamTimer >= 5) {
             dComIfGp_getVibration().StartQuake(VIBMODE_Q_POWER2, 1, cXyz(0.0f, 1.0f, 0.0f));
