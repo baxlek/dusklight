@@ -56,6 +56,12 @@ void resetForSpeedrunMode() {
     getSettings().game.damageMultiplier.setSpeedrunValue(1);
     getSettings().game.instantDeath.setSpeedrunValue(false);
     getSettings().game.noHeartDrops.setSpeedrunValue(false);
+    getSettings().game.holdToMash.sumo.setSpeedrunValue(false);
+    getSettings().game.holdToMash.surface.setSpeedrunValue(false);
+    getSettings().game.holdToMash.zoraSwim.setSpeedrunValue(false);
+    getSettings().game.holdToMash.twilitBloat.setSpeedrunValue(false);
+    getSettings().game.holdToMash.ganondorf.setSpeedrunValue(false);
+
     getSettings().game.autoSave.setSpeedrunValue(false);
     getSettings().game.sunsSong.setSpeedrunValue(false);
 
@@ -76,12 +82,7 @@ void resetForSpeedrunMode() {
     getSettings().game.fastSpinner.setSpeedrunValue(false);
     getSettings().game.armorRupeeDrain.setSpeedrunValue(MagicArmorMode::NORMAL);
     getSettings().game.invincibleEnemies.setSpeedrunValue(false);
-    getSettings().game.holdToMash.twilitBloat.setSpeedrunValue(false);
-    getSettings().game.holdToMash.ganondorf.setSpeedrunValue(false);
-    getSettings().game.holdToMash.sumo.setSpeedrunValue(false);
-    getSettings().game.holdToMash.zoraSwim.setSpeedrunValue(false);
-    getSettings().game.holdToMash.surface.setSpeedrunValue(false);
-
+    
     getSettings().game.pauseOnFocusLost.setSpeedrunValue(false);
 
     getSettings().backend.enableAdvancedSettings.setSpeedrunValue(false);
