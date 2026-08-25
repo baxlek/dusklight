@@ -2947,7 +2947,7 @@ static void demo_camera(b_gnd_class* i_this) {
     s8 sp8 = false;
 #if TARGET_PC
     const s16 entry_demo_cam_mode = i_this->mDemoCamMode;
-    const bool easyGanondorfQTE = dusk::getSettings().game.holdToMash.ganondorf;
+    const bool easyGanondorfQTE = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.ganondorf, false);
 #endif
     switch (i_this->mDemoCamMode) {
     case 0:
