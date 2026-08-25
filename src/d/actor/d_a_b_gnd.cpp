@@ -3405,7 +3405,7 @@ static void demo_camera(b_gnd_class* i_this) {
             cLib_addCalc2(&i_this->mDemoCamCenter.z, spF0.z + i_this->mDemoCamCenterTarget.z, 0.1f, 5.0f);
         }
 
-        if ((int)mDoCPd_c::getTrigA(PAD_1) != 0) {
+        if ((int)(dusk::getSettings().game.easyQTE ? mDoCPd_c::getHoldA(PAD_1) : mDoCPd_c::getTrigA(PAD_1)) != 0) {
             i_this->mTubazeriPushValue += 0.1f;
             if (i_this->mTubazeriPushValue > 1.0f) {
                 i_this->mTubazeriPushValue = 1.0f;

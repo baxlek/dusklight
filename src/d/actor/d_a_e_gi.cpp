@@ -9,6 +9,7 @@
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_actor_enemy.h"
 #include "f_op/f_op_camera_mng.h"
+#include "dusk/settings.h"
 
 class daE_GI_HIO_c : public JORReflexible {
 public:
@@ -746,20 +747,22 @@ void daE_GI_c::PushButtonCount() {
         if (abs((s16)(mPrevStickAngle - mDoCPd_c::getStickAngle3D(PAD_1))) > 0x1000) {
             mPushButtonCount++;
         }
-    
-        if (mDoCPd_c::getTrigA(PAD_1)) {
+
+        const bool easyQTE = dusk::getSettings().game.easyQTE;
+
+        if (easyQTE ? mDoCPd_c::getHoldA(PAD_1) : mDoCPd_c::getTrigA(PAD_1)) {
             mPushButtonCount += 2;
         }
 
-        if (mDoCPd_c::getTrigB(PAD_1)) {
+        if (easyQTE ? mDoCPd_c::getHoldB(PAD_1) : mDoCPd_c::getTrigB(PAD_1)) {
             mPushButtonCount += 2;
         }
 
-        if (mDoCPd_c::getTrigL(PAD_1)) {
+        if (easyQTE ? mDoCPd_c::getHoldL(PAD_1) : mDoCPd_c::getTrigL(PAD_1)) {
             mPushButtonCount += 2;
         }
 
-        if (mDoCPd_c::getTrigR(PAD_1)) {
+        if (easyQTE ? mDoCPd_c::getHoldR(PAD_1) : mDoCPd_c::getTrigR(PAD_1)) {
             mPushButtonCount += 2;
         }
 

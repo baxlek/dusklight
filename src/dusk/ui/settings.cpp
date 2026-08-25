@@ -1348,6 +1348,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             });
         addCheat("Invincible Enemies", getSettings().game.invincibleEnemies,
             "Prevents enemies from taking damage.");
+        addCheat("Easy QTE", getSettings().game.easyQTE,
+            "Hold the required button to pass Quick-Time Events instead of rapidly pressing it.");
     });
 
     add_tab("Interface", [this](Rml::Element* content) {
