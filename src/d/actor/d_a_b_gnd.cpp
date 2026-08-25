@@ -3339,7 +3339,7 @@ static void demo_camera(b_gnd_class* i_this) {
         daPy_getPlayerActorClass()->changeOriginalDemo();
         daPy_getPlayerActorClass()->changeDemoMode(89, 0, 0, 0);
         Z2GetAudioMgr()->changeBgmStatus(1);
-    case 51:
+    case 51: {
         mant_p->field_0x3966 = 1;
         i_this->field_0xc70 = 20;
 
@@ -3462,6 +3462,7 @@ static void demo_camera(b_gnd_class* i_this) {
             }
         }
         break;
+    }
     case 52:
         i_this->field_0xc70 = 20;
         if (i_this->mpModelMorf->isStop()) {
