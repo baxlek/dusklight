@@ -145,7 +145,7 @@ UserSettings g_userSettings = {
         .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
         .invincibleEnemies {"game.invincibleEnemies", false},
         .holdToMash {
-            .twilitBloat {"game.holdToMash.qte", false},
+            .twilitBloat {"game.holdToMash.twilitBloat", false},
             .ganondorf {"game.holdToMash.ganondorf", false},
             .sumo {"game.holdToMash.sumo", false},
             .zoraSwim {"game.holdToMash.zoraSwim", false},
