@@ -271,7 +271,8 @@ struct UserSettings {
         ConfigVar<MagicArmorMode> armorRupeeDrain;
         ConfigVar<bool> invincibleEnemies;
         struct {
-            ConfigVar<bool> qte;
+            ConfigVar<bool> twilitBloat;
+            ConfigVar<bool> ganondorf;
             ConfigVar<bool> sumo;
             ConfigVar<bool> zoraSwim;
             ConfigVar<bool> surface;

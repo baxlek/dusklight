@@ -1214,6 +1214,17 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Skips the delay when writing to the Memory Card.");
         addOption("Hold B for Instant Text", getSettings().game.instantText,
             "Makes text scroll immediately by holding B.");
+        leftPane.add_section("Accessibility");
+        addSpeedrunDisabledOption("Twilit Bloat", getSettings().game.holdToMash.twilitBloat,
+            "Hold the required button to pass Twilit Bloat's Quick-Time Event instead of rapidly pressing it.");
+        addSpeedrunDisabledOption("Ganondorf", getSettings().game.holdToMash.ganondorf,
+            "Hold A during Ganondorf's sword clash instead of rapidly pressing it.");
+        addSpeedrunDisabledOption("Sumo", getSettings().game.holdToMash.sumo,
+            "Hold A during sumo matches against Bo and Gor Coron instead of rapidly pressing it.");
+        addSpeedrunDisabledOption("Zora Armor Swimming", getSettings().game.holdToMash.zoraSwim,
+            "Hold A to boost swim speed while wearing Zora Armor instead of rapidly pressing it.");
+        addSpeedrunDisabledOption("Return to Surface", getSettings().game.holdToMash.surface,
+            "Hold A to return to the surface without Zora Armor (from hookshot swim state) instead of rapidly pressing it.");
         addOption("No Climbing Miss Animation", getSettings().game.noMissClimbing,
             "Prevents Link from playing a struggle animation when grabbing ledges or "
             "climbing on vines.");
@@ -1348,26 +1359,6 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             });
         addCheat("Invincible Enemies", getSettings().game.invincibleEnemies,
             "Prevents enemies from taking damage.");
-    });
-
-    add_tab("Accessibility", [this](Rml::Element* content) {
-        auto& leftPane = add_child<Pane>(content, Pane::Type::Controlled);
-        auto& rightPane = add_child<Pane>(content, Pane::Type::Uncontrolled);
-
-        auto addAccess = [&](const Rml::String& key, ConfigVar<bool>& value,
-                             const Rml::String& helpText) {
-            add_speedrun_disabled_option(leftPane, rightPane, value, key, helpText);
-        };
-
-        leftPane.add_section("Hold-to-Mash");
-        addAccess("Quick-Time Events", getSettings().game.holdToMash.qte,
-            "Hold the required button to pass Quick-Time Events instead of rapidly pressing it.");
-        addAccess("Sumo", getSettings().game.holdToMash.sumo,
-            "Hold A during sumo matches against Bo and Gor Coron instead of rapidly pressing it.");
-        addAccess("Zora Armor Swimming", getSettings().game.holdToMash.zoraSwim,
-            "Hold A to boost swim speed while wearing Zora Armor instead of rapidly pressing it.");
-        addAccess("Return to Surface", getSettings().game.holdToMash.surface,
-            "Hold A to return to the surface without Zora Armor (from hookshot swim state) instead of rapidly pressing it.");
     });
 
     add_tab("Interface", [this](Rml::Element* content) {

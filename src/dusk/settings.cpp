@@ -145,7 +145,8 @@ UserSettings g_userSettings = {
         .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
         .invincibleEnemies {"game.invincibleEnemies", false},
         .holdToMash {
-            .qte {"game.holdToMash.qte", false},
+            .twilitBloat {"game.holdToMash.qte", false},
+            .ganondorf {"game.holdToMash.ganondorf", false},
             .sumo {"game.holdToMash.sumo", false},
             .zoraSwim {"game.holdToMash.zoraSwim", false},
             .surface {"game.holdToMash.surface", false},
@@ -332,7 +333,8 @@ void registerSettings() {
     Register(g_userSettings.game.superClawshot);
     Register(g_userSettings.game.alwaysGreatspin);
     Register(g_userSettings.game.invincibleEnemies);
-    Register(g_userSettings.game.holdToMash.qte);
+    Register(g_userSettings.game.holdToMash.twilitBloat);
+    Register(g_userSettings.game.holdToMash.ganondorf);
     Register(g_userSettings.game.holdToMash.sumo);
     Register(g_userSettings.game.holdToMash.zoraSwim);
     Register(g_userSettings.game.holdToMash.surface);
