@@ -9,7 +9,9 @@
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_actor_enemy.h"
 #include "f_op/f_op_camera_mng.h"
+#if TARGET_PC
 #include "dusk/settings.h"
+#endif
 
 class daE_GI_HIO_c : public JORReflexible {
 public:
@@ -748,7 +750,7 @@ void daE_GI_c::PushButtonCount() {
             mPushButtonCount++;
         }
 
-        const bool easyQTE = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.twilitBloat, false);
+        IF_DUSK(const bool easyQTE = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.twilitBloat, false));
 
         if (easyQTE ? mDoCPd_c::getHoldA(PAD_1) : mDoCPd_c::getTrigA(PAD_1)) {
             mPushButtonCount += 2;
