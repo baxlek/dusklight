@@ -1135,17 +1135,7 @@ static void e_po_dead(e_po_class* i_this) {
             camera_player->mCamera.Start();
             camera_player->mCamera.SetTrimSize(0);
             dComIfGp_event_reset();
-#if TARGET_PC
-            const auto itemCheck = dusk::mods::item_check_commit(
-                dusk::mods::item_give_tag_poe(i_this->BitSW), dItemNo_POU_SPIRIT_e, a_this);
-            daPy_getPlayerActorClass()->cancelOriginalDemo();
-            if (itemCheck.itemNo == dItemNo_NONE_e) {
-                dusk::mods::item_check_complete(itemCheck, a_this);
-            } else {
-                daAlink_getAlinkActorClass()->procWolfAtnActorMoveInit();
-                dusk::mods::item_check_enqueue(itemCheck, dusk::mods::ItemGiveMode::ForcedDemo);
-            }
-#else
+#if !TARGET_PC
             dComIfGs_addPohSpiritNum();
 #if !PLATFORM_SHIELD
             if (dComIfGs_getPohSpiritNum() == 0x14) {
