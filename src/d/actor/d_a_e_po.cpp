@@ -1153,8 +1153,8 @@ static void e_po_dead(e_po_class* i_this) {
                 dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[457]);
             }
 #endif
-            daPy_getPlayerActorClass()->cancelOriginalDemo();
 #endif
+            daPy_getPlayerActorClass()->cancelOriginalDemo();
         } else if (mArg0Check(i_this, 0) != 0) {
             if (!fopAcM_isSwitch(a_this, 0x22)) {
                 if (fopAcM_SearchByID(i_this->field_0x5B8, &local_1b0_actor) != 0 &&
