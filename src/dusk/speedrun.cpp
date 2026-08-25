@@ -61,7 +61,6 @@ void resetForSpeedrunMode() {
     getSettings().game.holdToMash.zoraSwim.setSpeedrunValue(false);
     getSettings().game.holdToMash.twilitBloat.setSpeedrunValue(false);
     getSettings().game.holdToMash.ganondorf.setSpeedrunValue(false);
-
     getSettings().game.autoSave.setSpeedrunValue(false);
     getSettings().game.sunsSong.setSpeedrunValue(false);
 
