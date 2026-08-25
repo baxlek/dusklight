@@ -1362,16 +1362,12 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         leftPane.add_section("Hold-to-Mash");
         addAccess("Quick-Time Events", getSettings().game.holdToMash.qte,
             "Hold the required button to pass Quick-Time Events instead of rapidly pressing it.");
-        addAccess("Sumo (Bo & Gor Coron)", getSettings().game.holdToMash.sumo,
+        addAccess("Sumo", getSettings().game.holdToMash.sumo,
             "Hold A during sumo matches against Bo and Gor Coron instead of rapidly pressing it.");
-        addAccess("Gor Coron Boss Fight", getSettings().game.holdToMash.gorCoronBoss,
-            "Hold A during the Gor Coron boss push instead of rapidly pressing it.");
         addAccess("Zora Armor Swimming", getSettings().game.holdToMash.zoraSwim,
             "Hold A to boost swim speed while wearing Zora Armor instead of rapidly pressing it.");
         addAccess("Return to Surface", getSettings().game.holdToMash.surface,
             "Hold A to return to the surface without Zora Armor (from hookshot swim state) instead of rapidly pressing it.");
-        addAccess("Iza's River Rapids", getSettings().game.holdToMash.izaRapids,
-            "Hold A during Iza's river rapids mini-game instead of rapidly pressing it.");
     });
 
     add_tab("Interface", [this](Rml::Element* content) {

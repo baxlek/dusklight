@@ -273,10 +273,8 @@ struct UserSettings {
         struct {
             ConfigVar<bool> qte;
             ConfigVar<bool> sumo;
-            ConfigVar<bool> gorCoronBoss;
             ConfigVar<bool> zoraSwim;
             ConfigVar<bool> surface;
-            ConfigVar<bool> izaRapids;
         } holdToMash;
 
         // Technical
