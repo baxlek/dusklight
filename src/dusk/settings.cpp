@@ -51,6 +51,11 @@ UserSettings g_userSettings = {
         .buttonFishing {"game.buttonFishing", false},
         .instantSaves {"game.instantSaves", false},
         .instantText {"game.instantText", false},
+        .holdToMash.sumo {"game.holdToMash.sumo", false},
+        .holdToMash.surface {"game.holdToMash.surface", false},
+        .holdToMash.zoraSwim {"game.holdToMash.zoraSwim", false},
+        .holdToMash.twilitBloat {"game.holdToMash.twilitBloat", false},
+        .holdToMash.ganondorf {"game.holdToMash.ganondorf", false},
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
@@ -144,13 +149,6 @@ UserSettings g_userSettings = {
         .fastSpinner {"game.fastSpinner", false},
         .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
         .invincibleEnemies {"game.invincibleEnemies", false},
-        .holdToMash {
-            .twilitBloat {"game.holdToMash.twilitBloat", false},
-            .ganondorf {"game.holdToMash.ganondorf", false},
-            .sumo {"game.holdToMash.sumo", false},
-            .zoraSwim {"game.holdToMash.zoraSwim", false},
-            .surface {"game.holdToMash.surface", false},
-        },
 
         // Technical
         .restoreWiiGlitches {"game.restoreWiiGlitches", false},
@@ -267,6 +265,11 @@ void registerSettings() {
     Register(g_userSettings.game.buttonFishing);
     Register(g_userSettings.game.instantSaves);
     Register(g_userSettings.game.instantText);
+    Register(g_userSettings.game.holdToMash.sumo);
+    Register(g_userSettings.game.holdToMash.surface);
+    Register(g_userSettings.game.holdToMash.zoraSwim);
+    Register(g_userSettings.game.holdToMash.twilitBloat);
+    Register(g_userSettings.game.holdToMash.ganondorf);
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
     Register(g_userSettings.game.enhancedMapMenus);
@@ -333,11 +336,6 @@ void registerSettings() {
     Register(g_userSettings.game.superClawshot);
     Register(g_userSettings.game.alwaysGreatspin);
     Register(g_userSettings.game.invincibleEnemies);
-    Register(g_userSettings.game.holdToMash.twilitBloat);
-    Register(g_userSettings.game.holdToMash.ganondorf);
-    Register(g_userSettings.game.holdToMash.sumo);
-    Register(g_userSettings.game.holdToMash.zoraSwim);
-    Register(g_userSettings.game.holdToMash.surface);
     Register(g_userSettings.game.enableFrameInterpolation);
     Register(g_userSettings.game.enableGyroAim);
     Register(g_userSettings.game.enableGyroRollgoal);
