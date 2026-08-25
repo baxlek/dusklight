@@ -1214,17 +1214,56 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Skips the delay when writing to the Memory Card.");
         addOption("Hold B for Instant Text", getSettings().game.instantText,
             "Makes text scroll immediately by holding B.");
-        leftPane.add_section("Accessibility");
-        addSpeedrunDisabledOption("Twilit Bloat", getSettings().game.holdToMash.twilitBloat,
-            "Hold the required button to pass Twilit Bloat's Quick-Time Event instead of rapidly pressing it.");
-        addSpeedrunDisabledOption("Ganondorf", getSettings().game.holdToMash.ganondorf,
-            "Hold A during Ganondorf's sword clash instead of rapidly pressing it.");
-        addSpeedrunDisabledOption("Sumo", getSettings().game.holdToMash.sumo,
-            "Hold A during sumo matches against Bo and Gor Coron instead of rapidly pressing it.");
-        addSpeedrunDisabledOption("Zora Armor Swimming", getSettings().game.holdToMash.zoraSwim,
-            "Hold A to boost swim speed while wearing Zora Armor instead of rapidly pressing it.");
-        addSpeedrunDisabledOption("Return to Surface", getSettings().game.holdToMash.surface,
-            "Hold A to return to the surface without Zora Armor (from hookshot swim state) instead of rapidly pressing it.");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Hold-to-Mash",
+                .getValue = [] {
+                    int count = 0;
+                    int total = 0;
+                    auto check = [&](bool enabled) { total++; if (enabled) count++; };
+                    check(getSettings().game.holdToMash.sumo);
+                    check(getSettings().game.holdToMash.surface);
+                    check(getSettings().game.holdToMash.zoraSwim);
+                    check(getSettings().game.holdToMash.twilitBloat);
+                    check(getSettings().game.holdToMash.ganondorf);
+                    static thread_local char buf[12];
+                    std::snprintf(buf, sizeof(buf), "%d / %d", count, total);
+                    return Rml::String{buf};
+                },
+                .isModified = [] {
+                    return getSettings().game.holdToMash.sumo !=
+                                getSettings().game.holdToMash.sumo.getDefaultValue()
+                           || getSettings().game.holdToMash.surface !=
+                                  getSettings().game.holdToMash.surface.getDefaultValue()
+                           || getSettings().game.holdToMash.zoraSwim !=
+                                  getSettings().game.holdToMash.zoraSwim.getDefaultValue();
+                           || getSettings().game.holdToMash.twilitBloat !=
+                                  getSettings().game.holdToMash.twilitBloat.getDefaultValue();
+                           || getSettings().game.holdToMash.ganondorf !=
+                                  getSettings().game.holdToMash.ganondorf.getDefaultValue();
+                },
+            }),
+            rightPane, [](Pane& pane) {
+                pane.clear();
+                pane.add_rml(
+                    "Hold the indicated button to mash automatically.");
+
+                auto addSubToggle = [&pane](const Rml::String& text, ConfigVar<bool>& var) {
+                    pane.add_button({
+                        .text = text,
+                        .isSelected = [&var] { return var.getValue(); },
+                    }).on_pressed([&var] {
+                        mDoAud_seStartMenu(kSoundItemChange);
+                        var.setValue(!var.getValue());
+                        config::save();
+                    });
+                };
+                addSubToggle("Sumo Wrestling", getSettings().game.holdToMash.sumo);
+                addSubToggle("Surface in Water", getSettings().game.holdToMash.surface);
+                addSubToggle("Zora Swimming", getSettings().game.holdToMash.zoraSwim);
+                addSubToggle("Stunned by Twilit Bloat", getSettings().game.holdToMash.twilitBloat);
+                addSubToggle("Ganondorf Chance", getSettings().game.holdToMash.ganondorf);
+            });
         addOption("No Climbing Miss Animation", getSettings().game.noMissClimbing,
             "Prevents Link from playing a struggle animation when grabbing ledges or "
             "climbing on vines.");
