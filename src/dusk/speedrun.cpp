@@ -69,9 +69,10 @@ void resetForSpeedrunMode() {
     getSettings().game.enableIndefiniteItemDrops.setSpeedrunValue(false);
     getSettings().game.moonJump.setSpeedrunValue(false);
     getSettings().game.superClawshot.setSpeedrunValue(false);
-    getSettings().game.alwaysGreatspin.setSpeedrunValue(false);
+    getSettings().game.alwaysGreatspin.setSpeedrunValue(AlwaysGreatspinMode::OFF);
     getSettings().game.enableFastIronBoots.setSpeedrunValue(false);
     getSettings().game.canTransformAnywhere.setSpeedrunValue(false);
+    getSettings().game.unrestrictedItems.setSpeedrunValue(false);
     getSettings().game.fastRoll.setSpeedrunValue(false);
     getSettings().game.fastSpinner.setSpeedrunValue(false);
     getSettings().game.armorRupeeDrain.setSpeedrunValue(MagicArmorMode::NORMAL);

@@ -170,6 +170,16 @@ int daObjLife_c::create() {
             if (item != parameterItemNo) {
                 fopAcM_SetParam(this, (params & 0xFFFFFF00) | item);
             }
+        } else if (mGoldenWolfItem) {
+            mOriginalItemNo = mItemGiveOriginalNo;
+            const u16 obtainedItemFlag = static_cast<u16>(field_0x938);
+            const u8 resolvedItem =
+                dusk::mods::item_check_golden_wolf(obtainedItemFlag, mOriginalItemNo, this);
+            mItemGiveTag = dusk::mods::item_give_tag_golden_wolf(obtainedItemFlag);
+            mItemOverridden = resolvedItem != mOriginalItemNo;
+            if (resolvedItem != parameterItemNo) {
+                fopAcM_SetParam(this, (params & 0xFFFFFF00) | resolvedItem);
+            }
         } else {
             mOriginalItemNo = mItemGiveOriginalNo;
             setDisplayItemNo(
