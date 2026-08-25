@@ -748,7 +748,7 @@ void daE_GI_c::PushButtonCount() {
             mPushButtonCount++;
         }
 
-        const bool easyQTE = dusk::getSettings().game.easyQTE;
+        const bool easyQTE = dusk::getSettings().game.holdToMash.qte;
 
         if (easyQTE ? mDoCPd_c::getHoldA(PAD_1) : mDoCPd_c::getTrigA(PAD_1)) {
             mPushButtonCount += 2;

@@ -1348,8 +1348,30 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             });
         addCheat("Invincible Enemies", getSettings().game.invincibleEnemies,
             "Prevents enemies from taking damage.");
-        addCheat("Easy QTE", getSettings().game.easyQTE,
+    });
+
+    add_tab("Accessibility", [this](Rml::Element* content) {
+        auto& leftPane = add_child<Pane>(content, Pane::Type::Controlled);
+        auto& rightPane = add_child<Pane>(content, Pane::Type::Uncontrolled);
+
+        auto addAccess = [&](const Rml::String& key, ConfigVar<bool>& value,
+                             const Rml::String& helpText) {
+            add_speedrun_disabled_option(leftPane, rightPane, value, key, helpText);
+        };
+
+        leftPane.add_section("Hold-to-Mash");
+        addAccess("Quick-Time Events", getSettings().game.holdToMash.qte,
             "Hold the required button to pass Quick-Time Events instead of rapidly pressing it.");
+        addAccess("Sumo (Bo & Gor Coron)", getSettings().game.holdToMash.sumo,
+            "Hold A during sumo matches against Bo and Gor Coron instead of rapidly pressing it.");
+        addAccess("Gor Coron Boss Fight", getSettings().game.holdToMash.gorCoronBoss,
+            "Hold A during the Gor Coron boss push instead of rapidly pressing it.");
+        addAccess("Zora Armor Swimming", getSettings().game.holdToMash.zoraSwim,
+            "Hold A to boost swim speed while wearing Zora Armor instead of rapidly pressing it.");
+        addAccess("Return to Surface", getSettings().game.holdToMash.surface,
+            "Hold A to return to the surface without Zora Armor (from hookshot swim state) instead of rapidly pressing it.");
+        addAccess("Iza's River Rapids", getSettings().game.holdToMash.izaRapids,
+            "Hold A during Iza's river rapids mini-game instead of rapidly pressing it.");
     });
 
     add_tab("Interface", [this](Rml::Element* content) {

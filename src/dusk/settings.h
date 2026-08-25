@@ -270,7 +270,14 @@ struct UserSettings {
         ConfigVar<bool> fastSpinner;
         ConfigVar<MagicArmorMode> armorRupeeDrain;
         ConfigVar<bool> invincibleEnemies;
-        ConfigVar<bool> easyQTE;
+        struct {
+            ConfigVar<bool> qte;
+            ConfigVar<bool> sumo;
+            ConfigVar<bool> gorCoronBoss;
+            ConfigVar<bool> zoraSwim;
+            ConfigVar<bool> surface;
+            ConfigVar<bool> izaRapids;
+        } holdToMash;
 
         // Technical
         ConfigVar<bool> restoreWiiGlitches;

@@ -662,7 +662,7 @@ void daAlink_c::setSwimMoveAnime() {
 
         if (mMaxSpeed < mpHIO->mSwim.m.mUnderwaterMaxSpeed) {
             mMaxSpeed = mpHIO->mSwim.m.mUnderwaterMaxSpeed;
-        } else if (doTrigger()) {
+        } else if (dusk::getSettings().game.holdToMash.zoraSwim ? doButton() : doTrigger()) {
             mMaxSpeed += 0.75f;
             if (mMaxSpeed > temp_f29) {
                 mMaxSpeed = temp_f29;
@@ -1335,7 +1335,7 @@ int daAlink_c::procSwimHookshotMove() {
         return procSwimDiveInit();
     }
 
-    if (checkUpSwimButtonAccept() && doTrigger()) {
+    if (checkUpSwimButtonAccept() && (dusk::getSettings().game.holdToMash.surface ? doButton() : doTrigger())) {
         field_0x3000 = 30;
         return procSwimMoveInit();
     }

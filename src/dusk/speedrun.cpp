@@ -76,7 +76,12 @@ void resetForSpeedrunMode() {
     getSettings().game.fastSpinner.setSpeedrunValue(false);
     getSettings().game.armorRupeeDrain.setSpeedrunValue(MagicArmorMode::NORMAL);
     getSettings().game.invincibleEnemies.setSpeedrunValue(false);
-    getSettings().game.easyQTE.setSpeedrunValue(false);
+    getSettings().game.holdToMash.qte.setSpeedrunValue(false);
+    getSettings().game.holdToMash.sumo.setSpeedrunValue(false);
+    getSettings().game.holdToMash.gorCoronBoss.setSpeedrunValue(false);
+    getSettings().game.holdToMash.zoraSwim.setSpeedrunValue(false);
+    getSettings().game.holdToMash.surface.setSpeedrunValue(false);
+    getSettings().game.holdToMash.izaRapids.setSpeedrunValue(false);
 
     getSettings().game.pauseOnFocusLost.setSpeedrunValue(false);
 
