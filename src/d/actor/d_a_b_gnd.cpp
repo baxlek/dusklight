@@ -2947,7 +2947,7 @@ static void demo_camera(b_gnd_class* i_this) {
     s8 sp8 = false;
 #if TARGET_PC
     const s16 entry_demo_cam_mode = i_this->mDemoCamMode;
-    const bool easySumo = (dusk::getSettings().game.holdToMash.sumo, false);
+    const bool easySumo = dusk::getSettings().game.holdToMash.sumo;
 #endif
     switch (i_this->mDemoCamMode) {
     case 0:
@@ -3459,6 +3459,8 @@ static void demo_camera(b_gnd_class* i_this) {
                 i_this->field_0xc44[2] = 30;
                 Z2GetAudioMgr()->changeBgmStatus(6);
             }
+        }
+        break;
     case 52:
         i_this->field_0xc70 = 20;
         if (i_this->mpModelMorf->isStop()) {
