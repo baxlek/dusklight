@@ -1337,7 +1337,7 @@ int daAlink_c::procSwimHookshotMove() {
         return procSwimDiveInit();
     }
 
-    const bool easySurface = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.surface, false);
+    IF_DUSK(const bool easySurface = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.surface, false));
 
     if (checkUpSwimButtonAccept() && (easySurface ? doButton() : doTrigger())) {
         field_0x3000 = 30;
