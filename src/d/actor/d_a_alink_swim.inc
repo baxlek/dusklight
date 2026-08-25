@@ -660,7 +660,7 @@ void daAlink_c::setSwimMoveAnime() {
         field_0x3478 = mpHIO->mSwim.m.mUnderwaterMinAnmSpeed;
         field_0x347c = mpHIO->mSwim.m.mUnderwaterMaxAnmSpeed;
 
-        const bool easyZoraSwim = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.zoraSwim, false);
+        IF_DUSK(const bool easyZoraSwim = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash.zoraSwim, false));
 
         if (mMaxSpeed < mpHIO->mSwim.m.mUnderwaterMaxSpeed) {
             mMaxSpeed = mpHIO->mSwim.m.mUnderwaterMaxSpeed;
