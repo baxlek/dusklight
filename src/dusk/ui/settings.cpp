@@ -1236,9 +1236,9 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                            || getSettings().game.holdToMash.surface !=
                                   getSettings().game.holdToMash.surface.getDefaultValue()
                            || getSettings().game.holdToMash.zoraSwim !=
-                                  getSettings().game.holdToMash.zoraSwim.getDefaultValue();
+                                  getSettings().game.holdToMash.zoraSwim.getDefaultValue()
                            || getSettings().game.holdToMash.twilitBloat !=
-                                  getSettings().game.holdToMash.twilitBloat.getDefaultValue();
+                                  getSettings().game.holdToMash.twilitBloat.getDefaultValue()
                            || getSettings().game.holdToMash.ganondorf !=
                                   getSettings().game.holdToMash.ganondorf.getDefaultValue();
                 },
