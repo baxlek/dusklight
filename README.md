@@ -15,6 +15,8 @@ This branch includes the following unmerged PRs:
 "Disable Letterboxing Options" by baxlek
 <br/>
 "Unrestricted Items" by baxlek
+<br/>
+"Hold Button to Mash" by baxlek
 
 <div align="center">
   <img src="res/logo.png" alt="Logo" width="640">
