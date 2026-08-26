@@ -58,6 +58,7 @@ void resetForSpeedrunMode() {
     getSettings().game.noHeartDrops.setSpeedrunValue(false);
     getSettings().game.autoSave.setSpeedrunValue(false);
     getSettings().game.sunsSong.setSpeedrunValue(false);
+    getSettings().game.disableTransformOnWarp(false);
 
     getSettings().game.infiniteHearts.setSpeedrunValue(false);
     getSettings().game.infiniteArrows.setSpeedrunValue(false);
