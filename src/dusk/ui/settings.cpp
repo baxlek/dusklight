@@ -1231,6 +1231,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Allows Wolf Link to howl and change the time of day.");
         addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,
             "Transform instantly by pressing R and Y simultaneously.");
+        addOption("Disable Transform on Warp", getSettings().game.disableTransformOnWarp,
+            "Disable the forced transformation into wolf before warping.");
         addOption("Aiming Reticle", getSettings().game.aimingReticle,
             "Shows the aiming reticle for bow and slingshot.");
 
