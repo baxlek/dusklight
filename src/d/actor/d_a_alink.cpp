@@ -17453,7 +17453,7 @@ int daAlink_c::procCoMetamorphoseInit() {
     mFallVoiceInit = 0;
 
 #if TARGET_PC
-    if (((dusk::getSettings().game.disableTransformOnWarp && strlen(dMeter2Info_getWarpStageName())) || checkWolf()) &&
+    if (((dusk::getSettings().game.disableTransformOnWarp && strlen(dMeter2Info_getWarpStageName())) || (checkWolf())) &&
         mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e) ||
 #else
     if ((checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e) ||
