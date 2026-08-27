@@ -61,6 +61,7 @@ UserSettings g_userSettings = {
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
+        .disableTransformOnWarp {"game.disableTransformOnWarp", false},
         .aimingReticle {"game.aimingReticle", false},
         .enableDeselectSwords {"game.enableDeselectSwords", false},
         .enableDeselectShields {"game.enableDeselectShields", false},
@@ -282,6 +283,7 @@ void registerSettings() {
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
     Register(g_userSettings.game.enhancedMapMenus);
+    Register(g_userSettings.game.disableTransformOnWarp);
     Register(g_userSettings.game.aimingReticle);
     Register(g_userSettings.game.enableDeselectSwords);
     Register(g_userSettings.game.enableDeselectShields);
