@@ -213,9 +213,9 @@ namespace randomizer::logic::hints {
             );
 
             for (auto& location: world->GetAllLocations()) {
-                // If this location is progression, then add its hint regions to
-                // the set of potentially barren regions
-                if (location->IsProgression()) {
+                // If this location is progression and does not have an expected item,
+                // then add its hint regions to the set of potentially barren regions
+                if (location->IsProgression() && !location->HasExpectedItem()) {
                     for (const auto& locAccess : location->GetAccessList()) {
                         for (const auto& hintRegion : locAccess->GetArea()->GetHintRegions()) {
                             world->GetBarrenRegions()[hintRegion] = {};
@@ -271,7 +271,7 @@ namespace randomizer::logic::hints {
             // required items (unless they can be in a barren region). Otherwise, add
             // the location to the list of locations in the barren region
             for (auto location : world->GetAllLocations()) {
-                if (!location->IsProgression()) {
+                if (!location->IsProgression() || location->HasExpectedItem()) {
                     continue;
                 }
 
@@ -526,17 +526,43 @@ namespace randomizer::logic::hints {
     }
 
     void HintGenerator::GenerateItemHints() {
+
+        std::set<std::string> itemHintItems = {
+            "Magic Armor",
+            "Zora Armor",
+            "Shadow Crystal",
+            "Progressive Wallet",
+            "Progressive Sword",
+            "Gale Boomerang",
+            "Spinner",
+            "Ball and Chain",
+            "Progressive Bow",
+            "Progressive Clawshot",
+            "Iron Boots",
+            "Progressive Dominion Rod",
+            "Lantern",
+            "Progressive Fishing Rod",
+            "Slingshot",
+            "Bomb Bag",
+            "Aurus Memo",
+            "Asheis Sketch",
+            "Progressive Mirror Shard",
+            "Progressive Fused Shadow",
+        };
+
         location::LocationPool possibleItemHintLocations{};
         for (auto location : this->_world->GetAllLocations()) {
             // If the location is progression...
             // and has a major item...
             // and does not have an expected item...
             // and is not already hinted...
+            // and is part of our list of items that can be item hinted...
             // then it can be hinted as an item hint
             if (location->IsProgression() &&
                 location->GetCurrentItem()->IsMajor() &&
                !location->HasExpectedItem() &&
-               !location->IsHinted())
+               !location->IsHinted() &&
+                itemHintItems.contains(location->GetCurrentItem()->GetName()))
             {
                 possibleItemHintLocations.push_back(location);
             }
