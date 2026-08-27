@@ -4964,9 +4964,9 @@ int daAlink_c::create() {
 #if TARGET_PC
             if (startPoint == -4 && dusk::getSettings().game.disableTransformOnWarp) {
                 if (dComIfGs_getTransformStatus()) {
-                    attention_info.position.set(current.pos.x + cM_ssin(shape_angle.y) * 70.0f,
-                                                 current.pos.y + 0.0f, // 80.0f
-                                                 current.pos.z + cM_scos(shape_angle.y) * 70.0f);
+              //    attention_info.position.set(current.pos.x + cM_ssin(shape_angle.y) * 70.0f,
+              //                                 current.pos.y + 80.0f,
+              //                                 current.pos.z + cM_scos(shape_angle.y) * 70.0f);
                     onNoResetFlg1(FLG1_IS_WOLF);
                 }
             } else {
