@@ -17452,7 +17452,12 @@ int daAlink_c::procCoMetamorphoseInit() {
     field_0x347c = 1.0f;
     mFallVoiceInit = 0;
 
+#if TARGET_PC
+    if (((dusk::getSettings().game.disableTransformOnWarp && strlen(dMeter2Info_getWarpStageName())) || checkWolf()) &&
+        mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e) ||
+#else
     if ((checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e) ||
+#endif
        (!checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK2_e))
     {
         mProcVar1.field_0x300a = 1;
@@ -17465,7 +17470,7 @@ int daAlink_c::procCoMetamorphoseInit() {
     } else {
         deleteEquipItem(FALSE, TRUE);
 
-        if ((IF_DUSK(!dusk::getSettings().game.disableTransformOnWarp &&)checkEndResetFlg0(ERFLG0_FORCE_WOLF_CHANGE) && checkStageName("D_MN08"))) {
+        if (checkEndResetFlg0(ERFLG0_FORCE_WOLF_CHANGE) && checkStageName("D_MN08")) {
             mProcVar4.field_0x3010 = 1;
         }
         mProcVar1.field_0x300a = 0;
