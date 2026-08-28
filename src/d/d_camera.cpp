@@ -11195,6 +11195,9 @@ static void store(camera_process_class* i_camera) {
     cSAngle angle(fopCamM_GetBank(camera));
     f32 fovy = fopCamM_GetFovy(camera);
 
+    const f32 preDemoCenterY = center.y;
+    const f32 preDemoEyeY = eye.y;
+
     dDemo_camera_c* demoCamera = dDemo_c::getCamera();
     if (demoCamera != NULL && !dComIfGp_getPEvtManager()->cameraPlay()) {
         if (demoCamera->checkEnable(dDemo_camera_c::ENABLE_VIEW_TARG_POS_e)) {
@@ -11211,6 +11214,12 @@ static void store(camera_process_class* i_camera) {
         }
         if (demoCamera->checkEnable(dDemo_camera_c::ENABLE_PROJ_FOVY_e)) {
             fovy = demoCamera->getFovy();
+        }
+
+        const char* runEventName = dComIfGp_getEventManager().getRunEventName();
+        if (runEventName != nullptr && strncmp(runEventName, "PORTAL_WARP", sizeof("PORTAL_WARP") - 1) == 0) {
+            eye.y = preDemoEyeY;
+            center.y = preDemoCenterY;
         }
 #if DEBUG
     } else if (dDebugPad.Enable(0) && dCamera->CameraID() == 0) {
