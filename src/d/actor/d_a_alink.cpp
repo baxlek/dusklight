@@ -91,6 +91,8 @@ static const char l_cWShdArcName[] = "CWShd";
 static const char l_sWShdArcName[] = "SWShd";
 
 static bool l_skipForcedWarpTransformPending = false;
+static bool l_preserveWarpFormPending = false;
+static bool l_preserveWarpFormWasWolf = false;
 
 #include "d/actor/d_a_alink_HIO.inc"
 
@@ -4933,6 +4935,15 @@ int daAlink_c::create() {
             current.angle.y = shape_angle.y;
         }
 
+        bool forceWolfFromWarpStart = startPoint == -4;
+        #if TARGET_PC
+        if (forceWolfFromWarpStart && dusk::getSettings().game.preventForcedWolfWarpTransform &&
+            l_preserveWarpFormPending)
+        {
+            forceWolfFromWarpStart = l_preserveWarpFormWasWolf;
+        }
+        #endif
+
         if ((
                 (
                     !checkBossOctaIealRoom()
@@ -4947,7 +4958,7 @@ int daAlink_c::create() {
                 #if DEBUG
                 g_playerKind == 1 ||
                 #endif
-                startPoint == -4
+                forceWolfFromWarpStart
             )
             || sceneMode == 9
             )
@@ -4961,6 +4972,12 @@ int daAlink_c::create() {
         } else {
             attention_info.position.y = current.pos.y + 150.0f;
         }
+
+        #if TARGET_PC
+        if (startPoint == -4) {
+            l_preserveWarpFormPending = false;
+        }
+        #endif
         attention_info.flags = -1;
 
         if (!dComIfGp_getEventManager().dataLoaded()) {

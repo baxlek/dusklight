@@ -4440,6 +4440,12 @@ void daAlink_c::checkWarpStart() {
 
             if (dMeter2Info_getWarpStatus() == WARP_STATUS_DECIDED_e) {
 #if TARGET_PC
+                if (dusk::getSettings().game.preventForcedWolfWarpTransform) {
+                    l_preserveWarpFormPending = true;
+                    l_preserveWarpFormWasWolf = checkWolf();
+                } else {
+                    l_preserveWarpFormPending = false;
+                }
                 l_skipForcedWarpTransformPending =
                     dusk::getSettings().game.preventForcedWolfWarpTransform && !checkWolf();
 #endif
@@ -4468,6 +4474,7 @@ void daAlink_c::checkWarpStart() {
             } else {
 #if TARGET_PC
                 l_skipForcedWarpTransformPending = false;
+                l_preserveWarpFormPending = false;
 #endif
                 mDemo.setSpecialDemoType();
                 #if TARGET_PC || (VERSION == VERSION_GCN_JPN || VERSION == VERSION_SHIELD_DEBUG)
@@ -4486,6 +4493,9 @@ void daAlink_c::checkWarpStart() {
         }
 
         dMeter2Info_resetWarpStatus();
+#if TARGET_PC
+        l_skipForcedWarpTransformPending = false;
+#endif
     }
 }
 
