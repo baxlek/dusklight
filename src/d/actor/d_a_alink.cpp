@@ -90,6 +90,8 @@ static const char l_cWShdArcName[] = "CWShd";
 
 static const char l_sWShdArcName[] = "SWShd";
 
+static bool l_skipForcedWarpTransformPending = false;
+
 #include "d/actor/d_a_alink_HIO.inc"
 
 static const f32 l_boardSlopeAngleMin = 910.0f;
@@ -17429,7 +17431,11 @@ int daAlink_c::procCoMetamorphoseInit() {
         !checkWolf() &&
         dusk::getSettings().game.preventForcedWolfWarpTransform &&
         mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e &&
-        dMeter2Info_getWarpStatus() == WARP_STATUS_DECIDED_e;
+        l_skipForcedWarpTransformPending;
+
+    if (skipForcedWarpTransform) {
+        l_skipForcedWarpTransformPending = false;
+    }
 
     if ((checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e) ||
         (!checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK2_e) ||

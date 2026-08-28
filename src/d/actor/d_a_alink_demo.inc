@@ -4439,6 +4439,10 @@ void daAlink_c::checkWarpStart() {
             #endif
 
             if (dMeter2Info_getWarpStatus() == WARP_STATUS_DECIDED_e) {
+#if TARGET_PC
+                l_skipForcedWarpTransformPending =
+                    dusk::getSettings().game.preventForcedWolfWarpTransform && !checkWolf();
+#endif
                 const char* portal;
                 if (!checkMidnaRide()) {
                     if (dComIfGp_TargetWarpPt_get() == 3) {
@@ -4462,6 +4466,9 @@ void daAlink_c::checkWarpStart() {
                 }
                 fopAcM_orderOtherEvent(this, portal, 0xFFFF, 1, 1);
             } else {
+#if TARGET_PC
+                l_skipForcedWarpTransformPending = false;
+#endif
                 mDemo.setSpecialDemoType();
                 #if TARGET_PC || (VERSION == VERSION_GCN_JPN || VERSION == VERSION_SHIELD_DEBUG)
                 IF_DUSK_BLOCK(dusk::version::isRegionJpn())
@@ -4509,6 +4516,10 @@ int daAlink_c::warpModelTexScroll() {
 }
 
 int daAlink_c::procCoWarpInit(int param_0, int param_1) {
+#if TARGET_PC
+    l_skipForcedWarpTransformPending = false;
+#endif
+
     if (!commonProcInitNotSameProc(PROC_WARP)) {
         return 0;
     }
