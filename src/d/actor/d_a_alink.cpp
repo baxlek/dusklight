@@ -17463,12 +17463,14 @@ int daAlink_c::procCoMetamorphoseInit() {
     const bool skipForcedWarpTransform = false;
     #endif
 
+    #if TARGET_PC
     if (skipForcedWarpTransform ||
         (mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e &&
             l_skipForcedWarpTransformPending))
     {
         l_skipForcedWarpTransformPending = false;
     }
+    #endif
 
     if ((checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e) ||
         (!checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK2_e) ||
