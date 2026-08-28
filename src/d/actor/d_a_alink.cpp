@@ -17453,13 +17453,20 @@ int daAlink_c::procCoMetamorphoseInit() {
     field_0x347c = 1.0f;
     mFallVoiceInit = 0;
 
+    #if TARGET_PC
     const bool skipForcedWarpTransform =
         !checkWolf() &&
         dusk::getSettings().game.preventForcedWolfWarpTransform &&
         mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e &&
         l_skipForcedWarpTransformPending;
+    #else
+    const bool skipForcedWarpTransform = false;
+    #endif
 
-    if (skipForcedWarpTransform) {
+    if (skipForcedWarpTransform ||
+        (mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e &&
+            l_skipForcedWarpTransformPending))
+    {
         l_skipForcedWarpTransformPending = false;
     }
 
