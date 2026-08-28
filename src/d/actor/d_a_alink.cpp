@@ -4938,6 +4938,7 @@ int daAlink_c::create() {
         bool forceWolfFromWarpStart = startPoint == -4;
         bool forceWolfFromStoryState = dComIfGs_Wolf_Change_Check() == TRUE;
         bool clearWolfNoResetForPreservedHuman = false;
+        bool consumePreservedWarpFormState = false;
         #if TARGET_PC
         if (dusk::getSettings().game.preventForcedWolfWarpTransform &&
             l_preserveWarpFormPending)
@@ -4945,6 +4946,7 @@ int daAlink_c::create() {
             forceWolfFromWarpStart = l_preserveWarpFormWasWolf;
             forceWolfFromStoryState = l_preserveWarpFormWasWolf;
             clearWolfNoResetForPreservedHuman = !l_preserveWarpFormWasWolf;
+            consumePreservedWarpFormState = true;
         }
         #endif
 
@@ -4981,10 +4983,7 @@ int daAlink_c::create() {
         if (clearWolfNoResetForPreservedHuman) {
             offNoResetFlg1(FLG1_IS_WOLF);
         }
-        #endif
-
-        #if TARGET_PC
-        if (startPoint == -4) {
+        if (consumePreservedWarpFormState || startPoint == -4) {
             l_preserveWarpFormPending = false;
         }
         #endif
