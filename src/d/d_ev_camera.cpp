@@ -2579,6 +2579,9 @@ bool dCamera_c::stbWaitEvCamera() {
 #endif
 
     if (demo_cam != NULL) {
+        const f32 preDemoCenterY = mViewCache.mCenter.y;
+        const f32 preDemoEyeY = mViewCache.mEye.y;
+
         if (demo_cam->checkEnable(0x40)) {
             mViewCache.mCenter = demo_cam->getTarget();
 #if DEBUG
@@ -2619,6 +2622,16 @@ bool dCamera_c::stbWaitEvCamera() {
             dDbVw_Report(90, 190, "%s", enabled_report);
         }
 #endif
+
+        /* Prefix-match covers all portal warp events:
+         * PORTAL_WARP_KBRIDGE, PORTAL_WARP_KBRIDGE_OUT,
+         * PORTAL_WARP_OBRIDGE, PORTAL_WARP_OUT_OBRIDGE,
+         * PORTAL_WARP_BIGVOLC */
+        const char* runEventName = dComIfGp_getEventManager().getRunEventName();
+        if (runEventName != nullptr && strncmp(runEventName, "PORTAL_WARP", sizeof("PORTAL_WARP") - 1) == 0) {
+            mViewCache.mCenter.y = preDemoCenterY;
+            mViewCache.mEye.y = preDemoEyeY;
+        }
 
         mViewCache.mDirection.Val(mViewCache.mEye - mViewCache.mCenter);
     }
