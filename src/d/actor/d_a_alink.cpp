@@ -4936,11 +4936,15 @@ int daAlink_c::create() {
         }
 
         bool forceWolfFromWarpStart = startPoint == -4;
+        bool forceWolfFromStoryState = dComIfGs_Wolf_Change_Check() == TRUE;
+        bool clearWolfNoResetForPreservedHuman = false;
         #if TARGET_PC
         if (forceWolfFromWarpStart && dusk::getSettings().game.preventForcedWolfWarpTransform &&
             l_preserveWarpFormPending)
         {
             forceWolfFromWarpStart = l_preserveWarpFormWasWolf;
+            forceWolfFromStoryState = l_preserveWarpFormWasWolf;
+            clearWolfNoResetForPreservedHuman = !l_preserveWarpFormWasWolf;
         }
         #endif
 
@@ -4951,7 +4955,7 @@ int daAlink_c::create() {
                     && g_playerKind == 0
                     #endif
                 )
-                && dComIfGs_Wolf_Change_Check() == TRUE
+                && forceWolfFromStoryState
             )
             ||
             (
@@ -4972,6 +4976,12 @@ int daAlink_c::create() {
         } else {
             attention_info.position.y = current.pos.y + 150.0f;
         }
+
+        #if TARGET_PC
+        if (clearWolfNoResetForPreservedHuman) {
+            offNoResetFlg1(FLG1_IS_WOLF);
+        }
+        #endif
 
         #if TARGET_PC
         if (startPoint == -4) {
