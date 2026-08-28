@@ -4493,9 +4493,6 @@ void daAlink_c::checkWarpStart() {
         }
 
         dMeter2Info_resetWarpStatus();
-#if TARGET_PC
-        l_skipForcedWarpTransformPending = false;
-#endif
     }
 }
 
@@ -4526,10 +4523,6 @@ int daAlink_c::warpModelTexScroll() {
 }
 
 int daAlink_c::procCoWarpInit(int param_0, int param_1) {
-#if TARGET_PC
-    l_skipForcedWarpTransformPending = false;
-#endif
-
     if (!commonProcInitNotSameProc(PROC_WARP)) {
         return 0;
     }
