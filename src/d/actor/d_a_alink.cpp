@@ -17429,9 +17429,7 @@ int daAlink_c::procCoMetamorphoseInit() {
         !checkWolf() &&
         dusk::getSettings().game.preventForcedWolfWarpTransform &&
         mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e &&
-        checkEventRun() &&
-        (strcmp(dComIfGp_getEventManager().getRunEventName(), "PORTALWARP_START") == 0 ||
-            strcmp(dComIfGp_getEventManager().getRunEventName(), "PORTALWARP_START_B") == 0);
+        dMeter2Info_getWarpStatus() == WARP_STATUS_DECIDED_e;
 
     if ((checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e) ||
         (!checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK2_e) ||
