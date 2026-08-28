@@ -4939,7 +4939,7 @@ int daAlink_c::create() {
         bool forceWolfFromStoryState = dComIfGs_Wolf_Change_Check() == TRUE;
         bool clearWolfNoResetForPreservedHuman = false;
         #if TARGET_PC
-        if (forceWolfFromWarpStart && dusk::getSettings().game.preventForcedWolfWarpTransform &&
+        if (dusk::getSettings().game.preventForcedWolfWarpTransform &&
             l_preserveWarpFormPending)
         {
             forceWolfFromWarpStart = l_preserveWarpFormWasWolf;
