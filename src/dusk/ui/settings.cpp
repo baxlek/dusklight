@@ -1227,6 +1227,9 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Allow fishing with the Fishing Rod using the button the item is assigned to.");
         addOption("Show Poe Count on Map", getSettings().game.enhancedMapMenus,
             "Displays collected/total number of Poe Souls for a region on the map.");
+        addOption("No Forced Wolf Transform Before Warp",
+            getSettings().game.preventForcedWolfWarpTransform,
+            "Prevents portal warps from forcing Link to transform into wolf form first.");
         addSpeedrunDisabledOption("Sun's Song (R+X)", getSettings().game.sunsSong,
             "Allows Wolf Link to howl and change the time of day.");
         addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,

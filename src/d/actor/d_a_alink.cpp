@@ -17425,8 +17425,17 @@ int daAlink_c::procCoMetamorphoseInit() {
     field_0x347c = 1.0f;
     mFallVoiceInit = 0;
 
+    const bool skipForcedWarpTransform =
+        !checkWolf() &&
+        dusk::getSettings().game.preventForcedWolfWarpTransform &&
+        mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e &&
+        checkEventRun() &&
+        (strcmp(dComIfGp_getEventManager().getRunEventName(), "PORTALWARP_START") == 0 ||
+            strcmp(dComIfGp_getEventManager().getRunEventName(), "PORTALWARP_START_B") == 0);
+
     if ((checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK1_e) ||
-        (!checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK2_e))
+        (!checkWolf() && mDemo.getDemoMode() == daPy_demo_c::DEMO_METAMORPHOSE_UNK2_e) ||
+        skipForcedWarpTransform)
     {
         mProcVar1.field_0x300a = 1;
         speed.y = 0.0f;
