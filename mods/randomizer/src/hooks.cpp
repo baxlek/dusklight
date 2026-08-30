@@ -2,6 +2,7 @@
 #include "session.hpp"
 #include "randomizer_context.hpp"
 #include "ui/rando_config.hpp"
+#include "draw.hpp"
 #include "flags.h"
 #include "stages.h"
 #include "tools.h"
@@ -13,6 +14,7 @@
 #include <mods/svc/log.hpp>
 #include <mods/items.h>
 
+#include "Z2AudioLib/Z2SceneMgr.h"
 #include "c/c_damagereaction.h"
 #include "d/actor/d_a_alink.h"
 #include "d/actor/d_a_b_bq.h"
@@ -31,19 +33,20 @@
 #include "d/actor/d_a_npc_ykw.h"
 #include "d/actor/d_a_npc_zrc.h"
 #include "d/actor/d_a_npc_zrz.h"
-#include "d/actor/d_a_obj_bosswarp.h"
-#include "d/actor/d_a_shop_item.h"
-#include "d/actor/d_a_obj_swBallC.h"
-#include "d/actor/d_a_obj_zra_rock.h"
-#include "d/actor/d_a_tag_kmsg.h"
-#include "d/actor/d_a_tbox2.h"
 #include "d/actor/d_a_obj_item.h"
 #include "d/actor/d_a_obj_life_container.h"
+#include "d/actor/d_a_obj_master_sword.h"
+#include "d/actor/d_a_obj_swBallC.h"
+#include "d/actor/d_a_obj_zra_rock.h"
+#include "d/actor/d_a_shop_item.h"
+#include "d/actor/d_a_tag_kmsg.h"
+#include "d/actor/d_a_tbox2.h"
 #include "d/d_door_param2.h"
 #include "d/d_event.h"
 #include "d/d_file_sel_info.h"
 #include "d/d_file_select.h"
 #include "d/d_gameover.h"
+#include "d/d_item.h"
 #include "d/d_menu_item_explain.h"
 #include "d/d_menu_ring.h"
 #include "d/d_meter2_info.h"
@@ -52,10 +55,8 @@
 #include "d/d_s_play.h"
 #include "d/d_save.h"
 #include "d/d_shop_system.h"
-#include "d/d_item.h"
 #include "f_op/f_op_overlap_mng.h"
 #include "m_Do/m_Do_Reset.h"
-#include "Z2AudioLib/Z2SceneMgr.h"
 
 DEFINE_HOOK(&dFile_select_c::selectDataNameMove, dFile_select_c__selectDataNameMove);
 DEFINE_HOOK(&dFile_select_c::dataSelect, dFile_select_c__dataSelect);
@@ -157,11 +158,9 @@ DEFINE_HOOK(&dGameover_c::_create, dGameover_c___create);
 DEFINE_HOOK(&daObjSwBallC_c::Create, daObjSwBallC_c__Create);
 DEFINE_HOOK(&daObjSwBallC_c::actionWait, daObjSwBallC_c__actionWait);
 
-DEFINE_HOOK(&daDitem_c::CreateInit, daDitem_c__CreateInit);
+DEFINE_HOOK_SYMBOL("daDitem_c::execute", int(daDitem_c*), daDitem_c__execute);
 
 DEFINE_HOOK(&daShopItem_c::CreateInit, daShopItem_c__CreateInit);
-
-DEFINE_HOOK(&daObjBossWarp_c::demoProc, daObjBossWarp_c__demoProc);
 
 DEFINE_HOOK_SYMBOL("lure_heart", void(dmg_rod_class*), mgRod_lure_heart);
 DEFINE_HOOK_SYMBOL("uki_catch", void(dmg_rod_class*), mgRod_uki_catch);
@@ -186,6 +185,9 @@ DEFINE_HOOK(&dMenu_Ring_c::textScaleHIO, dMenu_Ring_c__textScaleHIO);
 #endif
 DEFINE_HOOK_SYMBOL(dMenu_Ring_c__destructor_sig, void(dMenu_Ring_c*), dMenu_Ring_c__destructor);
 
+DEFINE_HOOK(&dMenu_Ring_c::_create, dMenu_Ring_c__create);
+DEFINE_HOOK(&dMenu_Ring_c::_move, dMenu_Ring_c__move);
+DEFINE_HOOK(&dMenu_Ring_c::_draw, dMenu_Ring_c__draw);
 DEFINE_HOOK(&dMenu_Ring_c::setActiveCursor, dMenu_Ring_c__setActiveCursor);
 DEFINE_HOOK(&dMenu_Ring_c::getItemMaxNum, dMenu_Ring_c__getItemMaxNum);
 DEFINE_HOOK(&dMenu_Ring_c::getItemNum, dMenu_Ring_c__getItemNum);
@@ -204,6 +206,8 @@ DEFINE_HOOK(&daObjLife_c::calcScale, daObjLife_c__calcScale);
 DEFINE_HOOK_SYMBOL("dComIfGs_getCollectSmell", u8(), getCollectSmell);
 
 DEFINE_HOOK(&dEvt_control_c::skipper, dEvt_control_c__skipper);
+
+DEFINE_HOOK(&daObjMasterSword_c::executeWait, daObjMasterSword_c__executeWait);
 
 namespace randomizer::ui {
 dialogSelectModeState g_dialogSelectModeState = SelectReady;
@@ -590,9 +594,9 @@ HookAction hookPreIsDungeonItem(ModContext*, void* args, void* retval, void*) {
         return HOOK_SKIP_ORIGINAL;
     case dSv_memBit_c::STAGE_BOSS_ENEMY: {
         // If we are in a dungeon or fighting a midboss, we don't want the boss being
-        // defeated to affect the gameplay.
+        // defeated to affect the gameplay. The check should still succeed in boss rooms.
         std::string stageName = dComIfGp_getStartStageName();
-        if (stageName.starts_with("D_MN")) {
+        if (stageName.starts_with("D_MN") && !stageName.ends_with("A")) {
             out = FALSE;
             return HOOK_SKIP_ORIGINAL;
         }
@@ -760,7 +764,7 @@ HookAction hookPreShopSeqDecideYes(ModContext*, void* args, void*, void*) {
     int item_no = 0;
 
     if (i_this->mFlow.getEventId(&item_no) == 1 && playerIsInRoomStage(3, "R_SP109")) {
-        const u16 key = static_cast<u16>((getStageID() << 8) | (item_no & 0xFF));
+        const u16 key = static_cast<u32>((getStageID() << 16) | (dStage_roomControl_c::getStayNo() << 8) | (item_no & 0xFF));
         if (randomizer_GetContext().mShopOverrides.contains(key)) {
             i_this->setSoldOutFlag();
         }
@@ -2363,30 +2367,26 @@ HookAction hookPreSwBallActionWait(ModContext*, void* args, void*, void*) {
     return HOOK_SKIP_ORIGINAL;
 }
 
-void hookPostDitemCreateInit(ModContext*, void* args, void*, void*) {
+void hookPostDitemExecute(ModContext*, void* args, void*, void*) {
     auto* i_this = mods::arg<daDitem_c*>(args, 0);
 
     // Certain items use field models that are too big to fit in link's hands so we want to scale
     // them down to fit.
-    f32 modelScale = 0.0f;
+
     switch (i_this->getDisplayItemNo()) {
     case dItemNo_Randomizer_MIRROR_PIECE_1_e:
     case dItemNo_Randomizer_MIRROR_PIECE_2_e:
     case dItemNo_Randomizer_MIRROR_PIECE_3_e:
     case dItemNo_Randomizer_MIRROR_PIECE_4_e:
-        modelScale = 0.05f;
+        i_this->scale.x = 0.05f;
         break;
     case dItemNo_Randomizer_MASTER_SWORD_e:
     case dItemNo_Randomizer_LIGHT_SWORD_e:
-        modelScale = 0.001f;
+        i_this->scale.x = 0.001f;
         break;
     default:
         return;
     }
-
-    i_this->setMaxScale(modelScale);
-    i_this->scale.setall(modelScale);
-    i_this->set_mtx();
 }
 
 void hookPostShopItemCreateInit(ModContext*, void* args, void*, void*) {
@@ -2406,103 +2406,6 @@ void hookPostShopItemCreateInit(ModContext*, void* args, void*, void*) {
         break;
     }
     default:
-        break;
-    }
-}
-
-// pretty ugly way of handling this, but oh well. basically, we reconstruct the actionTable
-// and use it to check that we're in the correct action before proceeding. then store info
-// about what level we're on, and use it in the post-hook to undo the flag that's normally set.
-daObjBossWarp_c* hookBossWarpDemoProc_patchActor = nullptr;
-int hookBossWarpDemoProc_nowLevel = -1;
-HookAction hookPreBossWarpDemoProc(ModContext*, void* args, void*, void*) {
-    auto* i_this = mods::arg<daObjBossWarp_c*>(args, 0);
-
-    hookBossWarpDemoProc_patchActor = nullptr;
-    hookBossWarpDemoProc_nowLevel = -1;
-
-    static const char* const actionTable[15] = {
-        "WAIT",
-        "APPEAR",
-        "DISAPPEAR",
-        "SCENE_CHG",
-        "STONE_FALL",
-        "STONE_MIDNA",
-        "WALK_TARGET1",
-        "APPEAR_END",
-        "STONE_DELETE",
-        "STONE_PUTAWAY",
-        "WCHECK",
-        "SETPOS",
-        "SCALING",
-        "STONE_SCALE",
-        "HEART_MOVE",
-    };
-
-    bool isRewardAction =
-        dComIfGp_evmng_getIsAddvance(i_this->mStaffId)
-        && dComIfGp_evmng_getMyActIdx(i_this->mStaffId, actionTable, 15, 0, 0) == 4;
-    if (!isRewardAction) {
-        return HOOK_CONTINUE;
-    }
-
-    // this was a static function in the original TU, so reconstructing it for use here
-    auto getNowLevel = []() {
-        static const char* const stages[9] = {
-            "D_MN05A",
-            "D_MN04A",
-            "D_MN01A",
-            "D_MN10A",
-            "D_MN11A",
-            "D_MN06A",
-            "D_MN07A",
-            "D_MN08A",
-            "D_MN01A",
-        };
-
-        for (int i = 0; i < 9; i++) {
-            if (std::strcmp(dComIfGp_getStartStageName(), stages[i]) == 0) {
-                return i;
-            }
-        }
-
-        return -1;
-    };
-
-    hookBossWarpDemoProc_patchActor = i_this;
-    hookBossWarpDemoProc_nowLevel = getNowLevel();
-    return HOOK_CONTINUE;
-}
-
-void hookPostBossWarpDemoProc(ModContext*, void* args, void*, void*) {
-    auto* i_this = mods::arg<daObjBossWarp_c*>(args, 0);
-    if (hookBossWarpDemoProc_patchActor != i_this) {
-        return;
-    }
-
-    int level = hookBossWarpDemoProc_nowLevel;
-    hookBossWarpDemoProc_patchActor = nullptr;
-    hookBossWarpDemoProc_nowLevel = -1;
-
-    // undo the flag that was set in the original function
-    switch (level) {
-    case 0:
-        dComIfGs_offCollectCrystal(0);
-        break;
-    case 1:
-        dComIfGs_offCollectCrystal(1);
-        break;
-    case 2:
-        dComIfGs_offCollectCrystal(2);
-        break;
-    case 4:
-        dComIfGs_offCollectMirror(1);
-        break;
-    case 5:
-        dComIfGs_offCollectMirror(2);
-        break;
-    case 6:
-        dComIfGs_offCollectMirror(3);
         break;
     }
 }
@@ -2587,26 +2490,230 @@ void hookPostObjZraRockCreate(ModContext*, void* args, void* retval, void*) {
     }
 }
 
-J2DPicture* g_dpadIcon{};
+// Things used for rando additional data
+struct ItemTexture {
+    J2DPicture* picture = nullptr;
+    u8 buffer[0xC00]{};
+};
+ItemTexture gmKeyIcon{};
+ItemTexture bedKeyIcon{};
+ItemTexture bigKeyIcon{};
+ItemTexture dungeonMapIcon{};
+ItemTexture compassIcon{};
+ItemTexture pumpkinIcon{};
+ItemTexture cheeseIcon{};
+J2DTextBox* itemWheelDunText = nullptr;
+J2DTextBox* itemWheelKeyText = nullptr;
+JUTFont* itemWheelTextFont = nullptr;
+bool shouldDisplayMenu = false;
+
+void hookPostMenuRingCreate(ModContext*, void*, void*, void*) {
+    itemWheelTextFont = mDoExt_getMesgFont();
+
+    // Setup our menu text
+    itemWheelDunText = JKR_NEW J2DTextBox();
+    itemWheelDunText->setFont(itemWheelTextFont);
+    itemWheelDunText->setFontSize(16.0f, 16.0f);
+    itemWheelDunText->setLineSpace(25.0f);
+    itemWheelKeyText = JKR_NEW J2DTextBox();
+    itemWheelKeyText->setFont(itemWheelTextFont);
+    itemWheelKeyText->setFontSize(16.0f, 16.0f);
+    itemWheelKeyText->setLineSpace(25.0f);
+
+    // Setup dungeon item picture icons
+    gmKeyIcon.picture = JKR_NEW J2DPicture();
+    bedKeyIcon.picture = JKR_NEW J2DPicture();
+    bigKeyIcon.picture = JKR_NEW J2DPicture();
+    dungeonMapIcon.picture = JKR_NEW J2DPicture();
+    compassIcon.picture = JKR_NEW J2DPicture();
+    pumpkinIcon.picture = JKR_NEW J2DPicture();
+    cheeseIcon.picture = JKR_NEW J2DPicture();
+
+    // Read dungeon item textures
+    dMeter2Info_readItemTexture(dItemNo_LV2_BOSS_KEY_e, &gmKeyIcon.buffer, gmKeyIcon.picture, NULL, NULL, NULL, NULL, NULL, NULL, -1);
+    dMeter2Info_readItemTexture(dItemNo_LV5_BOSS_KEY_e, &bedKeyIcon.buffer, bedKeyIcon.picture, NULL, NULL, NULL, NULL, NULL, NULL, -1);
+    dMeter2Info_readItemTexture(dItemNo_BOSS_KEY_e, &bigKeyIcon.buffer, bigKeyIcon.picture, NULL, NULL, NULL, NULL, NULL, NULL, -1);
+    dMeter2Info_readItemTexture(dItemNo_MAP_e, &dungeonMapIcon.buffer, dungeonMapIcon.picture, NULL, NULL, NULL, NULL, NULL, NULL, -1);
+    dMeter2Info_readItemTexture(dItemNo_COMPUS_e, &compassIcon.buffer, compassIcon.picture, NULL, NULL, NULL, NULL, NULL, NULL, -1);
+    dMeter2Info_readItemTexture(dItemNo_TOMATO_PUREE_e, &pumpkinIcon.buffer, pumpkinIcon.picture, NULL, NULL, NULL, NULL, NULL, NULL, -1);
+    dMeter2Info_readItemTexture(dItemNo_TASTE_e, &cheeseIcon.buffer, cheeseIcon.picture, NULL, NULL, NULL, NULL, NULL, NULL, -1);
+
+    // Get data to display on the menu
+    const u32 shadowsCount = numFusedShadows();
+    const u32 shardsCount = numMirrorShards();
+    const u8 ftKeyNum = getTempleKeysFound(0x10);
+    const u8 ftTotalKeyNum = 4;
+    const u8 gmKeyNum = getTempleKeysFound(0x11);
+    const u8 gmTotalKeyNum = 3;
+    const u8 lbtKeyNum = getTempleKeysFound(0x12);
+    const u8 lbtTotalKeyNum = 3;
+    const u8 agKeyNum = getTempleKeysFound(0x13);
+    const u8 agTotalKeyNum = 5;
+    const u8 sprKeyNum = getTempleKeysFound(0x14);
+    const u8 sprTotalKeyNum = 4;
+    const u8 totKeyNum = getTempleKeysFound(0x15);
+    const u8 totTotalKeyNum = 3;
+    const u8 citsKeyNum = getTempleKeysFound(0x16);
+    const u8 citsTotalKeyNum = 1;
+    const u8 potKeyNum = getTempleKeysFound(0x17);
+    const u8 potTotalKeyNum = 7;
+    const u8 hcKeyNum = getTempleKeysFound(0x18);
+    const u8 hcTotalKeyNum = 3;
+    const u8 campKeyNum = getTempleKeysFound(0xA);
+    const u8 campTotalKeyNum = 1;
+    bool hasFaronGateKey = dComIfGs_isStageSwitch(0x2, 0x14);
+    bool hasCoroGateKey = dComIfGs_isStageSwitch(0x2, 0xC);
+    bool hasGateKey = haveItem(dItemNo_BOSSRIDER_KEY_e);
+
+    // Create and set the text strings
+    char itemWheelTextBuf[300];
+    snprintf(itemWheelTextBuf, sizeof(itemWheelTextBuf), "Shadows: %d/3        Key Legend:\nShards: %d/4         Current (Total)\n\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n", shadowsCount, shardsCount, "Forest", "Mines", "Lakebed", "Arbiters", "Snowpeak", "Time", "City", "Palace", "Hyrule", "Desert", "Faron Gate", "Coro Gate", "Gate Keys");
+    itemWheelDunText->setString(itemWheelTextBuf);
+
+    snprintf(itemWheelTextBuf, sizeof(itemWheelTextBuf), "\n\n\n%d (%d)\n%d (%d)\n%d (%d)\n%d (%d)\n%d (%d)\n%d (%d)\n%d (%d)\n%d (%d)\n%d (%d)\n%d (%d)\n%s\n%s\n%s\n", ftKeyNum, ftTotalKeyNum, gmKeyNum, gmTotalKeyNum, lbtKeyNum, lbtTotalKeyNum, agKeyNum, agTotalKeyNum, sprKeyNum, sprTotalKeyNum, totKeyNum, totTotalKeyNum, citsKeyNum, citsTotalKeyNum, potKeyNum, potTotalKeyNum, hcKeyNum, hcTotalKeyNum, campKeyNum, campTotalKeyNum, getYesNoText(hasFaronGateKey), getYesNoText(hasCoroGateKey),getYesNoText(hasGateKey));
+    itemWheelKeyText->setString(itemWheelTextBuf);
+}
+
+void hookPostMenuRingMove(ModContext*, void*, void*, void*) {
+    // Check every frame if we've toggled displaying the menu
+    if (mDoCPd_c::getTrigStart(PAD_1)) {
+        shouldDisplayMenu = !shouldDisplayMenu;
+    }
+}
+
+HookAction hookPreMenuRingDraw(ModContext*, void* args, void*, void*) {
+    auto menuRing = mods::arg<dMenu_Ring_c*>(args, 0);
+
+    // Create the toggle text
+    J2DTextBox textbox;
+    JUtility::TColor white(255, 255, 255, 255);
+    textbox.setFont(itemWheelTextFont);
+    textbox.setFontSize(16.f, 16.f);
+    textbox.setLineSpace(16.f);
+    textbox.setString("Press Start\nto toggle\nadditional\ndata");
+    textbox.setCharColor(white);
+    textbox.setGradColor(white);
+    textbox.draw(menuRing->mCenterPosX + 465.f, menuRing->mCenterPosY + 157.f);
+
+    return HOOK_CONTINUE;
+}
+
+void hookPostMenuRingDraw(ModContext*, void* args, void* retval, void*) {
+    auto menuRing = mods::arg<dMenu_Ring_c*>(args, 0);
+
+    if (shouldDisplayMenu) {
+        const f32 ringPosX = menuRing->mCenterPosX;
+        const f32 ringPosY = menuRing->mCenterPosY;
+        f32 windowPosXOffset = 95.f;
+        f32 windowPosYOffset = 20.f;
+        GXColor colorBlk = {0, 0, 0, 255};
+
+        // Draw the background first
+        drawFilledRect(ringPosX + windowPosXOffset, ringPosY + windowPosYOffset, 305.f, 410.f, colorBlk);
+
+        windowPosXOffset += 7.f;
+        windowPosYOffset += 20.f;
+
+        // Draw the text
+        itemWheelDunText->draw(ringPosX + windowPosXOffset, ringPosY + windowPosYOffset);
+        itemWheelKeyText->draw(ringPosX + windowPosXOffset + 120.f, ringPosY + windowPosYOffset);
+
+        windowPosYOffset += 58.f;
+
+        // For each dungeon draw map, compass, and big key icons
+        for (int i = 0x10; i < 0x19; i++) {
+            if (dComIfGs_isDungeonItemBossKey(i)) {
+                if (i == 0x11) {
+                    gmKeyIcon.picture->draw(ringPosX + windowPosXOffset + 170.f, ringPosY + windowPosYOffset, 23.f, 23.f, false, false, false);
+                }
+                else if (i == 0x14) {
+                    bedKeyIcon.picture->draw(ringPosX + windowPosXOffset + 170.f, ringPosY + windowPosYOffset, 23.f, 23.f, false, false, false);
+                }
+                else {
+                    bigKeyIcon.picture->draw(ringPosX + windowPosXOffset + 170.f, ringPosY + windowPosYOffset, 23.f, 23.f, false, false, false);
+                }
+            }
+
+            if (dComIfGs_isDungeonItemMap(i)) {
+                dungeonMapIcon.picture->draw(ringPosX + windowPosXOffset + 195.f, ringPosY + windowPosYOffset, 23.f, 23.f, false, false, false);
+            }
+            if (dComIfGs_isDungeonItemCompass(i)) {
+                compassIcon.picture->draw(ringPosX + windowPosXOffset + 220.f, ringPosY + windowPosYOffset, 23.f, 23.f, false, false, false);
+            }
+
+            // For Snowpeak, draw pumpkin and cheese
+            if (i == 0x14) {
+                if (dComIfGs_isEventBit(TOLD_YETA_ABOUT_PUMPKIN)) {
+                    pumpkinIcon.picture->draw(ringPosX + windowPosXOffset + 245.f, ringPosY + windowPosYOffset, 23.f, 23.f, false, false, false);
+                }
+                if (dComIfGs_isEventBit(TOLD_YETA_ABOUT_CHEESE)) {
+                    cheeseIcon.picture->draw(ringPosX + windowPosXOffset + 270.f, ringPosY + windowPosYOffset, 23.f, 23.f, false, false, false);
+                }
+            }
+            windowPosYOffset += 25.f;
+        }
+    }
+}
+
+J2DPicture* dpadIcon{};
 void hookPostMenuRingTextScaleHIO(ModContext*, void* args, void*, void*) {
     auto menuRing = mods::arg<dMenu_Ring_c*>(args, 0);
     if (menuRing->mItemSlots[menuRing->mCurrentSlot] == 0x15) {
         // Draw d-pad icon to indicate switching between Ilia quest items
         if (getWarashibeItemCount() >= 2) {
-            if (g_dpadIcon == nullptr) {
-                g_dpadIcon = JKR_NEW J2DPicture((ResTIMG*)dComIfGp_getMain2DArchive()->getResource('TIMG', "font_51.bti"));
+            if (dpadIcon == nullptr) {
+                dpadIcon = JKR_NEW J2DPicture((ResTIMG*)dComIfGp_getMain2DArchive()->getResource('TIMG', "font_51.bti"));
             }
-            g_dpadIcon->setAlpha(menuRing->mAlphaRate * 255.0);
-            g_dpadIcon->draw(menuRing->mCenterPosX + 330.f, menuRing->mCenterPosY + 194.f, 30.f, 30.f, false, false, false);
+            dpadIcon->setAlpha(menuRing->mAlphaRate * 255.0);
+            dpadIcon->draw(menuRing->mCenterPosX + 330.f, menuRing->mCenterPosY + 194.f, 30.f, 30.f, false, false, false);
         }
     }
 }
 
 void hookPostMenuRingDestructor(ModContext*, void*, void*, void*) {
-    if (g_dpadIcon != nullptr) {
-        JKR_DELETE(g_dpadIcon);
-        g_dpadIcon = nullptr;
+    // Free our custom menu stuff
+    if (dpadIcon != nullptr) {
+        JKR_DELETE(dpadIcon);
+        dpadIcon = nullptr;
     }
+    if (itemWheelDunText != nullptr) {
+        JKR_DELETE(itemWheelDunText);
+        itemWheelDunText = nullptr;
+    }
+    if (itemWheelKeyText != nullptr) {
+        JKR_DELETE(itemWheelKeyText);
+        itemWheelKeyText = nullptr;
+    }
+    if (gmKeyIcon.picture != nullptr) {
+        JKR_DELETE(gmKeyIcon.picture);
+        gmKeyIcon.picture = nullptr;
+    }
+    if (bedKeyIcon.picture != nullptr) {
+        JKR_DELETE(bedKeyIcon.picture);
+        bedKeyIcon.picture = nullptr;
+    }
+    if (bigKeyIcon.picture != nullptr) {
+        JKR_DELETE(bigKeyIcon.picture);
+        bigKeyIcon.picture = nullptr;
+    }
+    if (dungeonMapIcon.picture != nullptr) {
+        JKR_DELETE(dungeonMapIcon.picture);
+        dungeonMapIcon.picture = nullptr;
+    }
+    if (compassIcon.picture != nullptr) {
+        JKR_DELETE(compassIcon.picture);
+        compassIcon.picture = nullptr;
+    }
+    if (pumpkinIcon.picture != nullptr) {
+        JKR_DELETE(pumpkinIcon.picture);
+        pumpkinIcon.picture = nullptr;
+    }
+    if (cheeseIcon.picture != nullptr) {
+        JKR_DELETE(cheeseIcon.picture);
+        cheeseIcon.picture = nullptr;
+    }
+    mDoExt_removeMesgFont();
+    itemWheelTextFont = nullptr;
 }
 
 void hookPostMenuRingSetActiveCursor(ModContext*, void* args, void*, void*) {
@@ -3130,6 +3237,15 @@ void hookReplaceEvtControlSkipper(ModContext*, void* args, void* retval, void*) 
     *static_cast<bool*>(retval) = doSkip;
 }
 
+void hookPostMasterSwordExecuteWait(ModContext*, void* args, void* retval, void*) {
+    auto objMasterSword = mods::arg<daObjMasterSword_c*>(args, 0);
+
+    if (fopAcM_checkCarryNow(objMasterSword)) {
+        dComIfGs_onTmpBit(0x820);
+        objMasterSword->actor_status = 0;
+    }
+}
+
 }
 
 ModResult initialize() {
@@ -3250,11 +3366,8 @@ ModResult initialize() {
     ADD_HOOK_POST(daObjSwBallC_c__Create, hookPostSwBallCreate);
     ADD_HOOK_PRE(daObjSwBallC_c__actionWait, hookPreSwBallActionWait);
 
-    ADD_HOOK_POST(daDitem_c__CreateInit, hookPostDitemCreateInit);
+    ADD_HOOK_POST(daDitem_c__execute, hookPostDitemExecute);
     ADD_HOOK_POST(daShopItem_c__CreateInit, hookPostShopItemCreateInit);
-
-    ADD_HOOK_PRE(daObjBossWarp_c__demoProc, hookPreBossWarpDemoProc);
-    ADD_HOOK_POST(daObjBossWarp_c__demoProc, hookPostBossWarpDemoProc);
 
     ADD_HOOK_PRE(mgRod_lure_heart, hookPreLureHeart);
     ADD_HOOK_POST(mgRod_lure_heart, hookPostLureHeart);
@@ -3270,6 +3383,10 @@ ModResult initialize() {
 
     ADD_HOOK_POST(dMenu_Ring_c__textScaleHIO, hookPostMenuRingTextScaleHIO);
     ADD_HOOK_POST(dMenu_Ring_c__destructor, hookPostMenuRingDestructor);
+    ADD_HOOK_POST(dMenu_Ring_c__create, hookPostMenuRingCreate);
+    ADD_HOOK_POST(dMenu_Ring_c__move, hookPostMenuRingMove);
+    ADD_HOOK_PRE(dMenu_Ring_c__draw, hookPreMenuRingDraw);
+    ADD_HOOK_POST(dMenu_Ring_c__draw, hookPostMenuRingDraw);
     ADD_HOOK_POST(dMenu_Ring_c__setActiveCursor, hookPostMenuRingSetActiveCursor);
     ADD_HOOK_POST(dMenu_Ring_c__getItemMaxNum, hookPostMenuRingGetItemMaxNum);
     ADD_HOOK_POST(dMenu_Ring_c__getItemNum, hookPostMenuRingGetItemNum);
@@ -3288,6 +3405,8 @@ ModResult initialize() {
     ADD_HOOK_POST(getCollectSmell, hookPostGetCollectSmell);
 
     ADD_HOOK_REPLACE(dEvt_control_c__skipper, hookReplaceEvtControlSkipper);
+
+    ADD_HOOK_POST(daObjMasterSword_c__executeWait, hookPostMasterSwordExecuteWait);
 
     return MOD_OK;
 }
@@ -3387,10 +3506,8 @@ ModResult uninstall() {
     mods::hook::uninstall<daObjSwBallC_c__Create>(svc_hook);
     mods::hook::uninstall<daObjSwBallC_c__actionWait>(svc_hook);
 
-    mods::hook::uninstall<daDitem_c__CreateInit>(svc_hook);
+    mods::hook::uninstall<daDitem_c__execute>(svc_hook);
     mods::hook::uninstall<daShopItem_c__CreateInit>(svc_hook);
-
-    mods::hook::uninstall<daObjBossWarp_c__demoProc>(svc_hook);
 
     mods::hook::uninstall<mgRod_lure_heart>(svc_hook);
     mods::hook::uninstall<mgRod_uki_catch>(svc_hook);
@@ -3402,6 +3519,9 @@ ModResult uninstall() {
 
     mods::hook::uninstall<dMenu_Ring_c__textScaleHIO>(svc_hook);
     mods::hook::uninstall<dMenu_Ring_c__destructor>(svc_hook);
+    mods::hook::uninstall<dMenu_Ring_c__create>(svc_hook);
+    mods::hook::uninstall<dMenu_Ring_c__move>(svc_hook);
+    mods::hook::uninstall<dMenu_Ring_c__draw>(svc_hook);
     mods::hook::uninstall<dMenu_Ring_c__setActiveCursor>(svc_hook);
     mods::hook::uninstall<dMenu_Ring_c__getItemMaxNum>(svc_hook);
     mods::hook::uninstall<dMenu_Ring_c__getItemNum>(svc_hook);
@@ -3420,6 +3540,8 @@ ModResult uninstall() {
     mods::hook::uninstall<getCollectSmell>(svc_hook);
 
     mods::hook::uninstall<dEvt_control_c__skipper>(svc_hook);
+
+    mods::hook::uninstall<daObjMasterSword_c__executeWait>(svc_hook);
 
     return MOD_OK;
 }
