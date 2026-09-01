@@ -95,12 +95,32 @@ constexpr std::array kMenuScalingModeLabels = {
     "Dusklight",
 };
 
+constexpr std::array kWalletSizes = {
+    "Default", 
+    "HD", 
+    "Large", 
+    "Uncapped"
+};
+
+constexpr std::array kAlwaysGreatspinModes = {
+    "Off",
+    "After Learning Skilll",
+    "Always",
+};
+
 constexpr std::array kMagicArmorModes = {
     "Normal",
     "On Damage",
     "Double Defense",
     "Invincible",
     "Cosmetic",
+};
+
+constexpr std::array kLetterboxModes = {
+    "Off",
+    "On",
+    "Only During Gameplay",
+    "Only During Cutscenes",
 };
 
 bool try_parse_backend(std::string_view backend, AuroraBackend& outBackend) {
@@ -895,6 +915,38 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                             "during some cutscenes, particularly on ultra-wide displays. "
                             "Visuals beyond the original intended framing may appear buggy.",
             });
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Disable Letterboxing",
+                .getValue =
+                    [] {
+                        return kLetterboxModes[static_cast<u8>(getSettings().game.disableLetterboxing.getValue())];
+                    },
+                .isModified =
+                    [] {
+                        return getSettings().game.disableLetterboxing.getValue() !=
+                               getSettings().game.disableLetterboxing.getDefaultValue();
+                    },
+            }),
+            rightPane, [](Pane& pane) {
+                for (int i = 0; i < static_cast<int>(kLetterboxModes.size()); i++) {
+                    pane.add_button({
+                            .text = kLetterboxModes[i],
+                            .isSelected =
+                                [i] {
+                                    return getSettings().game.disableLetterboxing.getValue() == static_cast<LetterboxMode>(i);
+                                },
+                        })
+                        .on_pressed([i] {
+                            mDoAud_seStartMenu(kSoundItemChange);
+                            getSettings().game.disableLetterboxing.setValue(static_cast<LetterboxMode>(i));
+                            config::save();
+                        });
+                }
+                pane.add_rml(
+                    "<br/>Disable the top and bottom black bars during L-targeting, aiming, "
+                    "cutscenes, dialogue, etc.");
+            });
     });
 
     add_tab("Input", [this](Rml::Element* content) {
@@ -1200,10 +1252,94 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Hearts will never drop from enemies, pots, and various other places.");
 
         leftPane.add_section("Quality of Life");
-        addOption("Bigger Wallets", getSettings().game.biggerWallets,
-            "Wallet sizes are like in the HD version. (500, 1000, 2000)");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Equipment Deselection",
+                .getValue = [] {
+                    int count = 0;
+                    int total = 0;
+                    auto check = [&](bool enabled) { total++; if (enabled) count++; };
+                    check(getSettings().game.enableDeselectSwords.getValue());
+                    check(getSettings().game.enableDeselectShields.getValue());
+                    check(getSettings().game.enableDeselectClothes.getValue());
+                    static thread_local char buf[12];
+                    std::snprintf(buf, sizeof(buf), "%d / %d", count, total);
+                    return Rml::String{buf};
+                },
+                .isModified = [] {
+                    return getSettings().game.enableDeselectSwords.getValue() !=
+                               getSettings().game.enableDeselectSwords.getDefaultValue()
+                           || getSettings().game.enableDeselectShields.getValue() !=
+                                  getSettings().game.enableDeselectShields.getDefaultValue()
+                           || getSettings().game.enableDeselectClothes.getValue() !=
+                                  getSettings().game.enableDeselectClothes.getDefaultValue();
+                },
+            }),
+            rightPane, [](Pane& pane) {
+                pane.clear();
+                pane.add_rml(
+                    "Allows deselection of equipped items from the Collections menu.");
+
+                auto addSubToggle = [&pane](const Rml::String& text, ConfigVar<bool>& var) {
+                    pane.add_button({
+                        .text = text,
+                        .isSelected = [&var] { return var.getValue(); },
+                    }).on_pressed([&var] {
+                        mDoAud_seStartMenu(kSoundItemChange);
+                        var.setValue(!var.getValue());
+                        config::save();
+                    });
+                };
+
+                addSubToggle("Deselect Swords", getSettings().game.enableDeselectSwords);
+                addSubToggle("Deselect Shields", getSettings().game.enableDeselectShields);
+                addSubToggle("Deselect Clothes", getSettings().game.enableDeselectClothes);
+            });
+        
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Wallet Sizes",
+                .getValue =
+                    [] {
+                        const int idx = getSettings().game.walletSizes.getValue();
+                        return Rml::String{kWalletSizes[idx]};
+                    },
+                .isModified =
+                    [] {
+                        const auto& walletSizes = getSettings().game.walletSizes;
+                        return walletSizes.getValue() != walletSizes.getDefaultValue();
+                    },
+            }),
+            rightPane, [](Pane& pane) {
+                for (int i = 0; i < static_cast<int>(kWalletSizes.size()); ++i) {
+                    pane.add_button(
+                            {
+                                .text = kWalletSizes[i],
+                                .isSelected =
+                                    [i] { return getSettings().game.walletSizes.getValue() == i;
+                                    },
+                            })
+                        .on_pressed([i] {
+                            mDoAud_seStartMenu(kSoundItemChange);
+                            getSettings().game.walletSizes.setValue(i);
+                            config::save();
+                        });
+                }
+                pane.add_rml(R"(
+                    <br/>Modifies the maximum number of rupees the wallets can hold. 
+                    <ul style="display: block; margin-left: 20px;">
+                        <li style="display: block; margin-bottom: 4px;">• Default: 300, 600, 1 000</li>
+                        <li style="display: block; margin-bottom: 4px;">• HD: 500, 1 000, 2 000</li>
+                        <li style="display: block; margin-bottom: 4px;">• Large: 1 000, 5 000, 9 999</li>
+                        <li style="display: block; margin-bottom: 4px;">• Uncapped: 9 999</li>
+                    </ul>
+                )");
+            });
+
         addOption("Disable Rupee Cutscenes", getSettings().game.disableRupeeCutscenes,
             "Rupees will not play cutscenes after you have collected them the first time.");
+        addSpeedrunDisabledOption("Faster Scene Transitions", getSettings().game.fastTransitions,
+            "Reduces how long the transitions take when changing maps.");
         addOption("Faster Climbing", getSettings().game.fastClimbing,
             "Quicker climbing on ladders and vines like the HD version.");
         addOption("Faster Tears of Light", getSettings().game.fastTears,
@@ -1214,6 +1350,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Skips the delay when writing to the Memory Card.");
         addOption("Hold B for Instant Text", getSettings().game.instantText,
             "Makes text scroll immediately by holding B.");
+        addSpeedrunDisabledOption("Hold Button to Mash", getSettings().game.holdToMash,
+            "Hold the indicated button to mash automatically.");
         addOption("No Climbing Miss Animation", getSettings().game.noMissClimbing,
             "Prevents Link from playing a struggle animation when grabbing ledges or "
             "climbing on vines.");
@@ -1231,6 +1369,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Allows Wolf Link to howl and change the time of day.");
         addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,
             "Transform instantly by pressing R and Y simultaneously.");
+        addOption("Disable Transform on Warp", getSettings().game.disableTransformOnWarp,
+            "Disable the forced transformation into wolf before warping.");
         addOption("Aiming Reticle", getSettings().game.aimingReticle,
             "Shows the aiming reticle for bow and slingshot.");
 
@@ -1286,16 +1426,24 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         };
 
         leftPane.add_section("Resources");
-        addCheat("Infinite Hearts", getSettings().game.infiniteHearts, "Keeps your health full.");
-        addCheat(
-            "Infinite Arrows", getSettings().game.infiniteArrows, "Keeps your arrow count full.");
-        addCheat("Infinite Seeds", getSettings().game.infiniteSeeds, "Keeps your slingshot pellets (seeds) full.");
-        addCheat("Infinite Bombs", getSettings().game.infiniteBombs, "Keeps all bomb bags full.");
-        addCheat("Infinite Oil", getSettings().game.infiniteOil, "Keeps your lantern oil full.");
-        addCheat("Infinite Oxygen", getSettings().game.infiniteOxygen,
+        addCheat("Infinite Hearts", getSettings().game.infiniteHearts, 
+            "Keeps your health full.");
+        addCheat("Infinite Arrows", getSettings().game.infiniteArrows, 
+            "Keeps your arrow count full.");
+        addCheat("Infinite Seeds", getSettings().game.infiniteSeeds, 
+            "Keeps your slingshot pellets (seeds) full.");
+        addCheat("Infinite Bombs", getSettings().game.infiniteBombs, 
+            "Keeps all bomb bags full.");
+        addCheat("Infinite Oil", getSettings().game.infiniteOil, 
+            "Keeps your lantern oil full.");
+        addCheat("Infinite Oxygen", getSettings().game.infiniteOxygen, 
             "Keeps your underwater oxygen meter full.");
-        addCheat(
-            "Infinite Rupees", getSettings().game.infiniteRupees, "Keeps your rupee count full.");
+        addCheat("Infinite Rupees", getSettings().game.infiniteRupees, 
+            "Keeps your rupee count full.");
+        addCheat("Infinite Bottle Contents", getSettings().game.infiniteBottle, 
+            "Using the contents of a bottle does not consume them.");
+        addCheat("Infinite Fishing Bait", getSettings().game.infiniteBait,
+            "Catching a fish while bobber fishing with bait does not consume the bait.");
         addCheat("No Item Timer", getSettings().game.enableIndefiniteItemDrops,
             "Item drops such as rupees and hearts will never disappear after they drop.");
 
@@ -1304,12 +1452,46 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Moon Jump (R+A)", getSettings().game.moonJump, "Hold R and A to rise into the air.");
         addCheat("Super Clawshot", getSettings().game.superClawshot,
             "Extends Clawshot behavior beyond the normal game rules.");
-        addCheat("Always Greatspin", getSettings().game.alwaysGreatspin,
-            "Allows the Great Spin attack without requiring full health.");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Always Greatspin",
+                .getValue =
+                    [] {
+                        return kAlwaysGreatspinModes[static_cast<u8>(
+                            getSettings().game.alwaysGreatspin.getValue())];
+                    },
+                .isDisabled = [] { return getSettings().game.speedrunMode.getValue(); },
+                .isModified =
+                    [] {
+                        return getSettings().game.alwaysGreatspin.getValue() !=
+                               getSettings().game.alwaysGreatspin.getDefaultValue();
+                    },
+            }),
+            rightPane, [](Pane& pane) {
+                for (int i = 0; i < static_cast<int>(kAlwaysGreatspinModes.size()); i++) {
+                    pane.add_button({
+                            .text = kAlwaysGreatspinModes[i],
+                            .isSelected =
+                                [i] {
+                                    return getSettings().game.alwaysGreatspin.getValue() ==
+                                           static_cast<AlwaysGreatspinMode>(i);
+                                },
+                        })
+                        .on_pressed([i] {
+                            mDoAud_seStartMenu(kSoundItemChange);
+                            getSettings().game.alwaysGreatspin.setValue(
+                                static_cast<AlwaysGreatspinMode>(i));
+                            config::save();
+                        });
+                }
+                pane.add_rml("<br/>Allows the Great Spin attack without requiring full health.");
+            });
         addCheat("Fast Iron Boots", getSettings().game.enableFastIronBoots,
             "Speeds up movement while heavy, including wearing the Iron Boots, holding the Ball and Chain, wearing Magic Armor without rupees, etc.");
         addCheat("Can Transform Anywhere", getSettings().game.canTransformAnywhere,
             "Allows transforming even if NPCs are looking.");
+        addCheat("Unrestricted Items", getSettings().game.unrestrictedItems,
+            "Removes most restrictions on when and where equipped items can be used.");
         addCheat("Fast Roll", getSettings().game.fastRoll,
             "Makes Link's roll animation and movement twice as fast.");
         addCheat("Fast Spinner", getSettings().game.fastSpinner,
