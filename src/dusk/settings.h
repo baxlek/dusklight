@@ -214,9 +214,8 @@ struct UserSettings {
         ConfigVar<bool> enhancedMapMenus;
         ConfigVar<bool> disableTransformOnWarp;
         ConfigVar<bool> aimingReticle;
-        ConfigVar<bool> enableDeselectSwords;
-        ConfigVar<bool> enableDeselectShields;
-        ConfigVar<bool> enableDeselectClothes;
+        ConfigVar<bool> unequipShields;
+
 
         // Preferences
         ConfigVar<bool> enableMirrorMode;
