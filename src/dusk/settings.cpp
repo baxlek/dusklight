@@ -62,9 +62,7 @@ UserSettings g_userSettings = {
         .enhancedMapMenus {"game.enhancedMapMenus", false},
         .disableTransformOnWarp {"game.disableTransformOnWarp", false},
         .aimingReticle {"game.aimingReticle", false},
-        .enableDeselectSwords {"game.enableDeselectSwords", false},
-        .enableDeselectShields {"game.enableDeselectShields", false},
-        .enableDeselectClothes {"game.enableDeselectClothes", false},
+        .unequipShield {"game.unequipShield", false},
 
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
@@ -299,9 +297,7 @@ void registerSettings() {
     Register(g_userSettings.game.enhancedMapMenus);
     Register(g_userSettings.game.disableTransformOnWarp);
     Register(g_userSettings.game.aimingReticle);
-    Register(g_userSettings.game.enableDeselectSwords);
-    Register(g_userSettings.game.enableDeselectShields);
-    Register(g_userSettings.game.enableDeselectClothes);
+    Register(g_userSettings.game.unequipShield);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
     Register(g_userSettings.game.invertCameraYAxis);
