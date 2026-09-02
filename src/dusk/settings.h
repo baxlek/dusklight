@@ -357,6 +357,9 @@ UserSettings& getSettings();
 
 void registerSettings();
 
+void applyInternalResolutionScale(int scale);
+void applyResampler(Resampler resampler);
+
 inline bool isLetterboxingDisabled(bool inCutscene) {
     const auto mode = getSettings().game.disableLetterboxing.getValue();
     return mode == LetterboxMode::On ||
