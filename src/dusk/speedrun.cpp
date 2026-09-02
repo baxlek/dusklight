@@ -58,6 +58,10 @@ void resetForSpeedrunMode() {
     getSettings().game.damageMultiplier.setSpeedrunValue(1);
     getSettings().game.instantDeath.setSpeedrunValue(false);
     getSettings().game.noHeartDrops.setSpeedrunValue(false);
+    getSettings().game.holdToMash.sumo.setSpeedrunValue(false);
+    getSettings().game.holdToMash.swimming.setSpeedrunValue(false);
+    getSettings().game.holdToMash.twilitBloat.setSpeedrunValue(false);
+    getSettings().game.holdToMash.ganondorf.setSpeedrunValue(false);
     getSettings().game.autoSave.setSpeedrunValue(false);
     getSettings().game.sunsSong.setSpeedrunValue(false);
 
@@ -71,9 +75,10 @@ void resetForSpeedrunMode() {
     getSettings().game.enableIndefiniteItemDrops.setSpeedrunValue(false);
     getSettings().game.moonJump.setSpeedrunValue(false);
     getSettings().game.superClawshot.setSpeedrunValue(false);
-    getSettings().game.alwaysGreatspin.setSpeedrunValue(false);
+    getSettings().game.alwaysGreatspin.setSpeedrunValue(AlwaysGreatspinMode::OFF);
     getSettings().game.enableFastIronBoots.setSpeedrunValue(false);
     getSettings().game.canTransformAnywhere.setSpeedrunValue(false);
+    getSettings().game.unrestrictedItems.setSpeedrunValue(false);
     getSettings().game.fastRoll.setSpeedrunValue(false);
     getSettings().game.fastSpinner.setSpeedrunValue(false);
     getSettings().game.armorRupeeDrain.setSpeedrunValue(MagicArmorMode::NORMAL);
