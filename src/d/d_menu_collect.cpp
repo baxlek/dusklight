@@ -1402,7 +1402,7 @@ void dMenu_Collect2D_c::changeShield() {
             }
 #if TARGET_PC
             else if (dusk::getSettings().game.unequipShield) {
-                unequipShield();
+                deselectShield();
             }
 #endif
         } else if (dComIfGs_isItemFirstBit(dItemNo_WOOD_SHIELD_e)) {
@@ -1416,7 +1416,7 @@ void dMenu_Collect2D_c::changeShield() {
             }
 #if TARGET_PC
             else if (dusk::getSettings().game.unequipShield) {
-                unequipShield();
+                deselectShield();
             }
 #endif
         }
@@ -1431,7 +1431,7 @@ void dMenu_Collect2D_c::changeShield() {
         }
 #if TARGET_PC
         else if (dusk::getSettings().game.unequipShield) {
-            unequipShield();
+            deselectShield();
         }
 #endif
         break;
