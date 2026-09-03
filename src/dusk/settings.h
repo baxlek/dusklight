@@ -214,7 +214,7 @@ struct UserSettings {
         ConfigVar<bool> enhancedMapMenus;
         ConfigVar<bool> disableTransformOnWarp;
         ConfigVar<bool> aimingReticle;
-        ConfigVar<bool> unequipShields;
+        ConfigVar<bool> unequipShield;
 
 
         // Preferences
