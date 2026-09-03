@@ -55,11 +55,6 @@ void daObjMasterSword_c::executeWait() {
 
     if (fopAcM_checkCarryNow(this)) {
         dMeter2Info_setCloth(dItemNo_WEAR_KOKIRI_e, false);
-#if TARGET_PC
-        if (dusk::getSettings().game.enableDeselectClothes) {
-            daPy_getPlayerActorClass()->setClothesChange(0);
-        }
-#endif
         fopAcM_orderMapToolEvent(this, getEventID(), 0xFF, 0xFFFF, 1, 0);
     }
 }
