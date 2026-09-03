@@ -753,7 +753,7 @@ int daSpinner_c::execute() {
         } else {
             current.pos = field_0xaa4;
 
-            IF_DUSK(const bool holdToMash = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash, false));)
+            IF_DUSK(const bool holdToMash = DUSK_IF_ELSE(dusk::getSettings().game.holdToMash, false);)
             if (mSpinnerTag != TAG_END) {
                 if (!dComIfGp_event_runCheck() && (holdToMash ? mDoCPd_c::getHoldA(PAD_1) : mTrigJump)) {
                     field_0xa82 += 0x200;
