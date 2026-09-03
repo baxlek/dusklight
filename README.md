@@ -1,14 +1,10 @@
 This branch includes the following unmerged PRs:
 <br/>
-"Equipment Deselection Toggles" by xiedada05
-<br/>
 "Uncapped Wallets" by DarkZant
 <br/>
 "Infinite Bottle Contents & Infinite Fishing Bait" by DarkZant
 <br/>
 "Faster Scene Transitions" by t0mtee
-<br/>
-"Can Transform Anywhere fix" by baxlek
 <br/>
 "Additional Always Greatspin Option" by baxlek
 <br/>
