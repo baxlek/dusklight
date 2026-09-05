@@ -2654,7 +2654,8 @@ public:
     int procBottleSwing();
     int procBottleGetInit(BOOL);
     int procBottleGet();
-    BOOL checkWaterInKandelaarOffset(f32);
+    BOOL checkWaterInKandelaarOffset(f32) IF_DUSK(const);
+IF_DUSK(BOOL checkLanternIgnoresWater() const;)
     void checkWaterInKandelaar(f32);
     void offKandelaarModel();
     int kandelaarModelCallBack();
