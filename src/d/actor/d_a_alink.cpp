@@ -4710,7 +4710,7 @@ int daAlink_c::setStartProcInit() {
 
         if (mEquipItem == 0
 #if TARGET_PC
-            || (!dusk::getSettings().game.unrestrictedItems.getValue() && (!checkCastleTownUseItem(mEquipItem) 
+            || (!dusk::getSettings().game.unrestrictedItems.getValue() && (!checkCastleTownUseItem(mEquipItem)
 #else
             || !checkCastleTownUseItem(mEquipItem)
 #endif
