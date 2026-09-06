@@ -4313,7 +4313,9 @@ int daAlink_c::createHeap() {
         return 0;
     }
 
-    JKRReadIdxResource(mFaceBckHeap.getBuffer(), 0xC00, dRes_ID_ALANM_BCK_FAT_e, dComIfGp_getAnmArchive());
+    IF_DUSK(mFaceBckHeap.reserveBuffer(dRes_ID_ALANM_BCK_FAT_e);)
+    JKRReadIdxResource(mFaceBckHeap.getBuffer(), DUSK_IF_ELSE(mFaceBckHeap.getBufferSize(), 0xC00),
+                       dRes_ID_ALANM_BCK_FAT_e, dComIfGp_getAnmArchive());
     J3DAnmTransform* bck = (J3DAnmTransform*)J3DAnmLoaderDataBase::load(mFaceBckHeap.getBuffer());
     if (!mFaceBck.init(bck, FALSE, J3DFrameCtrl::EMode_LOOP, 1.0f, 0, -1, false)) {
         return 0;
@@ -5094,7 +5096,8 @@ int daAlink_c::create() {
     setAttentionPos();
     setItemActor();
 
-    if ((dComIfGs_getLastSceneMode() & 0x400000) && !checkWolf() && !checkNotHeavyBootsStage() &&
+    if ((dComIfGs_getLastSceneMode() & 0x400000) && !checkWolf() && (!checkNotHeavyBootsStage()
+IF_DUSK(|| dusk::getSettings().game.unrestrictedItems.getValue())) &&
         !isHorseStart && !isEnteringLV7)
     {
         setHeavyBoots(1);
@@ -11884,7 +11887,9 @@ BOOL daAlink_c::checkItemAction() {
             return true;
         }
 
-        if (!checkFishingRodItem(mEquipItem) || !(mWaterY - current.pos.y > 70.0f)) {
+        if (!checkFishingRodItem(mEquipItem) || !(mWaterY - current.pos.y > 70.0f)
+    IF_DUSK(|| (dusk::getSettings().game.unrestrictedItems.getValue() &&
+            mLinkAcch.ChkGroundHit() && !checkNoResetFlg0(FLG0_SWIM_UP)))) {
             onResetFlg1(RFLG0_FISHINGROD_USE_ACCEPT);
 
             if (checkReadyItem() && (itemTrigger() || (checkBoomerangCatchAnime() && itemButton()))) {
@@ -14322,7 +14327,11 @@ BOOL daAlink_c::checkMagicArmorWearAbility() const {
 
 J3DModelData* daAlink_c::loadAramBmd(u16 i_resIdx, u32 i_bufSize) {
     JKRArchive* anmArchive = dComIfGp_getAnmArchive();
+#if TARGET_PC
+    u8* tmpBuffer = (u8*)mItemHeap[field_0x2fa0].allocTempBuffer(i_resIdx, &i_bufSize);
+#else
     u8* tmpBuffer = JKR_NEW_ARRAY_ARGS(u8, i_bufSize, 0x20);
+#endif
 
     JKRReadIdxResource(tmpBuffer, i_bufSize, i_resIdx, anmArchive);
     #if DEBUG
@@ -14343,7 +14352,11 @@ J3DModelData* daAlink_c::loadAramBmd(u16 i_resIdx, u32 i_bufSize) {
 }
 
 void* daAlink_c::loadAram(u16 i_resIdx, u32 i_bufSize) {
+#if TARGET_PC
+    u8* tmpBuffer = (u8*)mItemHeap[field_0x2fa0].allocTempBuffer(i_resIdx, &i_bufSize);
+#else
     u8* tmpBuffer = JKR_NEW_ARRAY_ARGS(u8, i_bufSize, 0x20);
+#endif
     JKRReadIdxResource(tmpBuffer, i_bufSize, i_resIdx, dComIfGp_getAnmArchive());
     #if DEBUG
     daPy_aramBufferCheck(tmpBuffer, i_bufSize);
@@ -14599,6 +14612,8 @@ int daAlink_c::checkNewItemChange(u8 i_selItemIdx) {
     if (checkSpinnerRide()
         || sel_item == dItemNo_BOMB_BAG_LV1_e
 #if TARGET_PC
+        || ((checkModeFlg(0x40000) || checkNoResetFlg0(FLG0_WATER_IN_MOVE)) && !checkAcceptUseItemInWater(sel_item))
+        || (checkModeFlg(0x40000) && sel_item == dItemNo_WATER_BOMB_e)
         || (!dusk::getSettings().game.unrestrictedItems.getValue()
         && (((sel_item == dItemNo_KANTERA_e || checkOilBottleItem(sel_item)) && checkWaterInKandelaarOffset(mWaterY))
 #else
@@ -14606,8 +14621,10 @@ int daAlink_c::checkNewItemChange(u8 i_selItemIdx) {
 #endif
         || (checkCanoeRide() && checkStageName("F_SP127"))
         || checkCloudSea()
+#if !TARGET_PC
         || ((checkModeFlg(0x40000) || checkNoResetFlg0(FLG0_WATER_IN_MOVE)) && !checkAcceptUseItemInWater(sel_item))
         || (checkModeFlg(0x40000) && sel_item == dItemNo_WATER_BOMB_e)
+#endif
         || !checkCastleTownUseItem(sel_item)
         || (checkBoardRide() && sel_item != 0x103)
         || (checkModeFlg(0x400) && (sel_item == dItemNo_EMPTY_BOTTLE_e || sel_item == dItemNo_POKE_BOMB_e || sel_item == dItemNo_IRONBALL_e || sel_item == dItemNo_COPY_ROD_e || checkFishingRodItem(sel_item)))
@@ -14721,7 +14738,12 @@ int daAlink_c::checkNewItemChange(u8 i_selItemIdx) {
         if ((checkBombItem(sel_item) && !dComIfGp_getSelectItemNum(i_selItemIdx))
             || ((sel_item == dItemNo_NORMAL_BOMB_e || sel_item == dItemNo_WATER_BOMB_e) && mActiveBombNum >= 3)
             || (sel_item == dItemNo_IRONBALL_e && (!mLinkAcch.ChkGroundHit() || checkModeFlg(0x70C52)))
+#if TARGET_PC
+            || (sel_item == dItemNo_KANTERA_e && (checkEndResetFlg1(ERFLG1_UNK_4)
+            || (!checkLanternIgnoresWater() && (checkNoResetFlg0(FLG0_WATER_IN_MOVE) || checkModeFlg(0x40000))))))
+#else
             || (sel_item == dItemNo_KANTERA_e && (checkNoResetFlg0(FLG0_WATER_IN_MOVE) || checkEndResetFlg1(ERFLG1_UNK_4) || checkModeFlg(0x40000))))
+#endif
         {
             return ITEM_PROC_NONE;
         }
@@ -14865,7 +14887,7 @@ void daAlink_c::setLight() {
         offNoResetFlg1(FLG1_UNK_80);
     } else {
         if (checkNoResetFlg2(FLG2_UNK_1) || checkEndResetFlg1(ERFLG1_UNK_4)) {
-            if (dComIfGs_getOil() != 0 && !checkNoResetFlg2(FLG2_KANDELAAR_LIGHT_OFF) && ((checkNoResetFlg2(FLG2_UNK_1) && !checkFreezeDamage()) || checkEndResetFlg1(ERFLG1_UNK_10))) {
+            if (dComIfGs_getOil() != 0 && IF_DUSK(!(checkLanternIgnoresWater() && checkWaterInKandelaarOffset(mWaterY)) &&) !checkNoResetFlg2(FLG2_KANDELAAR_LIGHT_OFF) && ((checkNoResetFlg2(FLG2_UNK_1) && !checkFreezeDamage()) || checkEndResetFlg1(ERFLG1_UNK_10))) {
                 onNoResetFlg1(FLG1_UNK_80);
 
                 if (!checkEventRun() && !checkEndResetFlg1(ERFLG1_UNK_4)) {
@@ -18250,7 +18272,9 @@ int daAlink_c::execute() {
 
         if (checkEquipHeavyBoots()) {
             int itemButton = checkItemSetButton(dItemNo_HVY_BOOTS_e);
-            if (itemButton == 2 || checkNotHeavyBootsStage()) {
+            if (itemButton == 2 || (checkNotHeavyBootsStage()
+        IF_DUSK(&& !dusk::getSettings().game.unrestrictedItems.getValue())))
+            {
                 if (!dComIfGp_checkPlayerStatus1(0, 0x10000) || !checkHookshotRoofLv7Boss()) {
                     setHeavyBoots(0);
                 }
