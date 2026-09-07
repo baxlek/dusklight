@@ -1197,7 +1197,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                         .on_pressed([i] {
                             mDoAud_seStartMenu(kSoundItemChange);
                             getSettings().game.walletSizes.setValue(i);
-                            config::Save();
+                            config::save();
                         });
                 }
                 pane.add_rml(R"(
