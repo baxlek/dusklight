@@ -39,6 +39,7 @@
 
 #if TARGET_PC
 #include "dusk/menu_pointer.h"
+#include "dusk/settings.h"
 #include "dusk/utilities.hpp"
 #endif
 
@@ -1373,6 +1374,16 @@ void dMenu_Collect2D_c::changeShield() {
                                          0);
                 dMeter2Info_set2DVibration();
             }
+#if TARGET_PC
+            else if (dusk::getSettings().game.deselectShields) {
+                dMeter2Info_setShield(dItemNo_NONE_e, false);
+                setEquipItemFrameColorShield(-1);
+                daAlink_getAlinkActorClass()->setShieldChange();
+                Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
+                                         0);
+                dMeter2Info_set2DVibration();
+            }
+#endif
         } else if (dComIfGs_isItemFirstBit(dItemNo_WOOD_SHIELD_e)) {
             if (dComIfGs_getSelectEquipShield() != dItemNo_WOOD_SHIELD_e) {
                 dMeter2Info_setShield(dItemNo_WOOD_SHIELD_e, false);
@@ -1382,6 +1393,16 @@ void dMenu_Collect2D_c::changeShield() {
                                          0);
                 dMeter2Info_set2DVibration();
             }
+#if TARGET_PC
+            else if (dusk::getSettings().game.deselectShields) {
+                dMeter2Info_setShield(dItemNo_NONE_e, false);
+                setEquipItemFrameColorShield(-1);
+                daAlink_getAlinkActorClass()->setShieldChange();
+                Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
+                                         0);
+                dMeter2Info_set2DVibration();           
+            }
+#endif
         }
         break;
     case 4:
@@ -1392,6 +1413,15 @@ void dMenu_Collect2D_c::changeShield() {
             Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
             dMeter2Info_set2DVibration();
         }
+#if TARGET_PC
+        else if (dusk::getSettings().game.deselectShields) {
+            dMeter2Info_setShield(dItemNo_NONE_e, false);
+            setEquipItemFrameColorShield(-1);
+            daAlink_getAlinkActorClass()->setShieldChange();
+            Z2GetAudioMgr()->seStart(Z2SE_SY_ITEM_SET_X, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            dMeter2Info_set2DVibration();      
+        }
+#endif
         break;
     }
 }
@@ -1672,6 +1702,11 @@ void dMenu_Collect2D_c::setEquipItemFrameColorShield(int i_frame) {
             }
         }
     } else {
+#if TARGET_PC
+        if (dusk::getSettings().game.deselectShields) {
+            mEquippedShield = dComIfGs_getSelectEquipShield();
+        }
+#endif
         for (int i = 0; i < 2; i++) {
             if (i == i_frame && field_0x22d[i + 3][1] != 0) {
                 static_cast<J2DPicture*>(mpScreen->search(tag[i]))
