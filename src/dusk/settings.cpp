@@ -57,6 +57,7 @@ UserSettings g_userSettings = {
         .instantText {"game.instantText", false},
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
+        .deselectShields {"game.deselectShields", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
         .aimingReticle {"game.aimingReticle", false},
 
@@ -284,6 +285,7 @@ void registerSettings() {
     Register(g_userSettings.game.instantText);
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
+    Register(g_userSettings.game.deselectShields);
     Register(g_userSettings.game.enhancedMapMenus);
     Register(g_userSettings.game.aimingReticle);
     Register(g_userSettings.game.enableMirrorMode);
