@@ -50,6 +50,11 @@ public:
     void changeSword();
     void changeShield();
     void changeClothe();
+#if TARGET_PC
+    void deselectSword();
+    void deselectShield();
+    void deselectClothes();
+#endif
     void setArrowMaxNum(u8);
 #if TARGET_PC
     void setWalletSizeNum(u16);
