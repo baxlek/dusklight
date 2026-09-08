@@ -61,9 +61,9 @@ enum class MenuScaling : u8 {
 };
 
 enum class SuperClawshotMode : u8 {
-    OFF = 0
-    ATTACH = 1
-    BOTH = 2
+    OFF = 0,
+    ATTACH = 1,
+    BOTH = 2,
 };
     
 enum class MagicArmorMode : u8 {
