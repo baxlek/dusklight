@@ -131,7 +131,7 @@ struct ConfigEnumRange<MenuScaling> {
 };
 
 template <>
-struct ConfigEnumRange<SuperlawshotMode> {
+struct ConfigEnumRange<SuperClawshotMode> {
     static constexpr auto min = SuperClawshotMode::OFF;
     static constexpr auto max = SuperClawshotMode::BOTH;
 };
