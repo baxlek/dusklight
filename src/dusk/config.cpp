@@ -317,6 +317,7 @@ template class ConfigImpl<DepthOfFieldMode>;
 template class ConfigImpl<DiscVerificationState>;
 template class ConfigImpl<GameLanguage>;
 template class ConfigImpl<AudioOutputMode>;
+template class ConfigImpl<LetterboxMode>;
 
 template <>
 void ConfigImpl<FrameInterpMode>::loadFromJson(
@@ -396,6 +397,7 @@ template class ConfigImpl<TouchTargeting>;
 template class ConfigImpl<MenuScaling>;
 template class ConfigImpl<Resampler>;
 template class ConfigImpl<SuperClawshotMode>;
+template class ConfigImpl<AlwaysGreatspinMode>;
 template class ConfigImpl<MagicArmorMode>;
 template class ConfigImpl<ui::ControlLayout>;
 

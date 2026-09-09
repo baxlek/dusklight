@@ -1,3 +1,19 @@
+This branch includes the following unmerged PRs:
+<br/>
+"Uncapped Wallets" by DarkZant
+<br/>
+"Infinite Bottle Contents & Infinite Fishing Bait" by DarkZant
+<br/>
+"Faster Scene Transitions" by t0mtee
+<br/>
+"Additional Always Greatspin Option" by baxlek
+<br/>
+"Disable Letterboxing Options" by baxlek
+<br/>
+"Unrestricted Items" by baxlek
+<br/>
+"Hold Button to Mash" by baxlek
+
 <div align="center">
   <img src="res/logo.png" alt="Logo" width="640">
 

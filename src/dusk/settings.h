@@ -66,6 +66,12 @@ enum class SuperClawshotMode : u8 {
     BOTH = 2,
 };
     
+enum class AlwaysGreatspinMode : u8 {
+    OFF = 0,
+    AFTER_SKILL = 1,
+    ALWAYS = 2,
+};
+
 enum class MagicArmorMode : u8 {
     NORMAL = 0,
     ON_DAMAGE = 1,
@@ -79,6 +85,13 @@ enum class AudioOutputMode : u8 {
     StereoHeadphones = 1,   // spatial audio
     Surround6ch = 2,        // discrete 5.1
     Surround8ch = 3,        // discrete 7.1
+};
+
+enum class LetterboxMode : u8 {
+    Off = 0,
+    On = 1,
+    GameplayOnly = 2,
+    CutsceneOnly = 3,
 };
 
 namespace config {
@@ -135,6 +148,12 @@ struct ConfigEnumRange<SuperClawshotMode> {
     static constexpr auto min = SuperClawshotMode::OFF;
     static constexpr auto max = SuperClawshotMode::BOTH;
 };
+  
+template <>
+struct ConfigEnumRange<AlwaysGreatspinMode> {
+    static constexpr auto min = AlwaysGreatspinMode::OFF;
+    static constexpr auto max = AlwaysGreatspinMode::ALWAYS;
+};
 
 template <>
 struct ConfigEnumRange<MagicArmorMode> {
@@ -146,6 +165,12 @@ template <>
 struct ConfigEnumRange<AudioOutputMode> {
     static constexpr auto min = AudioOutputMode::StereoSpeakers;
     static constexpr auto max = AudioOutputMode::Surround8ch;
+};
+
+template <>
+struct ConfigEnumRange<LetterboxMode> {
+    static constexpr auto min = LetterboxMode::Off;
+    static constexpr auto max = LetterboxMode::CutsceneOnly;
 };
 
 template <>
@@ -193,9 +218,10 @@ struct UserSettings {
         // QoL
         ConfigVar<bool> enableQuickTransform;
         ConfigVar<bool> hideTvSettingsScreen;
-        ConfigVar<bool> biggerWallets;
+        ConfigVar<int> walletSizes;
         ConfigVar<bool> noReturnRupees;
         ConfigVar<bool> disableRupeeCutscenes;
+        ConfigVar<bool> fastTransitions;
         ConfigVar<bool> noSwordRecoil;
         ConfigVar<int> damageMultiplier;
         ConfigVar<bool> noHeartDrops;
@@ -207,10 +233,14 @@ struct UserSettings {
         ConfigVar<bool> buttonFishing;
         ConfigVar<bool> instantSaves;
         ConfigVar<bool> instantText;
+        ConfigVar<bool> holdToMash;
         ConfigVar<bool> sunsSong;
         ConfigVar<bool> autoSave;
         ConfigVar<bool> enhancedMapMenus;
+        ConfigVar<bool> disableTransformOnWarp;
         ConfigVar<bool> aimingReticle;
+        ConfigVar<bool> unequipShield;
+
 
         // Preferences
         ConfigVar<bool> enableMirrorMode;
@@ -235,6 +265,7 @@ struct UserSettings {
         ConfigVar<Resampler> resampler;
         ConfigVar<bool> enableMapBackground;
         ConfigVar<bool> disableCutscenePillarboxing;
+        ConfigVar<LetterboxMode> disableLetterboxing;
         ConfigVar<bool> enableHighQualityMinimapTextures;
 
         // Audio
@@ -285,12 +316,15 @@ struct UserSettings {
         ConfigVar<bool> infiniteOil;
         ConfigVar<bool> infiniteOxygen;
         ConfigVar<bool> infiniteRupees;
+        ConfigVar<bool> infiniteBottle;
+        ConfigVar<bool> infiniteBait;
         ConfigVar<bool> enableIndefiniteItemDrops;
         ConfigVar<bool> moonJump;
         ConfigVar<SuperClawshotMode> superClawshot;
-        ConfigVar<bool> alwaysGreatspin;
+        ConfigVar<AlwaysGreatspinMode> alwaysGreatspin;
         ConfigVar<bool> enableFastIronBoots;
         ConfigVar<bool> canTransformAnywhere;
+        ConfigVar<bool> unrestrictedItems;
         ConfigVar<bool> fastRoll;
         ConfigVar<bool> fastSpinner;
         ConfigVar<MagicArmorMode> armorRupeeDrain;
@@ -345,6 +379,13 @@ void registerSettings();
 
 void applyInternalResolutionScale(int scale);
 void applyResampler(Resampler resampler);
+
+inline bool isLetterboxingDisabled(bool inCutscene) {
+    const auto mode = getSettings().game.disableLetterboxing.getValue();
+    return mode == LetterboxMode::On ||
+           (mode == LetterboxMode::CutsceneOnly && inCutscene) ||
+           (mode == LetterboxMode::GameplayOnly && !inCutscene);
+}
 
 // Transient settings
 
