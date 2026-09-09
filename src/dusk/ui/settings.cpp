@@ -106,6 +106,12 @@ constexpr std::array kWalletSizes = {
     "Uncapped"
 };
 
+constexpr std::array kSuperClawshotModes = {
+    "Off",
+    "Attach to Everything",
+    "Attach & Super Length",
+};
+
 constexpr std::array kAlwaysGreatspinModes = {
     "Off",
     "After Learning Skilll",
@@ -1401,8 +1407,40 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         leftPane.add_section("Abilities");
         addCheat(
             "Moon Jump (R+A)", getSettings().game.moonJump, "Hold R and A to rise into the air.");
-        addCheat("Super Clawshot", getSettings().game.superClawshot,
-            "Extends Clawshot behavior beyond the normal game rules.");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Super Clawshot",
+                .getValue =
+                    [] {
+                        return kSuperClawshotModes[static_cast<u8>(
+                            getSettings().game.superClawshot.getValue())];
+                    },
+                .isDisabled = [] { return dusk::speedrun::isActive(); },
+                .isModified =
+                    [] {
+                        return getSettings().game.superClawshot.getValue() !=
+                               getSettings().game.superClawshot.getDefaultValue();
+                    },
+            }),
+            rightPane, [](Pane& pane) {
+                for (int i = 0; i < static_cast<int>(kSuperClawshotModes.size()); i++) {
+                    pane.add_button({
+                            .text = kSuperClawshotModes[i],
+                            .isSelected =
+                                [i] {
+                                    return getSettings().game.superClawshot.getValue() ==
+                                           static_cast<SuperClawshotMode>(i);
+                                },
+                        })
+                        .on_pressed([i] {
+                            mDoAud_seStartMenu(kSoundItemChange);
+                            getSettings().game.superClawshot.setValue(
+                                static_cast<SuperClawshotMode>(i));
+                            config::save();
+                        });
+                }
+                pane.add_rml("<br/>Extends Clawshot behavior beyond the normal game rules.");
+            });
         leftPane.register_control(
             leftPane.add_select_button({
                 .key = "Always Greatspin",
