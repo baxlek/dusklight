@@ -6099,12 +6099,22 @@ void daAlink_c::setItemMatrix(int param_0) {
 
             if (mProcID != PROC_OPEN_TREASURE && !checkEndResetFlg1(ERFLG1_UNK_4) && (mProcID != PROC_GET_ITEM || mProcVar4.field_0x3010 == 0)) {
                 if (mEquipItem == dItemNo_KANTERA_e || checkOilBottleItemNotGet(mEquipItem)) {
-                    mDoMtx_stack_c::copy(mpLinkModel->getAnmMtx(mLeftItemJntNo));
+                    cXyz kandelaarJntPos;
+                    mDoMtx_multVecZero(mpLinkModel->getAnmMtx(mLeftItemJntNo), &kandelaarJntPos);
+                    mDoMtx_stack_c::transS(kandelaarJntPos);
+                    // Force the Lantern's yaw to match Link's own body rotation instead of the
+                    // hand joint's animated rotation, which can desync from Link's facing angle.
+                    mDoMtx_stack_c::ZXYrotM(shape_angle.x, (shape_angle.y + field_0x308c), shape_angle.z);
                     mDoMtx_stack_c::transM(-2.0f, -0.1f, -0.7f);
                     mDoMtx_stack_c::XYZrotM(cM_deg2s(100.0f), cM_deg2s(9.3f), cM_deg2s(183.0f));
                     mpKanteraModel->setBaseTRMtx(mDoMtx_stack_c::get());
                 } else {
-                    mDoMtx_stack_c::copy(mpLinkModel->getAnmMtx(0x10));
+                    cXyz kandelaarJntPos;
+                    mDoMtx_multVecZero(mpLinkModel->getAnmMtx(0x10), &kandelaarJntPos);
+                    mDoMtx_stack_c::transS(kandelaarJntPos);
+                    // Force the Lantern's yaw to match Link's own body rotation instead of the
+                    // back joint's animated rotation, which can desync from Link's facing angle.
+                    mDoMtx_stack_c::ZXYrotM(shape_angle.x, (shape_angle.y + field_0x308c), shape_angle.z);
                     mDoMtx_stack_c::transM(-1.0f, 4.5f, 9.0f);
                     mDoMtx_stack_c::XYZrotM(cM_deg2s(-75.0f), cM_deg2s(62.0f), cM_deg2s(89.0f));
                     mpKanteraModel->setBaseTRMtx(mDoMtx_stack_c::get());
