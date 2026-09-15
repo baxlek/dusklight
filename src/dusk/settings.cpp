@@ -184,6 +184,7 @@ UserSettings g_userSettings = {
         .skipPreLaunchUI {"backend.skipPreLaunchUI", false},
         .wasPresetChosen {"backend.wasPresetChosen", false},
         .checkForUpdates {"backend.checkForUpdates", true},
+        .checkForModUpdates {"backend.checkForModUpdates", true},
         .cardFileType {"backend.cardFileType", static_cast<int>(CARD_GCIFOLDER)},
         .enableAdvancedSettings {"backend.enableAdvancedSettings", false},
     },
@@ -404,6 +405,7 @@ void registerSettings() {
     Register(g_userSettings.backend.skipPreLaunchUI);
     Register(g_userSettings.backend.wasPresetChosen);
     Register(g_userSettings.backend.checkForUpdates);
+    Register(g_userSettings.backend.checkForModUpdates);
     Register(g_userSettings.backend.cardFileType);
     Register(g_userSettings.backend.enableAdvancedSettings);
 

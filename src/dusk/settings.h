@@ -358,6 +358,7 @@ struct UserSettings {
         ConfigVar<bool> skipPreLaunchUI;
         ConfigVar<bool> wasPresetChosen;
         ConfigVar<bool> checkForUpdates;
+        ConfigVar<bool> checkForModUpdates;
         ConfigVar<int> cardFileType;
         ConfigVar<bool> enableAdvancedSettings;
     } backend;
