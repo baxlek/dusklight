@@ -9,6 +9,9 @@
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_meter2_info.h"
+#if TARGET_PC
+#include "dusk/settings.h"
+#endif
 
 #if TARGET_PC
 #include "dusk/mods/item.hpp"
