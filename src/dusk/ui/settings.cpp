@@ -1411,8 +1411,11 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Item drops such as rupees and hearts will never disappear after they drop.");
 
         leftPane.add_section("Abilities");
+
         addCheat(
             "Moon Jump (R+A)", getSettings().game.moonJump, "Hold R and A to rise into the air.");
+        addCheat(
+            "Easy Quick Spin (R+B)", getSettings().game.easyQuickSpin, "Hold R to always do a Quick Spin when attacking with B.");
         leftPane.register_control(
             leftPane.add_select_button({
                 .key = "Super Clawshot",
