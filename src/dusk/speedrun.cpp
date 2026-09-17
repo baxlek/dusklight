@@ -58,6 +58,7 @@ void resetForSpeedrunMode() {
     getSettings().game.damageMultiplier.setSpeedrunValue(1);
     getSettings().game.instantDeath.setSpeedrunValue(false);
     getSettings().game.noHeartDrops.setSpeedrunValue(false);
+    getSettings().game.fastTransitions.setSpeedrunValue(false);
     getSettings().game.autoSave.setSpeedrunValue(false);
     getSettings().game.sunsSong.setSpeedrunValue(false);
 
@@ -68,6 +69,8 @@ void resetForSpeedrunMode() {
     getSettings().game.infiniteOil.setSpeedrunValue(false);
     getSettings().game.infiniteOxygen.setSpeedrunValue(false);
     getSettings().game.infiniteRupees.setSpeedrunValue(false);
+    getSettings().game.infiniteBottle.setSpeedrunValue(false);
+    getSettings().game.infiniteBait.setSpeedrunValue(false);
     getSettings().game.enableIndefiniteItemDrops.setSpeedrunValue(false);
     getSettings().game.moonJump.setSpeedrunValue(false);
     getSettings().game.superClawshot.setSpeedrunValue(false);
