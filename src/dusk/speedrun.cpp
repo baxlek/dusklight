@@ -69,6 +69,8 @@ void resetForSpeedrunMode() {
     getSettings().game.infiniteOil.setSpeedrunValue(false);
     getSettings().game.infiniteOxygen.setSpeedrunValue(false);
     getSettings().game.infiniteRupees.setSpeedrunValue(false);
+    getSettings().game.infiniteBottle.setSpeedrunValue(false);
+    getSettings().game.infiniteBait.setSpeedrunValue(false);
     getSettings().game.enableIndefiniteItemDrops.setSpeedrunValue(false);
     getSettings().game.moonJump.setSpeedrunValue(false);
     getSettings().game.superClawshot.setSpeedrunValue(false);
