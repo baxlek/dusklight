@@ -1663,7 +1663,13 @@ int daAlink_c::procFishingCast() {
         field_0x2fc8 = 0;
     }
 
-    if (checkEndResetFlg0(ERFLG0_FISHING_HIT) && mItemMode != 0xFF) {
+
+#if TARGET_PC
+    bool consumesBait = true;
+    consumesBait = !dusk::getSettings().game.infiniteBait;
+#endif
+
+    if (checkEndResetFlg0(ERFLG0_FISHING_HIT) && mItemMode != 0xFF IF_DUSK(&& consumesBait)) {
         mItemMode = 0xFF;
         dComIfGs_setBaitItem(0xFF);
 
@@ -1741,10 +1747,17 @@ int daAlink_c::procFishingFood() {
             mProcVar2.field_0x300c = 1;
 
             u16 item = dComIfGp_getSelectItem(mProcVar3.field_0x300e);
+#if TARGET_PC
+            bool consumesContents = true;
+            if (dusk::getSettings().game.infiniteBottle)
+                consumesContents = false;          
+            if (consumesContents) {
+#endif
             if (item == dItemNo_WORM_e || dComIfGp_getSelectItemNum(mProcVar3.field_0x300e) == 1) {
                 dComIfGs_setEquipBottleItemEmpty(mProcVar3.field_0x300e);
             } else {
                 dComIfGp_addSelectItemNum(mProcVar3.field_0x300e, -1);
+    IF_DUSK(})
             }
 
             if (mItemMode != dItemNo_NONE_e) {
