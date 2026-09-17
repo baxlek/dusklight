@@ -25,13 +25,13 @@ UserSettings g_userSettings = {
     },
 
     .audio = {
+        .outputMode {"audio.outputMode", AudioOutputMode::StereoSpeakers},
         .masterVolume {"audio.masterVolume", 60},
         .mainMusicVolume {"audio.mainMusicVolume", 100},
         .subMusicVolume {"audio.subMusicVolume", 100},
         .soundEffectsVolume {"audio.soundEffectsVolume", 100},
         .fanfareVolume {"audio.fanfareVolume", 100},
         .enableReverb {"audio.enableReverb", true},
-        .enableHrtf {"audio.enableHrtf", false},
         .menuSounds {"audio.menuSounds", true},
     },
 
@@ -41,9 +41,10 @@ UserSettings g_userSettings = {
         // Quality of Life
         .enableQuickTransform {"game.enableQuickTransform", false},
         .hideTvSettingsScreen {"game.hideTvSettingsScreen", true},
-        .biggerWallets {"game.biggerWallets", false},
+        .walletSizes{"game.walletSizes", 0},
         .noReturnRupees {"game.noReturnRupees", false},
         .disableRupeeCutscenes {"game.disableRupeeCutscenes", false},
+        .fastTransitions {"game.fastTransitions", false},
         .noSwordRecoil {"game.noSwordRecoil", false},
         .damageMultiplier {"game.damageMultiplier", 1},
         .noHeartDrops {"game.noHeartDrops", false},
@@ -59,6 +60,7 @@ UserSettings g_userSettings = {
         .sunsSong {"game.sunsSong", false},
         .autoSave {"game.autoSave", false},
         .enhancedMapMenus {"game.enhancedMapMenus", false},
+        .disableTransformOnWarp {"game.disableTransformOnWarp", false},
         .aimingReticle {"game.aimingReticle", false},
 
         // Preferences
@@ -84,6 +86,7 @@ UserSettings g_userSettings = {
         .resampler {"game.resampler", Resampler::Bilinear},
         .enableMapBackground {"game.enableMapBackground", true},
         .disableCutscenePillarboxing {"game.disableCutscenePillarboxing", false},
+        .disableLetterboxing {"game.disableLetterboxing", LetterboxMode::Off},
         .enableHighQualityMinimapTextures {"game.enableHighQualityMinimapTextures", true},
 
         // Audio
@@ -139,16 +142,19 @@ UserSettings g_userSettings = {
         .infiniteOil {"game.infiniteOil", false},
         .infiniteOxygen {"game.infiniteOxygen", false},
         .infiniteRupees {"game.infiniteRupees", false},
+        .infiniteBottle {"game.infiniteBottle", false},
+        .infiniteBait {"game.infiniteBait", false},
         .enableIndefiniteItemDrops {"game.enableIndefiniteItemDrops", false},
         .moonJump {"game.moonJump", false},
         .superClawshot {"game.superClawshot", false},
-        .alwaysGreatspin {"game.alwaysGreatspin", false},
+        .alwaysGreatspin {"game.alwaysGreatspin", AlwaysGreatspinMode::OFF},
         .enableFastIronBoots {"game.enableFastIronBoots", false},
         .canTransformAnywhere {"game.canTransformAnywhere", false},
         .fastRoll {"game.fastRoll", false},
         .fastSpinner {"game.fastSpinner", false},
         .armorRupeeDrain {"game.armorRupeeDrain", MagicArmorMode::NORMAL},
         .invincibleEnemies {"game.invincibleEnemies", false},
+        .easyQuickSpin {"game.easyQuickSpin", false},
 
         // Technical
         .restoreWiiGlitches {"game.restoreWiiGlitches", false},
@@ -177,6 +183,7 @@ UserSettings g_userSettings = {
         .skipPreLaunchUI {"backend.skipPreLaunchUI", false},
         .wasPresetChosen {"backend.wasPresetChosen", false},
         .checkForUpdates {"backend.checkForUpdates", true},
+        .checkForModUpdates {"backend.checkForModUpdates", true},
         .cardFileType {"backend.cardFileType", static_cast<int>(CARD_GCIFOLDER)},
         .enableAdvancedSettings {"backend.enableAdvancedSettings", false},
     },
@@ -257,22 +264,23 @@ void registerSettings() {
         [](const int&, const int&) { dusk::ui::apply_scale(); });
 
     // Audio
+    Register(g_userSettings.audio.outputMode);
     Register(g_userSettings.audio.masterVolume);
     Register(g_userSettings.audio.mainMusicVolume);
     Register(g_userSettings.audio.subMusicVolume);
     Register(g_userSettings.audio.soundEffectsVolume);
     Register(g_userSettings.audio.fanfareVolume);
     Register(g_userSettings.audio.enableReverb);
-    Register(g_userSettings.audio.enableHrtf);
     Register(g_userSettings.audio.menuSounds);
 
     // Game
     Register(g_userSettings.game.language);
     Register(g_userSettings.game.enableQuickTransform);
     Register(g_userSettings.game.hideTvSettingsScreen);
-    Register(g_userSettings.game.biggerWallets);
+    Register(g_userSettings.game.walletSizes);
     Register(g_userSettings.game.noReturnRupees);
     Register(g_userSettings.game.disableRupeeCutscenes);
+    Register(g_userSettings.game.fastTransitions);
     Register(g_userSettings.game.noSwordRecoil);
     Register(g_userSettings.game.damageMultiplier);
     Register(g_userSettings.game.noHeartDrops);
@@ -287,6 +295,7 @@ void registerSettings() {
     Register(g_userSettings.game.sunsSong);
     Register(g_userSettings.game.autoSave);
     Register(g_userSettings.game.enhancedMapMenus);
+    Register(g_userSettings.game.disableTransformOnWarp);
     Register(g_userSettings.game.aimingReticle);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
@@ -317,6 +326,7 @@ void registerSettings() {
     Register(g_userSettings.game.shadowResolutionMultiplier);
     Register(g_userSettings.game.enableMapBackground);
     Register(g_userSettings.game.disableCutscenePillarboxing);
+    Register(g_userSettings.game.disableLetterboxing);
     Register(g_userSettings.game.enableHighQualityMinimapTextures);
     Register(g_userSettings.game.enableFastIronBoots);
     Register(g_userSettings.game.canTransformAnywhere);
@@ -350,11 +360,15 @@ void registerSettings() {
     Register(g_userSettings.game.infiniteOil);
     Register(g_userSettings.game.infiniteOxygen);
     Register(g_userSettings.game.infiniteRupees);
+    Register(g_userSettings.game.infiniteBottle);
+    Register(g_userSettings.game.infiniteBait);
     Register(g_userSettings.game.enableIndefiniteItemDrops);
     Register(g_userSettings.game.moonJump);
     Register(g_userSettings.game.superClawshot);
     Register(g_userSettings.game.alwaysGreatspin);
     Register(g_userSettings.game.invincibleEnemies);
+    Register(g_userSettings.game.easyQuickSpin);
+
     Register(g_userSettings.game.enableFrameInterpolation);
     Register(g_userSettings.game.enableGyroAim);
     Register(g_userSettings.game.enableGyroRollgoal);
@@ -390,6 +404,7 @@ void registerSettings() {
     Register(g_userSettings.backend.skipPreLaunchUI);
     Register(g_userSettings.backend.wasPresetChosen);
     Register(g_userSettings.backend.checkForUpdates);
+    Register(g_userSettings.backend.checkForModUpdates);
     Register(g_userSettings.backend.cardFileType);
     Register(g_userSettings.backend.enableAdvancedSettings);
 

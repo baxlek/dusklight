@@ -1307,6 +1307,7 @@ BOOL daAlink_c::checkDeadAction(int param_0) {
             }
         } else if (dComIfGs_getLife() == 0 && !checkResetFlg0(RFLG0_UNK_400) && dComIfGs_checkBottle(dItemNo_FAIRY_e)) {
             makeFairy(&current.pos, 0);
+    IF_DUSK(if (!dusk::getSettings().game.infiniteBottle))
             dComIfGs_setBottleItemIn(dItemNo_FAIRY_e, dItemNo_EMPTY_BOTTLE_e);
         }
     }
@@ -2387,7 +2388,7 @@ int daAlink_c::procCoGetItemInit() {
     if (var_r31 != 0) {
         mProcVar3.field_0x300e = -0x8000;
         mProcVar4.field_0x3010 = 1;
-    } else if (mDemo.getParam1() == 2) {
+    } else if (mDemo.getParam1() == DUSK_IF_ELSE(dusk::mods::item_give_tag("prayer_reward"), 2)) {
         mProcVar3.field_0x300e = 0;
     } else {
         mProcVar3.field_0x300e = shape_angle.y - (fopCamM_GetAngleY(dComIfGp_getCamera(field_0x317c)) + 0x8000);
