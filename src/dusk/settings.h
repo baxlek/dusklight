@@ -224,6 +224,7 @@ struct UserSettings {
         ConfigVar<bool> sunsSong;
         ConfigVar<bool> autoSave;
         ConfigVar<bool> enhancedMapMenus;
+        ConfigVar<bool> disableTransformOnWarp;
         ConfigVar<bool> aimingReticle;
 
         // Preferences
