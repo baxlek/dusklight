@@ -62,6 +62,7 @@ UserSettings g_userSettings = {
         .enhancedMapMenus {"game.enhancedMapMenus", false},
         .disableTransformOnWarp {"game.disableTransformOnWarp", false},
         .aimingReticle {"game.aimingReticle", false},
+        .deselectShields {"game.deselectShields", false},
 
         // Preferences
         .enableMirrorMode {"game.enableMirrorMode", false},
@@ -297,6 +298,7 @@ void registerSettings() {
     Register(g_userSettings.game.enhancedMapMenus);
     Register(g_userSettings.game.disableTransformOnWarp);
     Register(g_userSettings.game.aimingReticle);
+    Register(g_userSettings.game.deselectShields);
     Register(g_userSettings.game.enableMirrorMode);
     Register(g_userSettings.game.invertCameraXAxis);
     Register(g_userSettings.game.invertCameraYAxis);

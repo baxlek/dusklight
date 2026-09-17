@@ -1354,6 +1354,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Disable the forced transformation into wolf before warping.");
         addOption("Aiming Reticle", getSettings().game.aimingReticle,
             "Shows the aiming reticle for bow and slingshot.");
+        addOption("Unequip Shield", getSettings().game.deselectShields,
+            "Unequip shields on the Collection screen.");
 
         leftPane.add_section("Speedrunning");
         config_bool_select(leftPane, rightPane, getSettings().game.speedrunMode,

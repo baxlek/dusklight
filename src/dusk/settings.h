@@ -239,6 +239,7 @@ struct UserSettings {
         ConfigVar<bool> enhancedMapMenus;
         ConfigVar<bool> disableTransformOnWarp;
         ConfigVar<bool> aimingReticle;
+        ConfigVar<bool> deselectShields;
 
         // Preferences
         ConfigVar<bool> enableMirrorMode;
