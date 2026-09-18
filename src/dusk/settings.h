@@ -67,6 +67,12 @@ enum class MenuScaling : u8 {
     Dusklight = 2,
 };
 
+enum class SuperClawshotMode : u8 {
+    OFF = 0,
+    ATTACH = 1,
+    BOTH = 2,
+};
+    
 enum class AlwaysGreatspinMode : u8 {
     OFF = 0,
     AFTER_SKILL = 1,
@@ -144,6 +150,12 @@ struct ConfigEnumRange<MenuScaling> {
 };
 
 template <>
+struct ConfigEnumRange<SuperClawshotMode> {
+    static constexpr auto min = SuperClawshotMode::OFF;
+    static constexpr auto max = SuperClawshotMode::BOTH;
+};
+
+template <>
 struct ConfigEnumRange<AlwaysGreatspinMode> {
     static constexpr auto min = AlwaysGreatspinMode::OFF;
     static constexpr auto max = AlwaysGreatspinMode::ALWAYS;
@@ -206,7 +218,7 @@ struct UserSettings {
         // QoL
         ConfigVar<bool> enableQuickTransform;
         ConfigVar<bool> hideTvSettingsScreen;
-        ConfigVar<bool> biggerWallets;
+        ConfigVar<int> walletSizes;
         ConfigVar<bool> noReturnRupees;
         ConfigVar<bool> disableRupeeCutscenes;
         ConfigVar<bool> fastTransitions;
@@ -221,10 +233,13 @@ struct UserSettings {
         ConfigVar<bool> buttonFishing;
         ConfigVar<bool> instantSaves;
         ConfigVar<bool> instantText;
+        ConfigVar<bool> holdToMash;
         ConfigVar<bool> sunsSong;
         ConfigVar<bool> autoSave;
         ConfigVar<bool> enhancedMapMenus;
+        ConfigVar<bool> disableTransformOnWarp;
         ConfigVar<bool> aimingReticle;
+        ConfigVar<bool> deselectShields;
 
         // Preferences
         ConfigVar<bool> enableMirrorMode;
@@ -300,9 +315,11 @@ struct UserSettings {
         ConfigVar<bool> infiniteOil;
         ConfigVar<bool> infiniteOxygen;
         ConfigVar<bool> infiniteRupees;
+        ConfigVar<bool> infiniteBottle;
+        ConfigVar<bool> infiniteBait;
         ConfigVar<bool> enableIndefiniteItemDrops;
         ConfigVar<bool> moonJump;
-        ConfigVar<bool> superClawshot;
+        ConfigVar<SuperClawshotMode> superClawshot;
         ConfigVar<AlwaysGreatspinMode> alwaysGreatspin;
         ConfigVar<bool> enableFastIronBoots;
         ConfigVar<bool> canTransformAnywhere;

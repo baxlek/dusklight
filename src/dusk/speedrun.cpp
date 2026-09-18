@@ -58,9 +58,11 @@ void resetForSpeedrunMode() {
     getSettings().game.damageMultiplier.setSpeedrunValue(1);
     getSettings().game.instantDeath.setSpeedrunValue(false);
     getSettings().game.noHeartDrops.setSpeedrunValue(false);
+    getSettings().game.holdToMash.setSpeedrunValue(false);
     getSettings().game.fastTransitions.setSpeedrunValue(false);
     getSettings().game.autoSave.setSpeedrunValue(false);
     getSettings().game.sunsSong.setSpeedrunValue(false);
+    getSettings().game.disableTransformOnWarp.setSpeedrunValue(false);
 
     getSettings().game.infiniteHearts.setSpeedrunValue(false);
     getSettings().game.infiniteArrows.setSpeedrunValue(false);
@@ -69,9 +71,11 @@ void resetForSpeedrunMode() {
     getSettings().game.infiniteOil.setSpeedrunValue(false);
     getSettings().game.infiniteOxygen.setSpeedrunValue(false);
     getSettings().game.infiniteRupees.setSpeedrunValue(false);
+    getSettings().game.infiniteBottle.setSpeedrunValue(false);
+    getSettings().game.infiniteBait.setSpeedrunValue(false);
     getSettings().game.enableIndefiniteItemDrops.setSpeedrunValue(false);
     getSettings().game.moonJump.setSpeedrunValue(false);
-    getSettings().game.superClawshot.setSpeedrunValue(false);
+    getSettings().game.superClawshot.setSpeedrunValue(SuperClawshotMode::OFF);
     getSettings().game.alwaysGreatspin.setSpeedrunValue(AlwaysGreatspinMode::OFF);
     getSettings().game.enableFastIronBoots.setSpeedrunValue(false);
     getSettings().game.canTransformAnywhere.setSpeedrunValue(false);
