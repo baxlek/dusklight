@@ -107,6 +107,19 @@ constexpr std::array kMenuScalingModeLabels = {
     "Dusklight",
 };
 
+constexpr std::array kWalletSizes = {
+    "Default", 
+    "HD", 
+    "Large", 
+    "Uncapped"
+};
+
+constexpr std::array kSuperClawshotModes = {
+    "Off",
+    "Attach to Everything",
+    "Attach & Super Length",
+};
+
 constexpr std::array kAlwaysGreatspinModes = {
     "Off",
     "After Learning Skill",
@@ -1265,8 +1278,45 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Hearts will never drop from enemies, pots, and various other places.");
 
         leftPane.add_section("Quality of Life");
-        addOption("Bigger Wallets", getSettings().game.biggerWallets,
-            "Wallet sizes are like in the HD version. (500, 1000, 2000)");
+        leftPane.register_control(
+            leftPane.add_select_button({
+                .key = "Wallet Sizes",
+                .getValue =
+                    [] {
+                        const int idx = getSettings().game.walletSizes.getValue();
+                        return Rml::String{kWalletSizes[idx]};
+                    },
+                .isModified =
+                    [] {
+                        const auto& walletSizes = getSettings().game.walletSizes;
+                        return walletSizes.getValue() != walletSizes.getDefaultValue();
+                    },
+            }),
+            rightPane, [](Pane& pane) {
+                for (int i = 0; i < static_cast<int>(kWalletSizes.size()); ++i) {
+                    pane.add_button(
+                            {
+                                .text = kWalletSizes[i],
+                                .isSelected =
+                                    [i] { return getSettings().game.walletSizes.getValue() == i;
+                                    },
+                            })
+                        .on_pressed([i] {
+                            mDoAud_seStartMenu(kSoundItemChange);
+                            getSettings().game.walletSizes.setValue(i);
+                            config::save();
+                        });
+                }
+                pane.add_rml(R"(
+                    <br/>Modifies the maximum number of rupees the wallets can hold. 
+                    <ul style="display: block; margin-left: 20px;">
+                        <li style="display: block; margin-bottom: 4px;">• Default: 300, 600, 1 000</li>
+                        <li style="display: block; margin-bottom: 4px;">• HD: 500, 1 000, 2 000</li>
+                        <li style="display: block; margin-bottom: 4px;">• Large: 1 000, 5 000, 9 999</li>
+                        <li style="display: block; margin-bottom: 4px;">• Uncapped: 9 999</li>
+                    </ul>
+                )");
+            });
         addOption("Disable Rupee Cutscenes", getSettings().game.disableRupeeCutscenes,
             "Rupees will not play cutscenes after you have collected them the first time.");
         addSpeedrunDisabledOption("Faster Scene Transitions", getSettings().game.fastTransitions,
@@ -1281,6 +1331,8 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Skips the delay when writing to the Memory Card.");
         addOption("Hold B for Instant Text", getSettings().game.instantText,
             "Makes text scroll immediately by holding B.");
+        addSpeedrunDisabledOption("Hold Button to Mash", getSettings().game.holdToMash,
+            "Hold the indicated button to mash automatically.");
         addOption("No Climbing Miss Animation", getSettings().game.noMissClimbing,
             "Prevents Link from playing a struggle animation when grabbing ledges or "
             "climbing on vines.");
@@ -1298,8 +1350,12 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             "Allows Wolf Link to howl and change the time of day.");
         addOption("Quick Transform (R+Y)", getSettings().game.enableQuickTransform,
             "Transform instantly by pressing R and Y simultaneously.");
+        addOption("Disable Transform on Warp", getSettings().game.disableTransformOnWarp,
+            "Disable the forced transformation into wolf before warping.");
         addOption("Aiming Reticle", getSettings().game.aimingReticle,
             "Shows the aiming reticle for bow and slingshot.");
+        addOption("Unequip Shield", getSettings().game.deselectShields,
+            "Unequip shields on the Collection screen.");
 
         leftPane.add_section("Speedrunning");
         config_bool_select(leftPane, rightPane, getSettings().game.speedrunMode,
@@ -1361,8 +1417,12 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
         addCheat("Infinite Oil", getSettings().game.infiniteOil, "Keeps your lantern oil full.");
         addCheat("Infinite Oxygen", getSettings().game.infiniteOxygen,
             "Keeps your underwater oxygen meter full.");
-        addCheat(
-            "Infinite Rupees", getSettings().game.infiniteRupees, "Keeps your rupee count full.");
+        addCheat("Infinite Rupees", getSettings().game.infiniteRupees,
+            "Keeps your rupee count full.");
+        addCheat("Infinite Bottle Contents", getSettings().game.infiniteBottle,
+            "Using the contents of a bottle does not consume them.");
+        addCheat("Infinite Fishing Bait", getSettings().game.infiniteBait,
+            "Catching a fish while bobber fishing with bait does not consume the bait.");
         addCheat("No Item Timer", getSettings().game.enableIndefiniteItemDrops,
             "Item drops such as rupees and hearts will never disappear after they drop.");
 
