@@ -1390,7 +1390,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     return getSettings().game.superClawshotAttach.getValue() !=
                                getSettings().game.superClawshotAttach.getDefaultValue()
                            || getSettings().game.superClawshotLength.getValue() !=
-                                  getSettings().game.superClawshotLength.getDefaultValue()
+                                  getSettings().game.superClawshotLength.getDefaultValue();
                 },
             }),
             rightPane, [](Pane& pane) {
@@ -1404,7 +1404,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     }).on_pressed([&var] {
                         mDoAud_seStartMenu(kSoundItemChange);
                         var.setValue(!var.getValue());
-                        config::Save();
+                        config::save();
                     });
                 };
                 addSubToggle("Attach to Everything", getSettings().game.superClawshotAttach);
