@@ -358,7 +358,7 @@ void registerSettings() {
     Register(g_userSettings.game.enableIndefiniteItemDrops);
     Register(g_userSettings.game.moonJump);
     Register(g_userSettings.game.superClawshotAttach);
-    Register(g_userSettings.game.superClaeshotLength);
+    Register(g_userSettings.game.superClawshotLength);
     Register(g_userSettings.game.alwaysGreatspin);
     Register(g_userSettings.game.invincibleEnemies);
     Register(g_userSettings.game.easyQuickSpin);
