@@ -48,6 +48,13 @@ enum class FrameInterpMode : u8 {
     Unlimited = 2,
 };
 
+enum class LetterboxMode : u8 {
+    Off = 0,
+    On = 1,
+    GameplayOnly = 2,
+    CutsceneOnly = 3,
+};
+
 enum class TouchTargeting : u8 {
     Hybrid = 0,
     Hold = 1,
@@ -65,7 +72,13 @@ enum class SuperClawshotMode : u8 {
     ATTACH = 1,
     BOTH = 2,
 };
-    
+
+enum class AlwaysGreatspinMode : u8 {
+    OFF = 0,
+    AFTER_SKILL = 1,
+    ALWAYS = 2,
+};
+
 enum class MagicArmorMode : u8 {
     NORMAL = 0,
     ON_DAMAGE = 1,
@@ -119,6 +132,12 @@ struct ConfigEnumRange<FrameInterpMode> {
 };
 
 template <>
+struct ConfigEnumRange<LetterboxMode> {
+    static constexpr auto min = LetterboxMode::Off;
+    static constexpr auto max = LetterboxMode::CutsceneOnly;
+};
+
+template <>
 struct ConfigEnumRange<TouchTargeting> {
     static constexpr auto min = TouchTargeting::Hybrid;
     static constexpr auto max = TouchTargeting::Switch;
@@ -134,6 +153,12 @@ template <>
 struct ConfigEnumRange<SuperClawshotMode> {
     static constexpr auto min = SuperClawshotMode::OFF;
     static constexpr auto max = SuperClawshotMode::BOTH;
+};
+
+template <>
+struct ConfigEnumRange<AlwaysGreatspinMode> {
+    static constexpr auto min = AlwaysGreatspinMode::OFF;
+    static constexpr auto max = AlwaysGreatspinMode::ALWAYS;
 };
 
 template <>
@@ -236,6 +261,7 @@ struct UserSettings {
         ConfigVar<Resampler> resampler;
         ConfigVar<bool> enableMapBackground;
         ConfigVar<bool> disableCutscenePillarboxing;
+        ConfigVar<LetterboxMode> disableLetterboxing;
         ConfigVar<bool> enableHighQualityMinimapTextures;
 
         // Audio
@@ -289,7 +315,7 @@ struct UserSettings {
         ConfigVar<bool> enableIndefiniteItemDrops;
         ConfigVar<bool> moonJump;
         ConfigVar<SuperClawshotMode> superClawshot;
-        ConfigVar<bool> alwaysGreatspin;
+        ConfigVar<AlwaysGreatspinMode> alwaysGreatspin;
         ConfigVar<bool> enableFastIronBoots;
         ConfigVar<bool> canTransformAnywhere;
         ConfigVar<bool> fastRoll;
@@ -348,6 +374,13 @@ void registerSettings();
 
 void applyInternalResolutionScale(int scale);
 void applyResampler(Resampler resampler);
+
+inline bool isLetterboxingDisabled(bool inCutscene) {
+    const auto mode = getSettings().game.disableLetterboxing.getValue();
+    return mode == LetterboxMode::On ||
+           (mode == LetterboxMode::CutsceneOnly && inCutscene) ||
+           (mode == LetterboxMode::GameplayOnly && !inCutscene);
+}
 
 // Transient settings
 
