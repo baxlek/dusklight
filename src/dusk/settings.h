@@ -319,8 +319,7 @@ struct UserSettings {
         ConfigVar<bool> infiniteBait;
         ConfigVar<bool> enableIndefiniteItemDrops;
         ConfigVar<bool> moonJump;
-        ConfigVar<bool> superClawshotAttach;
-        ConfigVar<bool> superClawshotLength;
+        ConfigVar<SuperClawshotMode> superClawshot;
         ConfigVar<AlwaysGreatspinMode> alwaysGreatspin;
         ConfigVar<bool> enableFastIronBoots;
         ConfigVar<bool> canTransformAnywhere;

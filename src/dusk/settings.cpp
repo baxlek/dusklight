@@ -147,8 +147,7 @@ UserSettings g_userSettings = {
         .infiniteBait {"game.infiniteBait", false},
         .enableIndefiniteItemDrops {"game.enableIndefiniteItemDrops", false},
         .moonJump {"game.moonJump", false},
-        .superClawshotAttach {"game.superClawshotAttach", false},
-        .superClawshotLength {"game.superClawshotLength", false},
+        .superClawshot {"game.superClawshot", SuperClawshotMode::OFF},
         .alwaysGreatspin {"game.alwaysGreatspin", AlwaysGreatspinMode::OFF},
         .enableFastIronBoots {"game.enableFastIronBoots", false},
         .canTransformAnywhere {"game.canTransformAnywhere", false},
@@ -368,8 +367,7 @@ void registerSettings() {
     Register(g_userSettings.game.infiniteBait);
     Register(g_userSettings.game.enableIndefiniteItemDrops);
     Register(g_userSettings.game.moonJump);
-    Register(g_userSettings.game.superClawshotAttach);
-    Register(g_userSettings.game.superClawshotLength);
+    Register(g_userSettings.game.superClawshot);
     Register(g_userSettings.game.alwaysGreatspin);
     Register(g_userSettings.game.invincibleEnemies);
     Register(g_userSettings.game.easyQuickSpin);

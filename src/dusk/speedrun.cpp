@@ -75,8 +75,7 @@ void resetForSpeedrunMode() {
     getSettings().game.infiniteBait.setSpeedrunValue(false);
     getSettings().game.enableIndefiniteItemDrops.setSpeedrunValue(false);
     getSettings().game.moonJump.setSpeedrunValue(false);
-    getSettings().game.superClawshotAttach.setSpeedrunValue(false);
-    getSettings().game.superClawshotLength.setSpeedrunValue(false);
+    getSettings().game.superClawshot.setSpeedrunValue(SuperClawshotMode::OFF);
     getSettings().game.alwaysGreatspin.setSpeedrunValue(AlwaysGreatspinMode::OFF);
     getSettings().game.enableFastIronBoots.setSpeedrunValue(false);
     getSettings().game.canTransformAnywhere.setSpeedrunValue(false);
