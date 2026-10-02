@@ -544,6 +544,7 @@ if (DUSK_ENABLE_CODE_MODS AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR
     add_subdirectory(mods/custom_actor_demo)
     add_subdirectory(mods/cosmetics)
     add_subdirectory(mods/randomizer)
+    add_subdirectory(mods/zelda_on_epona)
     add_subdirectory(mods/audio_mod)
 endif ()
 
