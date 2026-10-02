@@ -545,6 +545,9 @@ if (DUSK_ENABLE_CODE_MODS AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR
     add_subdirectory(mods/cosmetics)
     add_subdirectory(mods/randomizer)
     add_subdirectory(mods/zelda_on_epona)
+    # The zelda_on_epona submodule's own CMakeLists.txt doesn't pass BUNDLE to add_mod(),
+    # so register it for bundling here instead (see dusklight_bundle_mod() in ModSDK.cmake).
+    dusklight_bundle_mod(zelda_on_epona)
     add_subdirectory(mods/audio_mod)
 endif ()
 
