@@ -375,27 +375,16 @@ function(add_mod target_name)
                 "-DDST=${_stage}/textures" -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/CopyModAssets.cmake")
     endif ()
 
-    # Record mod packaging metadata on the target so it can be bundled later even if the
-    # mod's own CMakeLists.txt (e.g. an out-of-tree submodule we can't edit directly) forgot
-    # to pass BUNDLE; see dusklight_bundle_mod() below.
-    file(READ "${_mod_json}" _mod_json_text)
-    string(JSON _mod_id GET "${_mod_json_text}" id)
-    set_target_properties(${target_name} PROPERTIES
-            DUSK_MOD_ID "${_mod_id}"
-            DUSK_MOD_STAGE_DIR "${_stage}"
-            DUSK_MOD_PACKAGE_PATH "${_out}"
-            DUSK_MOD_LIB_PLATFORM "${_lib_platform}"
-            DUSK_MOD_LIB_NAME "${_lib_name}")
-
     set(_bundle_cmds "")
     if (ARG_BUNDLE AND TARGET dusklight)
+        file(READ "${_mod_json}" _mod_json_text)
+        string(JSON _mod_id GET "${_mod_json_text}" id)
         set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_TARGETS "${target_name}")
         set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_IDS "${_mod_id}")
         set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_STAGES "${_stage}")
         set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_PACKAGES "${_out}")
         set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_LIB_PLATFORMS "${_lib_platform}")
         set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_LIB_NAMES "${_lib_name}")
-        set_target_properties(${target_name} PROPERTIES DUSK_MOD_BUNDLED TRUE)
         set(_bundle_cmds
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bundled_mods"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_out}" "${CMAKE_BINARY_DIR}/bundled_mods/${target_name}.dusk")
@@ -427,42 +416,6 @@ function(add_mod target_name)
     if (TARGET dusklight_mods)
         add_dependencies(dusklight_mods ${_package_target})
     endif ()
-    set_target_properties(${target_name} PROPERTIES DUSK_MOD_PACKAGE_TARGET "${_package_target}")
-endfunction()
-
-# Registers an already-defined add_mod() target for bundling, equivalent to passing BUNDLE to
-# add_mod() itself. Useful for mods (e.g. out-of-tree submodules) whose own CMakeLists.txt
-# cannot be edited to add BUNDLE directly: call this after add_subdirectory() instead.
-function(dusklight_bundle_mod target_name)
-    if (NOT TARGET dusklight)
-        return ()
-    endif ()
-    if (NOT TARGET ${target_name})
-        message(FATAL_ERROR "dusklight_bundle_mod: no such mod target: ${target_name}")
-    endif ()
-    get_target_property(_already_bundled ${target_name} DUSK_MOD_BUNDLED)
-    if (_already_bundled)
-        return ()
-    endif ()
-    get_target_property(_mod_id ${target_name} DUSK_MOD_ID)
-    get_target_property(_stage ${target_name} DUSK_MOD_STAGE_DIR)
-    get_target_property(_out ${target_name} DUSK_MOD_PACKAGE_PATH)
-    get_target_property(_lib_platform ${target_name} DUSK_MOD_LIB_PLATFORM)
-    get_target_property(_lib_name ${target_name} DUSK_MOD_LIB_NAME)
-    get_target_property(_package_target ${target_name} DUSK_MOD_PACKAGE_TARGET)
-    if (NOT _mod_id OR NOT _stage OR NOT _out OR NOT _package_target)
-        message(FATAL_ERROR "dusklight_bundle_mod: ${target_name} was not created via add_mod()")
-    endif ()
-    set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_TARGETS "${target_name}")
-    set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_IDS "${_mod_id}")
-    set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_STAGES "${_stage}")
-    set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_PACKAGES "${_out}")
-    set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_LIB_PLATFORMS "${_lib_platform}")
-    set_property(GLOBAL APPEND PROPERTY DUSK_BUNDLED_MOD_LIB_NAMES "${_lib_name}")
-    set_target_properties(${target_name} PROPERTIES DUSK_MOD_BUNDLED TRUE)
-    add_custom_command(TARGET ${_package_target} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bundled_mods"
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_out}" "${CMAKE_BINARY_DIR}/bundled_mods/${target_name}.dusk")
 endfunction()
 
 # Install rules for BUNDLE mods.
