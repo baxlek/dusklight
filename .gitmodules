@@ -10,3 +10,7 @@
 [submodule "mods/cosmetics"]
 	path = mods/cosmetics
 	url = https://github.com/TwilitRealm/dusklight-cosmetics
+[submodule "mods/zelda_on_epona"]
+	path = mods/zelda_on_epona
+	url = https://github.com/baxlek/Zelda-on-Epona.git
+	branch = Mifi-custom
