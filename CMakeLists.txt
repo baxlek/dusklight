@@ -399,6 +399,11 @@ if (DUSK_ENABLE_CODE_MODS)
         if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
             list(APPEND DUSK_GAME_ABI_INLINE_OPTIONS
                     $<$<COMPILE_LANGUAGE:CXX>:-finline-hint-functions>)
+            if (APPLE)
+                # Equivalent constructor variants must share an address for by-name hooks.
+                list(APPEND DUSK_GAME_ABI_INLINE_OPTIONS
+                        "$<$<COMPILE_LANGUAGE:CXX>:SHELL:-Xclang -mconstructor-aliases>")
+            endif ()
         elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             list(APPEND DUSK_GAME_ABI_INLINE_OPTIONS
                     $<$<COMPILE_LANGUAGE:CXX>:-flive-patching=inline-clone>
