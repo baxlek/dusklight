@@ -394,13 +394,18 @@ endif ()
 # Hook reliability: prevent auto-inlining, guarantee patchable function entries,
 # and disable identical-code folding for game functions.
 if (DUSK_ENABLE_CODE_MODS)
-    set(DUSK_GAME_ABI_INLINE_OPTIONS)
+    set(DUSK_GAME_ABI_OPTIONS)
+    if (APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "^(AppleClang|Clang)$")
+        list(APPEND DUSK_GAME_ABI_OPTIONS
+                $<$<COMPILE_LANGUAGE:CXX>:-Xclang>
+                $<$<COMPILE_LANGUAGE:CXX>:-mconstructor-aliases>)
+    endif ()
     if (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
         if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-            list(APPEND DUSK_GAME_ABI_INLINE_OPTIONS
+            list(APPEND DUSK_GAME_ABI_OPTIONS
                     $<$<COMPILE_LANGUAGE:CXX>:-finline-hint-functions>)
         elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-            list(APPEND DUSK_GAME_ABI_INLINE_OPTIONS
+            list(APPEND DUSK_GAME_ABI_OPTIONS
                     $<$<COMPILE_LANGUAGE:CXX>:-flive-patching=inline-clone>
                     $<$<COMPILE_LANGUAGE:CXX>:-fno-inline-functions>
                     $<$<COMPILE_LANGUAGE:CXX>:-fno-inline-small-functions>
@@ -413,18 +418,18 @@ if (DUSK_ENABLE_CODE_MODS)
         endif ()
     endif ()
 
-    if (DUSK_GAME_ABI_INLINE_OPTIONS)
-        target_compile_options(dusklight PRIVATE ${DUSK_GAME_ABI_INLINE_OPTIONS})
+    if (DUSK_GAME_ABI_OPTIONS)
+        target_compile_options(dusklight PRIVATE ${DUSK_GAME_ABI_OPTIONS})
 
         foreach(jsystem_lib IN LISTS JSYSTEM_LIBRARIES)
-            target_compile_options(${jsystem_lib} PRIVATE ${DUSK_GAME_ABI_INLINE_OPTIONS})
+            target_compile_options(${jsystem_lib} PRIVATE ${DUSK_GAME_ABI_OPTIONS})
         endforeach()
         foreach(_sdk_lib aurora_card aurora_core aurora_dvd aurora_gd aurora_gx aurora_mtx
                 aurora_os aurora_pad aurora_si aurora_vi)
             if (TARGET ${_sdk_lib})
                 get_target_property(_sdk_lib_imported ${_sdk_lib} IMPORTED)
                 if (NOT _sdk_lib_imported)
-                    target_compile_options(${_sdk_lib} PRIVATE ${DUSK_GAME_ABI_INLINE_OPTIONS})
+                    target_compile_options(${_sdk_lib} PRIVATE ${DUSK_GAME_ABI_OPTIONS})
                 endif ()
             endif ()
         endforeach ()
